@@ -1,35 +1,44 @@
-use std::cmp::Ordering;
+extern crate sdl2;
 
-struct Vec3 {
-    x: f32,
-    y: f32,
-    z: f32,
-}
+mod device;
+mod vector;
+mod rasterization;
 
-fn sum(x: Vec3, y: Vec3) -> Vec3 {
-    Vec3{x: x.x + y.x, y: x.y + y.y, z: x.z + y.z}
-}
+use device::Device;
+use vector::Vec2;
+use rasterization::triangle;
 
-fn cmp(x: i32, y: i32) -> Ordering {
-    if x > y { Ordering::Greater }
-    else if x == y { Ordering::Equal }
-    else { Ordering::Less }
-}
 
-fn print_ordering(v: Ordering) {
-    if v == Ordering::Greater { println!("Greater"); }
-    else if v == Ordering::Equal { println!("Equal"); }
-    else { println!("Less"); }
-}
+pub fn main() {
+    let mut device = Device::new("rust software render", 800, 600);
 
-fn main() {
-    let a = Vec3{x: 1.0, y: 2.0, z: 3.0};
-    let b = Vec3{x: 4.0, y: 5.0, z: 6.0};
-    let c = sum(a, b);
-    println!("a+b=({}, {}, {})", c.x, c.y, c.z);
-
-    let x = 5;
-    let y = 7;
-    let r = cmp(x, y);
-    print_ordering(r);
+    while device.keyboard() {
+        device.clear(0xFFFFFF);
+        // for j in (1..100) {
+        //     for i in (1..60) {
+        //         triangle(&mut device.cbuffer,
+        //                  device.x_size,
+        //                  device.y_size,
+        //                  Vec2::new(790.0_f32, i as f32 * 10.0_f32),
+        //                  Vec2::new( 10.0_f32, i as f32 * 10.0_f32 + 5.0_f32),
+        //                  Vec2::new(790.0_f32, i as f32 * 10.0_f32 + 10.0_f32));
+        //     }
+        //     for i in (1..60) {
+        //         triangle(&mut device.cbuffer,
+        //                  device.x_size,
+        //                  device.y_size,
+        //                  Vec2::new( 10.0_f32, i as f32 * 10.0_f32 + 5.0_f32),
+        //                  Vec2::new(790.0_f32, i as f32 * 10.0_f32 + 10.0_f32),
+        //                  Vec2::new( 10.0_f32, i as f32 * 10.0_f32 + 15.0_f32));
+        //     }
+        // }
+        triangle(&mut device.cbuffer,
+                 device.x_size,
+                 device.y_size,
+                 Vec2::new(100.0_f32, 300.0_f32),
+                 Vec2::new(400.0_f32, 100.0_f32),
+                 Vec2::new(500.0_f32, 200.0_f32));
+        device.draw();
+        device.draw_fps();
+    }
 }
