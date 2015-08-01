@@ -2,7 +2,7 @@ use std::mem;
 use std::cmp;
 use cgmath::Point2;
 
-pub fn triangle(buffer: &mut Vec<u32>, x_size: usize, y_size: usize, p_a: Point2<f32>, p_b: Point2<f32>, p_c: Point2<f32>) {
+pub fn triangle(buffer: &mut Vec<u32>, x_size: usize, y_size: usize, p_a: Point2<f32>, p_b: Point2<f32>, p_c: Point2<f32>, color: u32) {
     let mut a = &p_a;
     let mut b = &p_b;
     let mut c = &p_c;
@@ -80,7 +80,7 @@ pub fn triangle(buffer: &mut Vec<u32>, x_size: usize, y_size: usize, p_a: Point2
                     let x1_int = cmp::min(cmp::max(x1 as i32, 0) as usize, x_size);
                     let x2_int = cmp::min(cmp::max(x2 as i32, 0) as usize, x_size) + 1;
                     for x in (x1_int..x2_int) {
-                        buffer[y * x_size + x] = 0x00FF00;
+                        buffer[y * x_size + x] = color;
                     }
                 }
                 

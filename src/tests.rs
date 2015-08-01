@@ -7,7 +7,7 @@ mod rasterization {
         let x_size: usize = 7;
         let y_size: usize = 5;
         let mut buffer: Vec<u32> = vec![0; x_size * y_size];
-        triangle(&mut buffer, x_size, y_size, a, b, c);
+        triangle(&mut buffer, x_size, y_size, a, b, c, 1);
         
         println!("");
         println!("real: ");
