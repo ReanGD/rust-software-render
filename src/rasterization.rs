@@ -72,16 +72,14 @@ pub fn triangle(buffer: &mut Vec<u32>, x_size: usize, y_size: usize, p_a: Point2
         if y_begin[i] < y_end[i] {
             let y_step = y_begin[i] as f32 + 0.5_f32 - point_base[i].y;
             let (x1_step, x2_step) = steps[i];
-            let mut x1 = point_base[i].x + y_step * x1_step + (0.5_f32 - epsilon);
-            let mut x2 = point_base[i].x + y_step * x2_step - (0.5_f32 + epsilon);
+            let mut x1 = point_base[i].x + y_step * x1_step + 0.5_f32 - epsilon;
+            let mut x2 = point_base[i].x + y_step * x2_step + 0.5_f32 - epsilon;
 
             for y in y_begin[i]..y_end[i] {
-                if x2 >= 0.0_f32 {
-                    let x1_int = cmp::min(cmp::max(x1 as i32, 0) as usize, x_size);
-                    let x2_int = cmp::min(cmp::max(x2 as i32, 0) as usize, x_size) + 1;
-                    for x in (x1_int..x2_int) {
-                        buffer[y * x_size + x] = color;
-                    }
+                let x1_int = cmp::min(cmp::max(x1 as i32, 0) as usize, x_size - 1);
+                let x2_int = cmp::min(cmp::max(x2 as i32, 0) as usize, x_size);
+                for x in (x1_int..x2_int) {
+                    buffer[y * x_size + x] = color;
                 }
                 
                 x1 += x1_step;
