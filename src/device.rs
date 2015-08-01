@@ -91,7 +91,7 @@ impl Device {
         }
     }
 
-    pub fn draw(&mut self) {
+    pub fn present(&mut self) {
         let cbuffer = &self.cbuffer;
         let y_size = self.y_size;
         let x_size = self.x_size;

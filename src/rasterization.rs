@@ -1,8 +1,8 @@
 use std::mem;
 use std::cmp;
-use vector::Vec2;
+use cgmath::Point2;
 
-pub fn triangle(buffer: &mut Vec<u32>, x_size: usize, y_size: usize, p_a: Vec2, p_b: Vec2, p_c: Vec2) {
+pub fn triangle(buffer: &mut Vec<u32>, x_size: usize, y_size: usize, p_a: Point2<f32>, p_b: Point2<f32>, p_c: Point2<f32>) {
     let mut a = &p_a;
     let mut b = &p_b;
     let mut c = &p_c;
@@ -93,11 +93,11 @@ pub fn triangle(buffer: &mut Vec<u32>, x_size: usize, y_size: usize, p_a: Vec2, 
 
 
 #[cfg(test)]
-mod tests {
-    use vector::Vec2;
+mod rasterization {
+    use cgmath::Point2;
     use rasterization::triangle;
 
-    fn triangle_test(a: Vec2, b: Vec2, c: Vec2, buffer_except: Vec<u32>) {
+    fn triangle_test(a: Point2<f32>, b: Point2<f32>, c: Point2<f32>, buffer_except: Vec<u32>) {
         let x_size: usize = 7;
         let y_size: usize = 5;
         let mut buffer: Vec<u32> = vec![0; x_size * y_size];
@@ -133,7 +133,7 @@ mod tests {
 
     #[test]
     fn triangle_00() {
-        triangle_test(Vec2::new(1.0,4.0), Vec2::new(2.0,1.0), Vec2::new(6.0,3.0),
+        triangle_test(Point2::new(1.0,4.0), Point2::new(2.0,1.0), Point2::new(6.0,3.0),
                       vec![0,0,0,0,0,0,0,
                            0,1,1,0,0,0,0,
                            0,1,1,1,1,0,0,
@@ -143,7 +143,7 @@ mod tests {
 
     #[test]
     fn triangle_01() {
-        triangle_test(Vec2::new(1.4,1.6), Vec2::new(2.4,1.6), Vec2::new(2.4,2.6),
+        triangle_test(Point2::new(1.4,1.6), Point2::new(2.4,1.6), Point2::new(2.4,2.6),
                       vec![0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
@@ -153,7 +153,7 @@ mod tests {
 
     #[test]
     fn triangle_02() {
-        triangle_test(Vec2::new(3.5,1.5), Vec2::new(4.5,1.5), Vec2::new(4.5,2.5),
+        triangle_test(Point2::new(3.5,1.5), Point2::new(4.5,1.5), Point2::new(4.5,2.5),
                       vec![0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
@@ -163,7 +163,7 @@ mod tests {
     
     #[test]
     fn triangle_03() {
-        triangle_test(Vec2::new(2.5,2.5), Vec2::new(2.5,2.5), Vec2::new(2.5,2.5),
+        triangle_test(Point2::new(2.5,2.5), Point2::new(2.5,2.5), Point2::new(2.5,2.5),
                       vec![0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
@@ -173,7 +173,7 @@ mod tests {
     
     #[test]
     fn triangle_04() {
-        triangle_test(Vec2::new(0.0,0.0), Vec2::new(4.0,0.0), Vec2::new(6.0,2.0),
+        triangle_test(Point2::new(0.0,0.0), Point2::new(4.0,0.0), Point2::new(6.0,2.0),
                       vec![0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
@@ -183,7 +183,7 @@ mod tests {
     
     #[test]
     fn triangle_05() {
-        triangle_test(Vec2::new(1.0,2.0), Vec2::new(4.0,1.0), Vec2::new(3.0,4.0),
+        triangle_test(Point2::new(1.0,2.0), Point2::new(4.0,1.0), Point2::new(3.0,4.0),
                       vec![0,0,0,0,0,0,0,
                            0,0,1,0,0,0,0,
                            0,1,1,0,0,0,0,
@@ -193,7 +193,7 @@ mod tests {
 
     #[test]
     fn triangle_06() {
-        triangle_test(Vec2::new(5.5,2.5), Vec2::new(4.0,1.0), Vec2::new(3.0,4.0),
+        triangle_test(Point2::new(5.5,2.5), Point2::new(4.0,1.0), Point2::new(3.0,4.0),
                       vec![0,0,0,0,0,0,0,
                            0,0,0,1,0,0,0,
                            0,0,0,1,1,0,0,
@@ -203,7 +203,7 @@ mod tests {
 
     #[test]
     fn triangle_07() {
-        triangle_test(Vec2::new(1.5,0.5), Vec2::new(2.5,0.5), Vec2::new(1.5,-2.0),
+        triangle_test(Point2::new(1.5,0.5), Point2::new(2.5,0.5), Point2::new(1.5,-2.0),
                       vec![0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
@@ -213,7 +213,7 @@ mod tests {
 
     #[test]
     fn triangle_08() {
-        triangle_test(Vec2::new(0.7,3.5), Vec2::new(2.5,0.7), Vec2::new(4.6,3.5),
+        triangle_test(Point2::new(0.7,3.5), Point2::new(2.5,0.7), Point2::new(4.6,3.5),
                       vec![0,0,0,0,0,0,0,
                            0,1,1,1,1,0,0,
                            0,1,1,1,0,0,0,
@@ -223,7 +223,7 @@ mod tests {
 
     #[test]
     fn triangle_09() {
-        triangle_test(Vec2::new(0.7,1.5), Vec2::new(2.7,3.2), Vec2::new(4.7,1.5),
+        triangle_test(Point2::new(0.7,1.5), Point2::new(2.7,3.2), Point2::new(4.7,1.5),
                       vec![0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
                            0,0,1,1,0,0,0,
@@ -233,7 +233,7 @@ mod tests {
 
     #[test]
     fn triangle_10() {
-        triangle_test(Vec2::new(0.5,0.5), Vec2::new(0.5,2.5), Vec2::new(1.5,1.5),
+        triangle_test(Point2::new(0.5,0.5), Point2::new(0.5,2.5), Point2::new(1.5,1.5),
                       vec![0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
@@ -243,7 +243,7 @@ mod tests {
 
     #[test]
     fn triangle_11() {
-        triangle_test(Vec2::new(0.5,0.5), Vec2::new(0.5,2.5), Vec2::new(2.5,2.5),
+        triangle_test(Point2::new(0.5,0.5), Point2::new(0.5,2.5), Point2::new(2.5,2.5),
                       vec![0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
                            1,1,0,0,0,0,0,
@@ -253,7 +253,7 @@ mod tests {
 
     #[test]
     fn triangle_12() {
-        triangle_test(Vec2::new(0.5,0.5), Vec2::new(2.5,2.5), Vec2::new(2.5,0.5),
+        triangle_test(Point2::new(0.5,0.5), Point2::new(2.5,2.5), Point2::new(2.5,0.5),
                       vec![0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
@@ -263,7 +263,7 @@ mod tests {
 
     #[test]
     fn triangle_13() {
-        triangle_test(Vec2::new(0.5,3.5), Vec2::new(1.5,2.5), Vec2::new(1.5,0.5),
+        triangle_test(Point2::new(0.5,3.5), Point2::new(1.5,2.5), Point2::new(1.5,0.5),
                       vec![0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
@@ -273,7 +273,7 @@ mod tests {
 
     #[test]
     fn triangle_14() {
-        triangle_test(Vec2::new(0.5,3.5), Vec2::new(1.5,2.5), Vec2::new(2.0,5.0),
+        triangle_test(Point2::new(0.5,3.5), Point2::new(1.5,2.5), Point2::new(2.0,5.0),
                       vec![0,1,0,0,0,0,0,
                            1,1,0,0,0,0,0,
                            0,0,0,0,0,0,0,
@@ -283,7 +283,7 @@ mod tests {
 
     #[test]
     fn triangle_15() {
-        triangle_test(Vec2::new(0.5,0.5), Vec2::new(2.5,0.5), Vec2::new(0.5,2.5),
+        triangle_test(Point2::new(0.5,0.5), Point2::new(2.5,0.5), Point2::new(0.5,2.5),
                       vec![0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
@@ -293,7 +293,7 @@ mod tests {
 
     #[test]
     fn triangle_16() {
-        triangle_test(Vec2::new(2.5,2.5), Vec2::new(2.5,0.5), Vec2::new(0.5,2.5),
+        triangle_test(Point2::new(2.5,2.5), Point2::new(2.5,0.5), Point2::new(0.5,2.5),
                       vec![0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0,
                            1,1,0,0,0,0,0,
