@@ -1,0 +1,21 @@
+language: rust
+# sudo: required
+rust:
+  # - beta
+  # - nightly
+  - stable
+os:
+  - linux
+  # - osx
+install:
+  - sudo add-apt-repository ppa:team-xbmc/ppa -y
+  - sudo apt-get update -q
+  - sudo apt-get install libsdl2-dev
+before_script:
+  - rustc -V
+  - cargo -V
+script:
+  - cargo build -v
+  # - (cd src/sdl_mixer && cargo build -v)
+  # - (cd src/sdl_image && cargo build -v)
+  # - (cd src/sdl-demo && cargo build -v)
