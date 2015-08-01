@@ -4,5 +4,6 @@ version = "0.1.0"
 authors = ["ReanGD"]
 
 [dependencies]
+rand = "*"
 sdl2 = "*"
 cgmath = "*"
