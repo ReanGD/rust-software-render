@@ -3,6 +3,7 @@ extern crate cgmath;
 
 mod device;
 mod rasterization;
+mod tests;
 
 use device::Device;
 use cgmath::Point2;
