@@ -18,4 +18,4 @@ before_script:
   - cargo -V
 script:
   - cargo build --release -v
-  - cargo test --release -v
+  - cargo test -v
