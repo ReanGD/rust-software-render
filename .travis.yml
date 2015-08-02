@@ -19,3 +19,9 @@ before_script:
 script:
   - cargo build --release -v
   - cargo test -v
+notifications:
+  email:
+    recipients:
+      - reangd@yandex.ru
+    on_success: never
+    on_failure: always
