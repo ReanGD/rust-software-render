@@ -20,7 +20,7 @@ pub fn main() {
     let y_range = Range::new(-50f32, device.y_size as f32 + 50f32);
     let mut rng = rand::thread_rng();
 
-    let cnt = 16000;
+    let cnt = 16000
     let mut points: Vec<Point2<f32>> = vec![];
     let mut colors: Vec<u32> = vec![];
     for _ in 0..cnt {
