@@ -1,4 +1,3 @@
-extern crate rand;
 extern crate sdl2;
 extern crate cgmath;
 
@@ -6,38 +5,60 @@ mod device;
 mod rasterization;
 mod tests;
 
-use cgmath::Point2;
-use rand::distributions::{IndependentSample, Range};
+use cgmath::*;
+// use cgmath::matrix::to_matrix4;
 
 use device::Device;
 use rasterization::triangle;
 
+
 pub fn main() {
     let mut device = Device::new("rust software render", 800, 600);
 
-    let color_range = Range::new(0, std::u32::MAX);
-    let x_range = Range::new(-50f32, device.x_size as f32 + 50f32);
-    let y_range = Range::new(-50f32, device.y_size as f32 + 50f32);
-    let mut rng = rand::thread_rng();
+    // 1-2-3 1-3-4
+    let p1 = Vector4::new(-5.0_f32,  5.0_f32, 0.0_f32, 1.0_f32);
+    let p2 = Vector4::new( 5.0_f32,  5.0_f32, 0.0_f32, 1.0_f32);
+    let p3 = Vector4::new( 5.0_f32, -5.0_f32, 0.0_f32, 1.0_f32);
+    let p4 = Vector4::new(-5.0_f32, -5.0_f32, 0.0_f32, 1.0_f32);
 
-    let cnt = 16000;
-    let mut points: Vec<Point2<f32>> = vec![];
-    let mut colors: Vec<u32> = vec![];
-    for _ in 0..cnt {
-        points.push(Point2::new(x_range.ind_sample(&mut rng), y_range.ind_sample(&mut rng)));
-        points.push(Point2::new(x_range.ind_sample(&mut rng), y_range.ind_sample(&mut rng)));
-        points.push(Point2::new(x_range.ind_sample(&mut rng), y_range.ind_sample(&mut rng)));
-        colors.push(color_range.ind_sample(&mut rng));
-    }
-    
+    let eye = Point3::new(0.0_f32, 0.0_f32, -20.0_f32);
+	let center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
+	let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
+    let fovy = deg(130.0_f32);
+    let aspect = 800.0_f32/600.0_f32;
+    let near = 0.1_f32;
+    let far = 100.0_f32;
+
+    let mat_view = Matrix4::<f32>::look_at(&eye, &center, &up);
+    let mat_proj = perspective(fovy, aspect, near, far);
+
+
+    let mut angle = rad(0.0_f32);
+    let add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
     while device.keyboard() {
         device.clear(0xFFFFFF);
-        for i in 0..cnt {
-            triangle(&mut device.cbuffer,
-                     device.x_size,
-                     device.y_size,
-                     points[i*3 + 0], points[i*3 + 1], points[i*3 + 2], colors[i]);
+
+        angle = angle + add_angle;
+        let mat_world = Matrix4::from(Matrix3::from_angle_y(angle));
+        let mat = mat_proj * mat_view * mat_world;
+        // let mat = mat_world * mat_view * mat_proj;
+        let mut points: Vec<Point2<f32>> = vec![];
+        for p in &[p1, p2, p3, p4] {
+            let p_screen = mat.mul_v(&p);
+            points.push(
+                Point2::new(
+                    (p_screen.x/p_screen.w + 1.0_f32) * 800_f32 * 0.5_f32,
+                    (p_screen.y/p_screen.w + 1.0_f32) * 600_f32 * 0.5_f32));
         }
+        
+        triangle(&mut device.cbuffer,
+                 device.x_size,
+                 device.y_size,
+                 points[0], points[1], points[2], 0xFF00FF);
+        triangle(&mut device.cbuffer,
+                 device.x_size,
+                 device.y_size,
+                 points[0], points[2], points[3], 0x00FFFF);
         device.present();
         device.draw_fps();
     }
