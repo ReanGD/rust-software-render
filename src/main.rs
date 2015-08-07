@@ -1,4 +1,5 @@
 extern crate sdl2;
+extern crate rand;
 extern crate time;
 extern crate cgmath;
 
@@ -10,7 +11,7 @@ mod tests;
 use cgmath::*;
 
 use device::Device;
-use mesh::{Mesh, GenerateSquare};
+use mesh::generate_cube;
 
 // fn typed_to_bytes<T>(slice: &[T]) -> &[u8] {
 //     unsafe {
@@ -44,7 +45,7 @@ use mesh::{Mesh, GenerateSquare};
 pub fn main() {    
     let mut device = Device::new("rust software render", 800, 600);
 
-    let eye = Point3::new(0.0_f32, 0.0_f32, -20.0_f32);
+    let eye = Point3::new(0.0_f32, 0.0_f32, -2.0_f32);
 	let center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
 	let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
     let fovy = deg(130.0_f32);
@@ -58,7 +59,7 @@ pub fn main() {
     let mut angle = rad(0.0_f32);
     let add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
 
-    let mesh = GenerateSquare();
+    let mesh = generate_cube();
     while device.keyboard() {
         device.clear(0xFFFFFF);
 
