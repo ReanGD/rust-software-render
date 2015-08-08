@@ -1,3 +1,4 @@
+use std;
 use sdl2;
 use time;
 
@@ -45,6 +46,7 @@ pub struct Device {
     texture: sdl2::render::Texture,
     fps: Fps,
     pub cbuffer: Vec<u32>,
+    pub zbuffer: Vec<f32>,
     pub y_size: usize,
     pub x_size: usize,
 }
@@ -67,6 +69,7 @@ impl Device {
         let texture = renderer.create_texture_streaming(format, (width, height)).unwrap();
         let size = (width as usize)*(height as usize);
         let cbuffer = vec![0; size];
+        let zbuffer = vec![std::f32::MAX; size];
 
         let mut fps = Fps::new(5);
         fps.start();
@@ -77,6 +80,7 @@ impl Device {
             texture: texture,
             fps: fps,
             cbuffer: cbuffer,
+            zbuffer: zbuffer,
             y_size: height as usize,
             x_size: width as usize,
         }
@@ -121,6 +125,7 @@ impl Device {
         for y in (0..self.y_size) {
             for x in (0..self.x_size) {
                 self.cbuffer[y*self.x_size+x] = color;
+                self.zbuffer[y*self.x_size+x] = 0.0_f32;
             }
         }
     }

@@ -1,8 +1,8 @@
 use std::mem;
 use std::cmp;
-use cgmath::Point2;
+use cgmath::Point3;
 
-pub fn triangle(buffer: &mut Vec<u32>, x_size: usize, y_size: usize, p_a: Point2<f32>, p_b: Point2<f32>, p_c: Point2<f32>, color: u32) {
+pub fn triangle(cbuffer: &mut Vec<u32>, zbuffer: &mut Vec<f32>, x_size: usize, y_size: usize, p_a: Point3<f32>, p_b: Point3<f32>, p_c: Point3<f32>, color: u32) {
     let mut a = &p_a;
     let mut b = &p_b;
     let mut c = &p_c;
@@ -33,19 +33,19 @@ pub fn triangle(buffer: &mut Vec<u32>, x_size: usize, y_size: usize, p_a: Point2
     // steps for line
     let epsilon = 0.0001_f32;
     let step_ab = if a.y - b.y > epsilon {
-        (a.x - b.x) / (a.y - b.y)
+        ((a.x - b.x) / (a.y - b.y), (a.z - b.z) / (a.y - b.y))
     } else {
-        0.0_f32
+        (0.0_f32, 0.0_f32)
     };
     let step_ac = if a.y - c.y > epsilon {
-        (a.x - c.x) / (a.y - c.y)
+        ((a.x - c.x) / (a.y - c.y), (a.z - c.z) / (a.y - c.y))
     } else {
-        0.0_f32
+        (0.0_f32, 0.0_f32)
     };
     let step_bc = if b.y - c.y > epsilon {
-        (b.x - c.x) / (b.y - c.y)
+        ((b.x - c.x) / (b.y - c.y), (b.z - c.z) / (b.y - c.y))
     } else {
-        0.0_f32
+        (0.0_f32, 0.0_f32)
     };
 
     // y-ranges: [y0; y1) + [y1; y2)
@@ -71,19 +71,34 @@ pub fn triangle(buffer: &mut Vec<u32>, x_size: usize, y_size: usize, p_a: Point2
     for i in (0..2) {
         if y_begin[i] < y_end[i] {
             let y_step = y_begin[i] as f32 + 0.5_f32 - point_base[i].y;
-            let (x1_step, x2_step) = steps[i];
+            let ((x1_step, z1_step), (x2_step, z2_step)) = steps[i];
             let mut x1 = point_base[i].x + y_step * x1_step + 0.5_f32 - epsilon;
+            let mut z1 = point_base[i].z + y_step * z1_step; // inverse z
             let mut x2 = point_base[i].x + y_step * x2_step + 0.5_f32 - epsilon;
+            let dx_step = x1_step - x2_step;
+            let dz_step = z1_step - z2_step;
+            let mut dx = y_step * dx_step;
+            let mut dz = y_step * dz_step;
 
             for y in y_begin[i]..y_end[i] {
                 let x1_int = cmp::min(cmp::max(x1 as i32, 0) as usize, x_size - 1);
                 let x2_int = cmp::min(cmp::max(x2 as i32, 0) as usize, x_size);
-                for x in (x1_int..x2_int) {
-                    buffer[y * x_size + x] = color;
+                if x2_int > x1_int {
+                    let z_step = dz / dx;
+                    let mut z = z1 + z_step * (x1_int as f32 - x1 - epsilon); // inverse z
+                    for x in (x1_int..x2_int) {
+                        z += z_step;
+                        if zbuffer[y * x_size + x] < z {
+                            cbuffer[y * x_size + x] = color;
+                            zbuffer[y * x_size + x] = z;
+                        }
+                    }
                 }
-                
                 x1 += x1_step;
                 x2 += x2_step;
+                dx += dx_step;
+                z1 += z1_step;
+                dz += dz_step;
             }
         }
     }

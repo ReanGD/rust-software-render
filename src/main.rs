@@ -45,10 +45,10 @@ use mesh::generate_cube;
 pub fn main() {    
     let mut device = Device::new("rust software render", 800, 600);
 
-    let eye = Point3::new(0.0_f32, 0.0_f32, -2.0_f32);
+    let eye = Point3::new(0.0_f32, 0.7_f32, -1.1_f32);
 	let center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
 	let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
-    let fovy = deg(130.0_f32);
+    let fovy = deg(100.0_f32);
     let aspect = 800.0_f32/600.0_f32;
     let near = 0.1_f32;
     let far = 100.0_f32;

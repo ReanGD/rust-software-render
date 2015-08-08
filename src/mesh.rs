@@ -54,18 +54,21 @@ impl Mesh {
     pub fn draw(&self, mat: &Matrix4<f32>, device: &mut Device) {
         for triangle_index in 0..self.index_buffer.len() / 3 {
             let color = self.colors[triangle_index];
-            let mut points: Vec<Point2<f32>> = vec![];
+            let mut points: Vec<Point3<f32>> = vec![];
             for i in 0..3 {
                 let ind = self.index_buffer[triangle_index * 3 + i] as usize;
                 let v3 = self.vertex_buffer[ind].position;
                 let v4 = Vector4::<f32>::new(v3.x, v3.y, v3.z, 1.0_f32);
                 let p_screen = mat.mul_v(&v4);
+                let inverse_w = 1.0_f32 / p_screen.w;
                 points.push(
-                    Point2::new(
-                        (p_screen.x/p_screen.w + 1.0_f32) * device.x_size as f32 * 0.5_f32,
-                        (p_screen.y/p_screen.w + 1.0_f32) * device.y_size as f32 * 0.5_f32));
+                    Point3::new(
+                        (p_screen.x * inverse_w + 1.0_f32) * device.x_size as f32 * 0.5_f32,
+                        (p_screen.y * inverse_w + 1.0_f32) * device.y_size as f32 * 0.5_f32,
+                        inverse_w));
             }
             triangle(&mut device.cbuffer,
+                     &mut device.zbuffer,
                      device.x_size,
                      device.y_size,
                      points[0], points[1], points[2], color);
