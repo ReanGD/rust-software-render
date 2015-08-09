@@ -5,6 +5,7 @@ extern crate cgmath;
 
 mod device;
 mod mesh;
+mod mesh3ds;
 mod rasterization;
 mod tests;
 
@@ -12,35 +13,8 @@ use cgmath::*;
 
 use device::Device;
 use mesh::generate_cube;
+use mesh3ds::Loader3ds;
 
-// fn typed_to_bytes<T>(slice: &[T]) -> &[u8] {
-//     unsafe {
-//         std::slice::from_raw_parts(slice.as_ptr() as *const u8,
-//                                    slice.len() * std::mem::size_of::<T>())
-//     }
-// }
-
-// fn bytes_to_typed<T>(slice: &mut [u8]) -> &mut [T] {
-//     unsafe {
-//     std::slice::from_raw_parts_mut(slice.as_mut_ptr() as *mut T,
-//                                    slice.len() / std::mem::size_of::<T>())
-//             }
-// }
-    // let a: Vec<f32> = vec![0.55_f32];
-    // for it in &a {
-    //     println!("{}", it);
-    // }
-
-    // let b = typed_to_bytes(&a);
-    // for it in b {
-    //     println!("0x{:x}",it);
-    // }
-
-    // let mut aa: Vec<u8> = vec![0xcd, 0xcc, 0x0c, 0x3f];
-    // let c = bytes_to_typed::<f32>(&mut aa);
-    // for it in c {
-    //     println!("{}",*it);
-    // }
 
 pub fn main() {    
     let mut device = Device::new("rust software render", 800, 600);
@@ -60,6 +34,8 @@ pub fn main() {
     let add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
 
     let mesh = generate_cube();
+    let path = "../media/cube.3ds";
+    Loader3ds::load(&path).unwrap();
     while device.keyboard() {
         device.clear(0xFFFFFF);
 
