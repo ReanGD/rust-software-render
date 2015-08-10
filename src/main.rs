@@ -12,14 +12,13 @@ mod tests;
 use cgmath::*;
 
 use device::Device;
-use mesh::generate_cube;
 use mesh3ds::Loader3ds;
 
 
 pub fn main() {    
     let mut device = Device::new("rust software render", 800, 600);
 
-    let eye = Point3::new(0.0_f32, 0.7_f32, -1.1_f32);
+    let eye = Point3::new(0.0_f32, 0.7_f32, -5.1_f32);
 	let center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
 	let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
     let fovy = deg(100.0_f32);
@@ -33,9 +32,8 @@ pub fn main() {
     let mut angle = rad(0.0_f32);
     let add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
 
-    let mesh = generate_cube();
-    let path = "../media/cube.3ds";
-    Loader3ds::load(&path).unwrap();
+    let path = "../media/ring.3ds";
+    let mesh = Loader3ds::load(&path).unwrap();
     while device.keyboard() {
         device.clear(0xFFFFFF);
 

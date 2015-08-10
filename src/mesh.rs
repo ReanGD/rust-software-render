@@ -25,30 +25,29 @@ pub struct Mesh {
 }
 
 impl Mesh {
-    pub fn new(vertex_cnt: usize, triagle_cnt: usize) -> Mesh {
-        let vertex_buffer: Vec<Vertex> = vec![Vertex::new(); vertex_cnt];
-        let index_buffer: Vec<u32> = vec![0; triagle_cnt * 3];
-        let mut colors: Vec<u32> = vec![];
-        
+    pub fn new() -> Mesh {
+        Mesh {
+            vertex_buffer: Vec::<Vertex>::new(),
+            index_buffer: Vec::<u32>::new(),
+            colors: Vec::<u32>::new(),
+        }
+    }
+
+    pub fn vertex(&mut self, buffer: Vec<Vertex>) {
+        self.vertex_buffer = buffer;
+    }
+
+    pub fn index(&mut self, buffer: Vec<u32>) {
+        self.index_buffer = buffer;
+
         let color_range = Range::new(0, std::u32::MAX);
         let mut rng = rand::thread_rng();
-        for _ in 0..triagle_cnt {
-            colors.push(color_range.ind_sample(&mut rng));
+        let triagle_cnt = self.index_buffer.len() / 3;
+        let mut colors: Vec<u32> = vec![0; triagle_cnt];
+        for i in 0..triagle_cnt {
+            colors[i] = color_range.ind_sample(&mut rng);
         }
-
-        Mesh {
-            vertex_buffer: vertex_buffer,
-            index_buffer: index_buffer,
-            colors: colors,
-        }
-    }
-
-    pub fn get_vertex(&mut self) -> &mut Vec<Vertex> {
-        &mut self.vertex_buffer
-    }
-
-    pub fn get_index(&mut self) -> &mut Vec<u32> {
-        &mut self.index_buffer
+        self.colors = colors;
     }
 
     pub fn draw(&self, mat: &Matrix4<f32>, device: &mut Device) {
@@ -79,66 +78,62 @@ impl Mesh {
 
 #[allow(dead_code)]
 pub fn generate_square() -> Mesh {
-    let mut mesh = Mesh::new(4, 2);
-    {
-        let mut vb = mesh.get_vertex();
-        vb[0].position = Vector3::new(-0.5_f32,  0.5_f32, 0.0_f32);
-        vb[1].position = Vector3::new( 0.5_f32,  0.5_f32, 0.0_f32);
-        vb[2].position = Vector3::new( 0.5_f32, -0.5_f32, 0.0_f32);
-        vb[3].position = Vector3::new(-0.5_f32, -0.5_f32, 0.0_f32);
-    }
-    {
-        let mut ib = mesh.get_index();
-        ib[0] = 0;
-        ib[1] = 1;
-        ib[2] = 2;
-        ib[3] = 0;
-        ib[4] = 2;
-        ib[5] = 3;
-    }
+    let mut mesh = Mesh::new();
+    let mut vb: Vec<Vertex> = vec![Vertex::new(); 4];
+    vb[0].position = Vector3::new(-0.5_f32,  0.5_f32, 0.0_f32);
+    vb[1].position = Vector3::new( 0.5_f32,  0.5_f32, 0.0_f32);
+    vb[2].position = Vector3::new( 0.5_f32, -0.5_f32, 0.0_f32);
+    vb[3].position = Vector3::new(-0.5_f32, -0.5_f32, 0.0_f32);
+    mesh.vertex(vb);
+    let mut ib: Vec<u32> = vec![0; 2 * 3];
+    ib[0] = 0;
+    ib[1] = 1;
+    ib[2] = 2;
+    ib[3] = 0;
+    ib[4] = 2;
+    ib[5] = 3;
+    mesh.index(ib);
 
     mesh
 }
 
 #[allow(dead_code)]
 pub fn generate_cube() -> Mesh {
-    let mut mesh = Mesh::new(24, 12);
-    {
-        let mut vb = mesh.get_vertex();
-	    vb[ 0].position	= Vector3::new(-0.5_f32,-0.5_f32,-0.5_f32);
-	    vb[ 1].position	= Vector3::new(-0.5_f32, 0.5_f32,-0.5_f32);
-	    vb[ 2].position	= Vector3::new( 0.5_f32, 0.5_f32,-0.5_f32);
-	    vb[ 3].position	= Vector3::new( 0.5_f32,-0.5_f32,-0.5_f32);
-	    vb[ 4].position	= Vector3::new( 0.5_f32,-0.5_f32, 0.5_f32);
-	    vb[ 5].position	= Vector3::new( 0.5_f32, 0.5_f32, 0.5_f32);
-	    vb[ 6].position	= Vector3::new(-0.5_f32, 0.5_f32, 0.5_f32);
-	    vb[ 7].position	= Vector3::new(-0.5_f32,-0.5_f32, 0.5_f32);
-	    vb[ 8].position	= Vector3::new(-0.5_f32,-0.5_f32, 0.5_f32);
-	    vb[ 9].position	= Vector3::new(-0.5_f32, 0.5_f32, 0.5_f32);
-	    vb[10].position	= Vector3::new(-0.5_f32, 0.5_f32,-0.5_f32);
-	    vb[11].position	= Vector3::new(-0.5_f32,-0.5_f32,-0.5_f32);
-	    vb[12].position	= Vector3::new( 0.5_f32,-0.5_f32,-0.5_f32);
-	    vb[13].position	= Vector3::new( 0.5_f32, 0.5_f32,-0.5_f32);
-	    vb[14].position	= Vector3::new( 0.5_f32, 0.5_f32, 0.5_f32);
-	    vb[15].position	= Vector3::new( 0.5_f32,-0.5_f32, 0.5_f32);
-	    vb[16].position	= Vector3::new(-0.5_f32,-0.5_f32, 0.5_f32);
-	    vb[17].position	= Vector3::new(-0.5_f32,-0.5_f32,-0.5_f32);
-	    vb[18].position	= Vector3::new( 0.5_f32,-0.5_f32,-0.5_f32);
-	    vb[19].position	= Vector3::new( 0.5_f32,-0.5_f32, 0.5_f32);
-	    vb[20].position	= Vector3::new(-0.5_f32, 0.5_f32,-0.5_f32);
-	    vb[21].position	= Vector3::new(-0.5_f32, 0.5_f32, 0.5_f32);
-	    vb[22].position	= Vector3::new( 0.5_f32, 0.5_f32, 0.5_f32);
-	    vb[23].position	= Vector3::new( 0.5_f32, 0.5_f32,-0.5_f32);
-    }
-    {
-        let mut ib = mesh.get_index();
-	    for i in 0..6 {
-		    let sm = (i * 4) as u32;
-            let ind = i * 6;
-		    ib[ind + 0] = sm + 0; ib[ind + 1] = sm + 1; ib[ind + 2] = sm + 2;
-		    ib[ind + 3] = sm + 0; ib[ind + 4] = sm + 2; ib[ind + 5] = sm + 3;
-	    }
-    }
+    let mut mesh = Mesh::new();
+    let mut vb: Vec<Vertex> = vec![Vertex::new(); 24];
+	vb[ 0].position	= Vector3::new(-0.5_f32,-0.5_f32,-0.5_f32);
+	vb[ 1].position	= Vector3::new(-0.5_f32, 0.5_f32,-0.5_f32);
+	vb[ 2].position	= Vector3::new( 0.5_f32, 0.5_f32,-0.5_f32);
+	vb[ 3].position	= Vector3::new( 0.5_f32,-0.5_f32,-0.5_f32);
+	vb[ 4].position	= Vector3::new( 0.5_f32,-0.5_f32, 0.5_f32);
+	vb[ 5].position	= Vector3::new( 0.5_f32, 0.5_f32, 0.5_f32);
+	vb[ 6].position	= Vector3::new(-0.5_f32, 0.5_f32, 0.5_f32);
+	vb[ 7].position	= Vector3::new(-0.5_f32,-0.5_f32, 0.5_f32);
+	vb[ 8].position	= Vector3::new(-0.5_f32,-0.5_f32, 0.5_f32);
+	vb[ 9].position	= Vector3::new(-0.5_f32, 0.5_f32, 0.5_f32);
+	vb[10].position	= Vector3::new(-0.5_f32, 0.5_f32,-0.5_f32);
+	vb[11].position	= Vector3::new(-0.5_f32,-0.5_f32,-0.5_f32);
+	vb[12].position	= Vector3::new( 0.5_f32,-0.5_f32,-0.5_f32);
+	vb[13].position	= Vector3::new( 0.5_f32, 0.5_f32,-0.5_f32);
+	vb[14].position	= Vector3::new( 0.5_f32, 0.5_f32, 0.5_f32);
+	vb[15].position	= Vector3::new( 0.5_f32,-0.5_f32, 0.5_f32);
+	vb[16].position	= Vector3::new(-0.5_f32,-0.5_f32, 0.5_f32);
+	vb[17].position	= Vector3::new(-0.5_f32,-0.5_f32,-0.5_f32);
+	vb[18].position	= Vector3::new( 0.5_f32,-0.5_f32,-0.5_f32);
+	vb[19].position	= Vector3::new( 0.5_f32,-0.5_f32, 0.5_f32);
+	vb[20].position	= Vector3::new(-0.5_f32, 0.5_f32,-0.5_f32);
+	vb[21].position	= Vector3::new(-0.5_f32, 0.5_f32, 0.5_f32);
+	vb[22].position	= Vector3::new( 0.5_f32, 0.5_f32, 0.5_f32);
+	vb[23].position	= Vector3::new( 0.5_f32, 0.5_f32,-0.5_f32);
+    mesh.vertex(vb);
+    let mut ib: Vec<u32> = vec![0; 12 * 3];
+	for i in 0..6 {
+		let sm = (i * 4) as u32;
+        let ind = i * 6;
+		ib[ind + 0] = sm + 0; ib[ind + 1] = sm + 1; ib[ind + 2] = sm + 2;
+		ib[ind + 3] = sm + 0; ib[ind + 4] = sm + 2; ib[ind + 5] = sm + 3;
+	}
+    mesh.index(ib);
 
     mesh
 }
