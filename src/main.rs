@@ -18,8 +18,10 @@ use mesh3ds::Loader3ds;
 pub fn main() {    
     let mut device = Device::new("rust software render", 800, 600);
 
-    let eye = Point3::new(0.0_f32, 0.7_f32, -10.1_f32);
+    let eye = Point3::new(0.0_f32, 0.0_f32, -1.1_f32);
 	let center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
+    // let eye = Point3::new(0.0_f32, 3.0_f32, -7.1_f32);
+	// let center = Point3::new(0.0_f32, 3.0_f32, 0.0_f32);
 	let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
     let fovy = deg(100.0_f32);
     let aspect = 800.0_f32/600.0_f32;
@@ -32,8 +34,8 @@ pub fn main() {
     let mut angle = rad(0.0_f32);
     let add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
 
-    // let path = "../media/ring.3ds";
-    let path = "../media/tux.3ds";
+    let path = "../media/ring.3ds";
+    // let path = "../media/tux.3ds";
     // let path = "../media/yoda.3ds";
     // let path = "../media/cube.3ds";
     // let path = "../media/model.3ds";
@@ -44,8 +46,8 @@ pub fn main() {
         angle = angle + add_angle;
         let mat_world = Matrix4::from(Matrix3::from_angle_y(angle));
         let mat = mat_proj * mat_view * mat_world;
-        mesh.draw(&mat, &mut device);
+        let cnt_triangle = mesh.draw(&mat, &mat_world, &mut device);
         device.present();
-        device.draw_fps();
+        device.update_fps(cnt_triangle);
     }
 }

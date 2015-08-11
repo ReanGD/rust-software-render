@@ -4,8 +4,10 @@ use time;
 
 struct Fps {
     pub fps: f32,
+    pub mega_tps: u32,
     counter_max: u32,
     counter: u32,
+    triangle_counter: u32,
     time_start: u64,
 }
 
@@ -13,8 +15,10 @@ impl Fps {
     pub fn new(counter_max: u32) -> Fps {
         Fps {
             fps: 0.0_f32,
+            mega_tps: 0,
             counter_max: counter_max,
             counter: 0,
+            triangle_counter: 0,
             time_start: 0,
         }
     }
@@ -22,17 +26,22 @@ impl Fps {
     pub fn start(&mut self) {
         self.time_start = time::precise_time_ns();
         self.counter = 0;
+        self.triangle_counter = 0;
         self.fps = 0.0_f32;
+        self.mega_tps = 0;
     }
 
-    pub fn update(&mut self) -> bool {
+    pub fn update(&mut self, cnt_triangle: u32) -> bool {
         self.counter += 1;
+        self.triangle_counter += cnt_triangle;
         if self.counter == self.counter_max {
             let cur_time = time::precise_time_ns();
             let dt = ((cur_time - self.time_start) / 1000000) as f32;
             self.time_start = cur_time;
             self.fps = (self.counter_max * 1000) as f32 / dt;
+            self.mega_tps = self.triangle_counter / (dt as u32);
             self.counter = 0;
+            self.triangle_counter = 0;
             true
         } else {
             false
@@ -71,7 +80,7 @@ impl Device {
         let cbuffer = vec![0; size];
         let zbuffer = vec![std::f32::MAX; size];
 
-        let mut fps = Fps::new(5);
+        let mut fps = Fps::new(10);
         fps.start();
 
         Device {
@@ -91,10 +100,10 @@ impl Device {
         window.set_title(&title);
     }
 
-    pub fn draw_fps(&mut self) {
-        if self.fps.update() {
-            let fps = format!("fps={:.1}", self.fps.fps);
-            self.set_title(&fps);
+    pub fn update_fps(&mut self, cnt_triangle: u32) {
+        if self.fps.update(cnt_triangle) {
+            let title = format!("fps={:.1}, tps={} 000", self.fps.fps, self.fps.mega_tps as u32);
+            self.set_title(&title);
         }
     }
 

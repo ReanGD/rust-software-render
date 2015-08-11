@@ -219,7 +219,7 @@ impl Loader3ds {
                 ind += 1;
             }
         }
-        self.mesh.index(ib);
+        try!(self.mesh.index(ib));
         try!(self.read_children(header));
         Ok(try!(header.check_end()))
     }
@@ -268,6 +268,7 @@ impl Loader3ds {
             mesh: Mesh::new(),
         };
         try!(this.read_chunk());
+        try!(this.mesh.calc_normal());
 
         Ok(this.mesh)
     }
