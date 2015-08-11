@@ -2,7 +2,7 @@ use std;
 use cgmath::*;
 use mesh::{Mesh, Vertex};
 use std::fs::File;
-use std::io::{Read, BufReader, BufRead, Seek, SeekFrom};
+use std::io::{Read, Seek, SeekFrom};
 
 const CHUNK_MAIN:         u16 = 0x4D4D;
 const CHUNK_VERSION:      u16 = 0x0002;
@@ -35,16 +35,20 @@ const CHUNK_TRACKFOV:     u16 = 0xB023;
 const CHUNK_TRACKROLL:    u16 = 0xB024;
 const CHUNK_TRACKCAMTGT:  u16 = 0xB004;
 
+struct Reader {
+    reader: File
+}
+
 pub struct Loader3ds {
-    reader: BufReader<File>,
+    reader: Reader,
     mesh: Mesh,
 }
 
 struct Header3ds {
     id: u16,
     size: u32,
+    left_bytes: u32,
 }
-
 
 
 #[allow(dead_code)]
@@ -62,149 +66,208 @@ fn bytes_to_typed<T>(slice: &mut [u8]) -> &mut [T] {
     }
 }
 
-impl Loader3ds {    
-    fn read_u16(&mut self) -> u16 {
-        let mut buff = [0xFF, 0xFF];
-        self.reader.read(&mut buff).unwrap();
-        (buff[0] as u16) + ((buff[1] as u16) << 8)
+impl Header3ds {
+    fn check_end(&self) -> Result<u32, String> {
+        if self.left_bytes == 0 {
+            Ok(self.size)
+        } else {
+            Err(format!("error length chunk in end for id = 0x{:x} left {} bytes", self.id, self.left_bytes))
+        }
     }
 
-    fn read_u32(&mut self) -> u32 {
-        let mut buff = [0xFF, 0xFF, 0xFF, 0xFF];
-        self.reader.read(&mut buff).unwrap();
-        (buff[0] as u32) + ((buff[1] as u32) << 8) + ((buff[2] as u32) << 16) + ((buff[3] as u32) << 24)
+    fn update_left(&mut self, read_bytes: u32) -> Result<(), String> {
+        if self.left_bytes < read_bytes {
+            return Err(format!("for chunk id = 0x{:x}, real read {} bytes, left {} bytes", self.id, read_bytes, self.left_bytes));
+        } else {
+            self.left_bytes -= read_bytes;
+            Ok(())
+        }
+    }
+}
+
+impl Reader {
+    fn new(filepath: &str) -> Result<Reader, String> {
+        let f = match File::open(filepath) {
+            Ok(f) => f,
+            Err(e) => return Err(format!("Can't open file \"{}\" with error: \"{}\"", filepath, e))
+        };
+        Ok(Reader {reader: f})
     }
 
-    fn read_vector3(&mut self) -> Vector3<f32> {
-        let mut buff = [0xFF; 4*3];
-        self.reader.read(&mut buff).unwrap();
-        let r = bytes_to_typed::<f32>(&mut buff);
-        Vector3::new(r[0], r[2], r[1])
+    #[allow(dead_code)]
+    fn get_u16(&mut self, header: &mut Header3ds) -> Result<u16, String> {
+        try!(header.update_left(2));
+        let mut buff = [0x0; 2];
+        match self.reader.read(&mut buff) {
+            Ok(_) => Ok((buff[0] as u16) + ((buff[1] as u16) << 8)),
+            Err(e) => Err(format!("can't read 2 bytes, err = \"{}\"", e))
+        }
     }
 
-    fn read_header(&mut self) -> Header3ds {
-        let id = self.read_u16();
-        let size = self.read_u32();
-        Header3ds {
+    fn get_u16_vec(&mut self, header: &mut Header3ds, num: usize) -> Result<Vec<u16>, String> {
+        try!(header.update_left(2*num as u32));
+        let mut buff: Vec<u8> = vec![0x0; 2*num];
+        match self.reader.read(&mut buff) {
+            Ok(_) => Ok(bytes_to_typed::<u16>(&mut buff).iter().cloned().collect()),
+            Err(e) => Err(format!("can't read {} bytes, err = \"{}\"", 2*num, e))
+        }
+    }
+
+    #[allow(dead_code)]
+    fn get_u32(&mut self, header: &mut Header3ds) -> Result<u32, String> {
+        try!(header.update_left(4));
+        let mut buff = [0x0; 4];
+        match self.reader.read(&mut buff) {
+            Ok(_) => Ok((buff[0] as u32) + ((buff[1] as u32) << 8) + ((buff[2] as u32) << 16) + ((buff[3] as u32) << 24)),
+            Err(e) => Err(format!("can't read 4 bytes, err = \"{}\"", e))
+        }
+    }
+
+    fn get_f32_vec(&mut self, header: &mut Header3ds, num: usize) -> Result<Vec<f32>, String> {
+        try!(header.update_left(4*num as u32));
+        let mut buff: Vec<u8> = vec![0x0; 4*num];
+        match self.reader.read(&mut buff) {
+            Ok(_) => Ok(bytes_to_typed::<f32>(&mut buff).iter().cloned().collect()),
+            Err(e) => Err(format!("can't read {} bytes, err = \"{}\"", 4*num, e))
+        }
+    }
+
+    fn skip_string(&mut self, header: &mut Header3ds) -> Result<u32, String> {
+        let mut buff: Vec<u8> = vec![0xFF];
+        let mut size = 0;
+        while buff[0] != 0 {
+            match self.reader.read(&mut buff) {
+                Ok(_) => {},
+                Err(e) => return Err(format!("can't read 1 bytes, err = \"{}\"", e))
+            };
+            try!(header.update_left(1));
+            size += 1;
+        }        
+        Ok(size)
+    }
+
+    fn skip(&mut self, header: &mut Header3ds) -> Result<u32, String> {
+        match self.reader.seek(SeekFrom::Current(header.left_bytes as i64)) {
+            Ok(_) => {header.left_bytes = 0; return Ok(header.size)},
+            Err(e) => return Err(format!("seek file error \"{}\"for chunk id = 0x{:x}", e, header.id))
+        };
+    }
+
+    fn get_header(&mut self) -> Result<Header3ds, String> {
+        let id;
+        let size;
+        let mut buff = [0x0; 6];
+        match self.reader.read(&mut buff) {
+            Ok(_) => {
+                id = (buff[0] as u16) + ((buff[1] as u16) << 8);
+                size = (buff[2] as u32) + ((buff[3] as u32) << 8) + ((buff[4] as u32) << 16) + ((buff[5] as u32) << 24);
+            },
+            Err(e) => return Err(format!("can't read 6 bytes, err = \"{}\"", e))
+        };
+
+        if size < 6 {
+            return Err(format!("for chunk id = 0x{:x}, header real size is 6 bytes, but in header is {} bytes", id, size));
+        }
+
+        Ok(Header3ds {
             id: id,
             size: size,
+            left_bytes: size - 6,
+        })
+    }
+}
+
+impl Loader3ds {
+    fn read_children(&mut self, header: &mut Header3ds) -> Result<u32, String> {
+        while header.left_bytes != 0 {
+            try!(header.update_left(try!(self.read_chunk())));
         }
+        Ok(try!(header.check_end()))
     }
 
-    fn read_children(&mut self, header: &Header3ds) -> Result<u32, String> {
-        let mut left_bytes = header.size - 2 - 4;
-        {
-            while left_bytes > 0 {
-                let size = self.read_chunk().unwrap();
-                if left_bytes < size {
-                    return Err(format!("error length for id = 0x{:x}", header.id));
-                } else {
-                    left_bytes -= size;
-                }
-            }
-        }
-        Ok(header.size)
+    fn skip_chunk(&mut self, header: &mut Header3ds) -> Result<u32, String> {
+        try!(self.reader.skip(header));
+        Ok(try!(header.check_end()))
     }
 
-    fn skip_chunk(&mut self, header: &Header3ds) -> Result<u32, String> {
-        self.reader.seek(SeekFrom::Current(header.size as i64 - 4 - 2))
-            .ok()
-            .expect("seek file error");
-        Ok(header.size)
+    fn read_objblok(&mut self, header: &mut Header3ds) -> Result<u32, String> {
+        try!(self.reader.skip_string(header));
+        self.read_children(header)
     }
 
-    fn read_objblok(&mut self, header: &Header3ds) -> Result<u32, String> {
-        let mut name = Vec::<u8>::new();
-        let mut size = self.reader.read_until(0x00, &mut name)
-            .ok()
-            .expect("error read_until") as u32;
-        let new_header = Header3ds{id: header.id, size: header.size - size};
-        size += try!(self.read_children(&new_header));
-        Ok(size)
-    }
-
-    fn read_vertlist(&mut self, header: &Header3ds) -> Result<u32, String> {
-        let mut size: u32 = 4 + 2;
-        let num = self.read_u16() as usize;
-        size += 2 + 3 * 4 * (num as u32);
+    fn read_vertlist(&mut self, header: &mut Header3ds) -> Result<u32, String> {
+        let num = try!(self.reader.get_u16(header)) as usize;
         let mut vb: Vec<Vertex> = vec![Vertex::new(); num];
+
+        let arr = try!(self.reader.get_f32_vec(header, num * 3));
         for i in 0..num {
-            vb[i].position = self.read_vector3();
+            let ind = i * 3;
+            vb[i].position = Vector3::new(arr[ind], arr[ind + 2], arr[ind + 1]);
         }
         self.mesh.vertex(vb);
-        if size == header.size {
-            Ok(size)
-        } else {
-            Err(format!("error length for id = 0x{:x}", header.id))
-        }
+        Ok(try!(header.check_end()))
     }
 
-    fn read_facelist(&mut self, header: &Header3ds) -> Result<u32, String> {
-        let num = self.read_u16() as usize;
-        let mut size: u32 = 2 + 4 * 2 * (num as u32);
+    fn read_facelist(&mut self, header: &mut Header3ds) -> Result<u32, String> {
+        let num = try!(self.reader.get_u16(header)) as usize;
         let mut ib: Vec<u32> = vec![0; num * 3];
-        for i in 0..num {
-            for j in 0..3 {
-                ib[i*3 + j] = self.read_u16() as u32;
+
+        let mut ind = 0;
+        for (i, item) in try!(self.reader.get_u16_vec(header, num * 4)).iter().enumerate() {
+            if i % 4 != 3 {
+                ib[ind] = *item as u32;
+                ind += 1;
             }
-            let _ = self.read_u16();
         }
         self.mesh.index(ib);
-        let new_header = Header3ds{id: header.id, size: header.size - size};
-        size += try!(self.read_children(&new_header));
-        Ok(size)
+        try!(self.read_children(header));
+        Ok(try!(header.check_end()))
     }
 
     fn read_chunk(& mut self) -> Result<u32, String> {
-        let header = self.read_header();
+        let mut header = try!(self.reader.get_header());
         println!("id = 0x{:x}; size={};", header.id, header.size);
         match header.id {
-            CHUNK_MAIN         => self.read_children(&header),
-            CHUNK_VERSION      => self.skip_chunk(&header),
-            CHUNK_OBJMESH      => self.read_children(&header),
-            CHUNK_MESHVERSION  => self.skip_chunk(&header),
-            CHUNK_MASTERSCALE  => self.skip_chunk(&header),
-            CHUNK_OBJBLOCK     => self.read_objblok(&header),
-            CHUNK_TRIMESH      => self.read_children(&header),
-            CHUNK_VERTLIST     => self.read_vertlist(&header),
-            CHUNK_FACELIST     => self.read_facelist(&header),
-            CHUNK_FACEMAT      => self.skip_chunk(&header),
-            CHUNK_MAPLIST      => self.skip_chunk(&header),
-            CHUNK_SMOOTHING    => self.skip_chunk(&header),
-            CHUNK_TRMATRIX     => self.skip_chunk(&header),
-            CHUNK_LIGHT        => self.skip_chunk(&header),
-            CHUNK_SPOTLIGHT    => self.skip_chunk(&header),
-            CHUNK_CAMERA       => self.skip_chunk(&header),
-            CHUNK_MATERIAL     => self.skip_chunk(&header),
-            CHUNK_MATNAME      => self.skip_chunk(&header),
-            CHUNK_TEXTURE      => self.skip_chunk(&header),
-            CHUNK_MAPFILE      => self.skip_chunk(&header),
-            CHUNK_KEYFRAMER    => self.skip_chunk(&header),
-            CHUNK_TRACKINFO    => self.skip_chunk(&header),
-            CHUNK_TRACKOBJNAME => self.skip_chunk(&header),
-            CHUNK_TRACKPIVOT   => self.skip_chunk(&header),
-            CHUNK_TRACKPOS     => self.skip_chunk(&header),
-            CHUNK_TRACKROTATE  => self.skip_chunk(&header),
-            CHUNK_TRACKCAMERA  => self.skip_chunk(&header),
-            CHUNK_TRACKFOV     => self.skip_chunk(&header),
-            CHUNK_TRACKROLL    => self.skip_chunk(&header),
-            CHUNK_TRACKCAMTGT  => self.skip_chunk(&header),
+            CHUNK_MAIN         => self.read_children(&mut header),
+            CHUNK_VERSION      => self.skip_chunk(&mut header),
+            CHUNK_OBJMESH      => self.read_children(&mut header),
+            CHUNK_MESHVERSION  => self.skip_chunk(&mut header),
+            CHUNK_MASTERSCALE  => self.skip_chunk(&mut header),
+            CHUNK_OBJBLOCK     => self.read_objblok(&mut header),
+            CHUNK_TRIMESH      => self.read_children(&mut header),
+            CHUNK_VERTLIST     => self.read_vertlist(&mut header),
+            CHUNK_FACELIST     => self.read_facelist(&mut header),
+            CHUNK_FACEMAT      => self.skip_chunk(&mut header),
+            CHUNK_MAPLIST      => self.skip_chunk(&mut header),
+            CHUNK_SMOOTHING    => self.skip_chunk(&mut header),
+            CHUNK_TRMATRIX     => self.skip_chunk(&mut header),
+            CHUNK_LIGHT        => self.skip_chunk(&mut header),
+            CHUNK_SPOTLIGHT    => self.skip_chunk(&mut header),
+            CHUNK_CAMERA       => self.skip_chunk(&mut header),
+            CHUNK_MATERIAL     => self.skip_chunk(&mut header),
+            CHUNK_MATNAME      => self.skip_chunk(&mut header),
+            CHUNK_TEXTURE      => self.skip_chunk(&mut header),
+            CHUNK_MAPFILE      => self.skip_chunk(&mut header),
+            CHUNK_KEYFRAMER    => self.skip_chunk(&mut header),
+            CHUNK_TRACKINFO    => self.skip_chunk(&mut header),
+            CHUNK_TRACKOBJNAME => self.skip_chunk(&mut header),
+            CHUNK_TRACKPIVOT   => self.skip_chunk(&mut header),
+            CHUNK_TRACKPOS     => self.skip_chunk(&mut header),
+            CHUNK_TRACKROTATE  => self.skip_chunk(&mut header),
+            CHUNK_TRACKCAMERA  => self.skip_chunk(&mut header),
+            CHUNK_TRACKFOV     => self.skip_chunk(&mut header),
+            CHUNK_TRACKROLL    => self.skip_chunk(&mut header),
+            CHUNK_TRACKCAMTGT  => self.skip_chunk(&mut header),
             _ => Err(format!("unknown chank id = 0x{:x}", header.id))
         }
     }
 
-    pub fn load(filepath: &str) -> Result<Mesh, &str> {
-        let f = File::open(filepath)
-            .ok()
-            .expect("can't open file");
-
-        let mesh = Mesh::new();
+    pub fn load(filepath: &str) -> Result<Mesh, String> {
         let mut this = Loader3ds {
-            reader: BufReader::new(f),
-            mesh: mesh,
+            reader: try!(Reader::new(filepath)),
+            mesh: Mesh::new(),
         };
-
-        this.read_chunk().unwrap();
+        try!(this.read_chunk());
 
         Ok(this.mesh)
     }

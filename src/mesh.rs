@@ -20,6 +20,7 @@ impl Vertex {
 
 pub struct Mesh {
     pub vertex_buffer: Vec<Vertex>,
+    pub normal_buffer: Vec<Vector3<f32>>,
     pub index_buffer: Vec<u32>,
     pub colors: Vec<u32>,
 }
@@ -28,6 +29,7 @@ impl Mesh {
     pub fn new() -> Mesh {
         Mesh {
             vertex_buffer: Vec::<Vertex>::new(),
+            normal_buffer: Vec::<Vector3<f32>>::new(),
             index_buffer: Vec::<u32>::new(),
             colors: Vec::<u32>::new(),
         }
@@ -35,6 +37,10 @@ impl Mesh {
 
     pub fn vertex(&mut self, buffer: Vec<Vertex>) {
         self.vertex_buffer = buffer;
+    }
+
+    pub fn normal(&mut self, buffer: Vec<Vector3<f32>>) {
+        self.normal_buffer = buffer;
     }
 
     pub fn index(&mut self, buffer: Vec<u32>) {
