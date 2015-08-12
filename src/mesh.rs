@@ -64,11 +64,10 @@ impl Mesh {
 
     pub fn draw(&self, mat_proj_view_world: &Matrix4<f32>, mat_world: &Matrix4<f32>, device: &mut Device) -> u32 {
         let cnt_triangle = self.index_buffer.len() / 3;
-        for triangle_index in 0..cnt_triangle {
+        for (triangle_index, indexes) in self.index_buffer.chunks(3).enumerate() {
             let mut points: Vec<Point3<f32>> = vec![];
             for i in 0..3 {
-                let ind = self.index_buffer[triangle_index * 3 + i] as usize;
-                let v3 = self.vertex_buffer[ind].position;
+                let v3 = self.vertex_buffer[indexes[i] as usize].position;
                 let v4 = Vector4::<f32>::new(v3.x, v3.y, v3.z, 1.0_f32);
                 let p_screen = mat_proj_view_world.mul_v(&v4);
                 let inverse_w = 1.0_f32 / p_screen.w;

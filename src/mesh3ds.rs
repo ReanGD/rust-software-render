@@ -1,6 +1,6 @@
-use std;
 use cgmath::*;
 use mesh::{Mesh, Vertex};
+use memory::bytes_to_typed;
 use std::fs::File;
 use std::io::{Read, Seek, SeekFrom};
 
@@ -48,22 +48,6 @@ struct Header3ds {
     id: u16,
     size: u32,
     left_bytes: u32,
-}
-
-
-#[allow(dead_code)]
-fn typed_to_bytes<T>(slice: &[T]) -> &[u8] {
-    unsafe {
-        std::slice::from_raw_parts(slice.as_ptr() as *const u8,
-                                   slice.len() * std::mem::size_of::<T>())
-    }
-}
-
-fn bytes_to_typed<T>(slice: &mut [u8]) -> &mut [T] {
-    unsafe {
-        std::slice::from_raw_parts_mut(slice.as_mut_ptr() as *mut T,
-                                       slice.len() / std::mem::size_of::<T>())
-    }
 }
 
 impl Header3ds {
@@ -197,30 +181,26 @@ impl Loader3ds {
 
     fn read_vertlist(&mut self, header: &mut Header3ds) -> Result<u32, String> {
         let num = try!(self.reader.get_u16(header)) as usize;
-        let mut vb: Vec<Vertex> = vec![Vertex::new(); num];
-
-        let arr = try!(self.reader.get_f32_vec(header, num * 3));
-        for i in 0..num {
-            let ind = i * 3;
-            vb[i].position = Vector3::new(arr[ind], arr[ind + 2], arr[ind + 1]);
+        let mut vb = Vec::<Vertex>::with_capacity(num);
+        for v in try!(self.reader.get_f32_vec(header, num * 3)).chunks(3) {
+            vb.push(Vertex{position: Vector3::new(v[0], v[2], v[1])});
         }
         self.mesh.vertex(vb);
+
         Ok(try!(header.check_end()))
     }
 
     fn read_facelist(&mut self, header: &mut Header3ds) -> Result<u32, String> {
         let num = try!(self.reader.get_u16(header)) as usize;
-        let mut ib: Vec<u32> = vec![0; num * 3];
-
-        let mut ind = 0;
-        for (i, item) in try!(self.reader.get_u16_vec(header, num * 4)).iter().enumerate() {
-            if i % 4 != 3 {
-                ib[ind] = *item as u32;
-                ind += 1;
-            }
+        let mut ib = Vec::<u32>::with_capacity(num * 3);
+        for i in try!(self.reader.get_u16_vec(header, num * 4)).chunks(4) {
+            ib.push(i[0] as u32);
+            ib.push(i[1] as u32);
+            ib.push(i[2] as u32);
         }
         try!(self.mesh.index(ib));
         try!(self.read_children(header));
+
         Ok(try!(header.check_end()))
     }
 

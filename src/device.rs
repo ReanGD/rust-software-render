@@ -74,11 +74,11 @@ impl Device {
 
         let renderer = window.renderer().build().unwrap();
 
-        let format = sdl2::pixels::PixelFormatEnum::RGBX8888;
+        let format = sdl2::pixels::PixelFormatEnum::ARGB8888;
         let texture = renderer.create_texture_streaming(format, (width, height)).unwrap();
         let size = (width as usize)*(height as usize);
         let cbuffer = vec![0; size];
-        let zbuffer = vec![std::f32::MAX; size];
+        let zbuffer = vec![0.0_f32; size];
 
         let mut fps = Fps::new(10);
         fps.start();
@@ -111,31 +111,23 @@ impl Device {
         let cbuffer = &self.cbuffer;
         let y_size = self.y_size;
         let x_size = self.x_size;
-        self.texture.with_lock(None, |buffer: &mut [u8], pitch: usize| {
-            for y in (0..y_size) {
-                for x in (0..x_size) {
-                    let offset = y*pitch + x*4;
-                    let c = cbuffer[(y_size - y - 1)*x_size + x];
-                    
-                    buffer[offset + 0] = 0            as u8;
-                    buffer[offset + 1] = c            as u8;
-                    buffer[offset + 2] = (c >> (8*1)) as u8;
-                    buffer[offset + 3] = (c >> (8*2)) as u8;
-                }
+        self.texture.with_lock(None, |buffer: &mut [u8], _: usize| {
+            unsafe {
+                std::ptr::copy_nonoverlapping::<u8>(cbuffer.as_ptr() as *const u8, buffer.as_mut_ptr(), buffer.len());
             }
         }).unwrap();
-        self.renderer.clear();
+        // self.renderer.clear();
         let rect = sdl2::rect::Rect::new_unwrap(0, 0, x_size as u32, y_size as u32);
-        self.renderer.copy(&self.texture, None, Some(rect));
+        self.renderer.copy_ex(&self.texture, None, Some(rect), 0.0_f64, None, (false, true));
         self.renderer.present();
     }
 
     pub fn clear(&mut self, color: u32) {
-        for y in (0..self.y_size) {
-            for x in (0..self.x_size) {
-                self.cbuffer[y*self.x_size+x] = color;
-                self.zbuffer[y*self.x_size+x] = 0.0_f32;
-            }
+        for val in &mut self.cbuffer {
+            *val = color;
+        }
+        for val in &mut self.zbuffer {
+            *val = 0.0_f32;
         }
     }
 

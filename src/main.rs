@@ -3,9 +3,10 @@ extern crate rand;
 extern crate time;
 extern crate cgmath;
 
-mod device;
 mod mesh;
 mod mesh3ds;
+mod device;
+mod memory;
 mod rasterization;
 mod tests;
 
