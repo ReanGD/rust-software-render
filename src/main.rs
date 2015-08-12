@@ -45,8 +45,8 @@ pub fn main() {
 
         angle = angle + add_angle;
         let mat_world = Matrix4::from(Matrix3::from_angle_y(angle));
-        let mat = mat_proj * mat_view * mat_world;
-        let cnt_triangle = mesh.draw(&mat, &mat_world, &mut device);
+        let mat_proj_view_world = mat_proj * mat_view * mat_world;
+        let cnt_triangle = mesh.draw(&mat_proj_view_world, &mat_world, &mut device);
         device.present();
         device.update_fps(cnt_triangle);
     }

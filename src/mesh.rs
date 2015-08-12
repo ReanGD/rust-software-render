@@ -62,7 +62,7 @@ impl Mesh {
         Ok(())
     }
 
-    pub fn draw(&self, mat: &Matrix4<f32>, mat_world: &Matrix4<f32>, device: &mut Device) -> u32 {
+    pub fn draw(&self, mat_proj_view_world: &Matrix4<f32>, mat_world: &Matrix4<f32>, device: &mut Device) -> u32 {
         let cnt_triangle = self.index_buffer.len() / 3;
         for triangle_index in 0..cnt_triangle {
             let mut points: Vec<Point3<f32>> = vec![];
@@ -70,13 +70,21 @@ impl Mesh {
                 let ind = self.index_buffer[triangle_index * 3 + i] as usize;
                 let v3 = self.vertex_buffer[ind].position;
                 let v4 = Vector4::<f32>::new(v3.x, v3.y, v3.z, 1.0_f32);
-                let p_screen = mat.mul_v(&v4);
+                let p_screen = mat_proj_view_world.mul_v(&v4);
                 let inverse_w = 1.0_f32 / p_screen.w;
                 points.push(
                     Point3::new(
                         (p_screen.x * inverse_w + 1.0_f32) * device.x_size as f32 * 0.5_f32,
                         (p_screen.y * inverse_w + 1.0_f32) * device.y_size as f32 * 0.5_f32,
                         inverse_w));
+            }
+
+            let col0 = Vector3::new(points[0].x, points[1].x, points[2].x);
+            let col1 = Vector3::new(points[0].y, points[1].y, points[2].y);
+            let col2 = Vector3::new(1.0_f32,     1.0_f32,     1.0_f32    );
+            let d = Matrix3::from_cols(col0, col1, col2).determinant();
+            if d > 0.0_f32 {
+                continue;
             }
             let norm = self.normal_buffer[triangle_index];
             let world_norm = mat_world.mul_v(&Vector4::<f32>::new(norm.x, norm.y, norm.z, 0.0_f32)).normalize();
