@@ -72,13 +72,13 @@ impl Mesh {
         let cnt_triangle = self.index_buffer.len() / 3;
         for (triangle_index, indexes) in self.index_buffer.chunks(3).enumerate() {
             let norm = self.normal_buffer[triangle_index];
-            shader.set_vec4(VEC_NORM, Vector4::new(norm.x, norm.y, norm.z, 0.0_f32));
+            shader.set_vec4(IN_VS_VEC_NORM, Vector4::new(norm.x, norm.y, norm.z, 0.0_f32));
             
             let mut points: Vec<Point3<f32>> = vec![];
             for i in 0..3 {
                 let v3 = self.vertex_buffer[indexes[i] as usize].position;
                 let v4 = Vector4::<f32>::new(v3.x, v3.y, v3.z, 1.0_f32);
-                shader.set_vec4(VEC_POS, v4);
+                shader.set_vec4(IN_VS_VEC_POS, v4);
                 let p_screen = shader.vertex();
                 let inverse_w = 1.0_f32 / p_screen.w;
                 

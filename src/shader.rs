@@ -3,29 +3,27 @@ use cgmath::*;
 pub const MATRIX_PROJ_VIEW_WORLD: usize = 0;
 pub const MATRIX_WORLD: usize = 1;
 
-pub const VEC_POS: usize = 0;
-pub const VEC_NORM: usize = 4;
-pub const VEC_NEG_LIGHT: usize = 8;
+pub const IN_VS_VEC_POS: usize = 0;
+pub const IN_VS_VEC_NORM: usize = 4;
+pub const IN_VS_VEC_NEG_LIGHT: usize = 8;
 
 pub struct Shader {
-    pub matrix_arr: [Matrix4<f32>; 2],
-    pub in_vertex_data: Vec<f32>,
-    pub ambient_color: Vector3<f32>, // {r, g, b}
-    pub diffuse_color: Vector3<f32>, // {r, g, b}
-    pub ambient_intensity: f32,      // [0; 1]
-    pub cos_nl: f32,                 // [0; 1]
+    pub matrix_arr: [Matrix4<f32>; 2], // see MATRIX_*
+    pub in_vertex_data: Vec<f32>,      // see IN_VS_*
+    // pub out_vertex_data: Vec<f32>,
+    pub color: Vector3<f32>,           // {r, g, b}
+    pub ambient_intensity: f32,        // [0; 1]
+    pub cos_nl: f32,                   // [0; 1]
 }
 
-
 impl Shader {
-    pub fn new(ambient_color: Vector3<f32>, diffuse_color: Vector3<f32>, ambient_intensity: f32, cos_nl: f32) -> Shader {
+    pub fn new(color: Vector3<f32>, ambient_intensity: f32) -> Shader {
         Shader {
             matrix_arr: [Matrix4::<f32>::zero(); 2],
             in_vertex_data: vec![0.0_f32; 12],
-            ambient_color: ambient_color,
-            diffuse_color: diffuse_color,
+            color: color,
             ambient_intensity: ambient_intensity,
-            cos_nl: cos_nl,
+            cos_nl: 0.0_f32,
         }
     }
 
@@ -52,17 +50,15 @@ impl Shader {
     }
 
     pub fn vertex(&mut self) -> Vector4<f32> {
-        let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(VEC_POS));
-        let norm = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(VEC_NORM)).normalize();
-        self.cos_nl = norm.dot(&self.read_vec4(VEC_NEG_LIGHT)).max(0.0_f32);
+        let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
+        let norm = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_NORM)).normalize();
+        self.cos_nl = norm.dot(&self.read_vec4(IN_VS_VEC_NEG_LIGHT)).max(0.0_f32);
 
         pos
     }
 
     pub fn pixel(&self) -> Vector3<f32> {
-        let color = self.ambient_color
-            .mul_s(self.ambient_intensity)
-            .add_v(&self.diffuse_color.mul_s(self.cos_nl));
+        let color = self.color.mul_s(self.cos_nl.max(self.ambient_intensity));
 
         color
     }

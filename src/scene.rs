@@ -53,7 +53,7 @@ impl Scene {
     pub fn draw(&mut self, mesh: &Model, mat_world: Matrix4<f32>, shader: &mut Shader) -> &mut Scene {
         shader.set_matrix(MATRIX_PROJ_VIEW_WORLD, self.mat_proj * self.mat_view * mat_world);
         shader.set_matrix(MATRIX_WORLD, mat_world);
-        shader.set_vec4(VEC_NEG_LIGHT, self.vec_neg_light);
+        shader.set_vec4(IN_VS_VEC_NEG_LIGHT, self.vec_neg_light);
 
         self.cnt_triangle += mesh.draw(shader, &mut self.device);
 
