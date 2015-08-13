@@ -1,4 +1,5 @@
 use cgmath::*;
+use shader::*;
 use device::Device;
 use rasterization::triangle;
 
@@ -62,15 +63,20 @@ impl Mesh {
         Ok(())
     }
 
-    pub fn draw(&self, mat_proj_view_world: &Matrix4<f32>, mat_world: &Matrix4<f32>, device: &mut Device) -> u32 {
+    pub fn draw(&self, shader: &mut Shader, device: &mut Device) -> u32 {
         let cnt_triangle = self.index_buffer.len() / 3;
         for (triangle_index, indexes) in self.index_buffer.chunks(3).enumerate() {
+            let norm = self.normal_buffer[triangle_index];
+            shader.set_vec4(VEC_NORM, Vector4::new(norm.x, norm.y, norm.z, 0.0_f32));
+            
             let mut points: Vec<Point3<f32>> = vec![];
             for i in 0..3 {
                 let v3 = self.vertex_buffer[indexes[i] as usize].position;
                 let v4 = Vector4::<f32>::new(v3.x, v3.y, v3.z, 1.0_f32);
-                let p_screen = mat_proj_view_world.mul_v(&v4);
+                shader.set_vec4(VEC_POS, v4);
+                let p_screen = shader.vertex();
                 let inverse_w = 1.0_f32 / p_screen.w;
+                
                 points.push(
                     Point3::new(
                         (p_screen.x * inverse_w + 1.0_f32) * device.x_size as f32 * 0.5_f32,
@@ -85,21 +91,12 @@ impl Mesh {
             if d > 0.0_f32 {
                 continue;
             }
-            let norm = self.normal_buffer[triangle_index];
-            let world_norm = mat_world.mul_v(&Vector4::<f32>::new(norm.x, norm.y, norm.z, 0.0_f32)).normalize();
-            let mut light_vec = Vector4::new(0.0_f32, 1.0_f32, -1.0_f32, 0.0_f32).normalize();
-            light_vec.neg_self();
-            let mut cos_nl = world_norm.dot(&light_vec);
-            if cos_nl < 0.0_f32 {
-                cos_nl = 0.0_f32;
-            }
-            
             
             triangle(&mut device.cbuffer,
                      &mut device.zbuffer,
                      device.x_size,
                      device.y_size,
-                     points[0], points[1], points[2], cos_nl);
+                     points[0], points[1], points[2], shader);
         }
 
         cnt_triangle as u32

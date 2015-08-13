@@ -1,11 +1,13 @@
 use cgmath::*;
-use device::Device;
 use mesh::Mesh;
+use device::Device;
+use shader::*;
 
 pub struct Scene {
     device: Device,
     mat_proj: Matrix4<f32>,
     mat_view: Matrix4<f32>,
+    vec_neg_light: Vector4<f32>,
     cnt_triangle: u32,
 }
 
@@ -15,6 +17,7 @@ impl Scene {
             device: Device::new("rust software render", width, height),
             mat_proj: Matrix4::<f32>::zero(),
             mat_view: Matrix4::<f32>::zero(),
+            vec_neg_light: Vector4::<f32>::zero(),
             cnt_triangle: 0,
         }
     }
@@ -30,19 +33,29 @@ impl Scene {
         self
     }
 
+    pub fn light(&mut self, vec: Vector3<f32>) -> &mut Scene {
+        self.vec_neg_light = Vector4::new(vec.x, vec.y, vec.z, 0.0_f32).normalize();
+        self.vec_neg_light.neg_self();
+
+        self
+    }
+
     pub fn start(&mut self, color: u32) -> bool {
         if self.device.keyboard() {
             self.device.clear(color);
             self.cnt_triangle = 0;
             true
-        }else {
+        } else {
             false
         }
     }
 
-    pub fn draw(&mut self, mesh: &Mesh, mat_world: Matrix4<f32>) -> &mut Scene {
-        let mat_proj_view_world = self.mat_proj * self.mat_view * mat_world;
-        self.cnt_triangle += mesh.draw(&mat_proj_view_world, &mat_world, &mut self.device);
+    pub fn draw(&mut self, mesh: &Mesh, mat_world: Matrix4<f32>, shader: &mut Shader) -> &mut Scene {
+        shader.set_matrix(MATRIX_PROJ_VIEW_WORLD, self.mat_proj * self.mat_view * mat_world);
+        shader.set_matrix(MATRIX_WORLD, mat_world);
+        shader.set_vec4(VEC_NEG_LIGHT, self.vec_neg_light);
+
+        self.cnt_triangle += mesh.draw(shader, &mut self.device);
 
         self
     }

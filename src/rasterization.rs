@@ -1,8 +1,9 @@
 use std::mem;
 use std::cmp;
 use cgmath::*;
+use shader::Shader;
 
-pub fn triangle(cbuffer: &mut Vec<u32>, zbuffer: &mut Vec<f32>, x_size: usize, y_size: usize, p_a: Point3<f32>, p_b: Point3<f32>, p_c: Point3<f32>, cos_nl: f32) {
+pub fn triangle(cbuffer: &mut Vec<u32>, zbuffer: &mut Vec<f32>, x_size: usize, y_size: usize, p_a: Point3<f32>, p_b: Point3<f32>, p_c: Point3<f32>, shader: &Shader) {
     let mut a = &p_a;
     let mut b = &p_b;
     let mut c = &p_c;
@@ -68,8 +69,6 @@ pub fn triangle(cbuffer: &mut Vec<u32>, zbuffer: &mut Vec<f32>, x_size: usize, y
     };
     let steps = [step0, step1];
 
-    let v_color = Vector3::new(0.7_f32, 0.7_f32, 0.7_f32).mul_s(cos_nl).mul_s(0xFF as f32);
-    let clr: u32 = ((v_color.x as u32) << 16) + ((v_color.y as u32) << 8) + (v_color.z as u32);
     for i in (0..2) {
         if y_begin[i] < y_end[i] {
             let y_step = y_begin[i] as f32 + 0.5_f32 - point_base[i].y;
@@ -91,7 +90,10 @@ pub fn triangle(cbuffer: &mut Vec<u32>, zbuffer: &mut Vec<f32>, x_size: usize, y
                     for x in (x1_int..x2_int) {
                         z += z_step;
                         if zbuffer[y * x_size + x] < z {
-                            cbuffer[y * x_size + x] = clr;
+                            let clr = shader.pixel();
+                            cbuffer[y * x_size + x] = (cmp::min((clr.x as u32), 0xFF) << 16) +
+                                (cmp::min((clr.y as u32), 0xFF) << 8) +
+                                cmp::min((clr.z as u32), 0xFF);
                             zbuffer[y * x_size + x] = z;
                         }
                     }
