@@ -21,6 +21,8 @@ use import3ds::Loader3ds;
 pub fn main() {    
     let eye = Point3::new(0.0_f32, 0.0_f32, -1.1_f32);
 	let center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
+    // let eye = Point3::new(0.0_f32, -2.0_f32, -4.1_f32);
+	// let center = Point3::new(0.0_f32, -2.0_f32, 0.0_f32);
 	let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
 
     let mut angle = rad(0.0_f32);
@@ -31,19 +33,23 @@ pub fn main() {
         .view(eye, center, up)
         .light(Vector3::new(0.0_f32, 1.0_f32, -1.0_f32));
 
-    let path = "../media/ring.3ds";
-    // let path = "../media/monster.3ds";
-    // let path = "../media/tux.3ds";
-    // let path = "../media/yoda.3ds";
-    // let path = "../media/cube.3ds";
-    // let path = "../media/model.3ds";
-    
-    let mesh = Loader3ds::load(&path).unwrap();
+    let path = "ring.3ds";
+    // let path = "monster.3ds";
+    // let path = "tux.3ds";
+    // let path = "yoda.3ds";
+    // let path = "cube.3ds";
+    // let path = "model.3ds";
+
+    let model = Loader3ds::load(&path).unwrap();
     let ambient = Vector3::<f32>::new(0xff as f32, 0xd7 as f32, 0x00 as f32);
     let diffuse = Vector3::<f32>::new(0xff as f32, 0xd7 as f32, 0x00 as f32);
+    // let ambient = Vector3::<f32>::new(0xbb as f32, 0xbb as f32, 0xbb as f32);
+    // let diffuse = Vector3::<f32>::new(0xbb as f32, 0xbb as f32, 0xbb as f32);
     let mut shader = Shader::new(ambient, diffuse, 0.2_f32, 0.0_f32);
+    // let to_begin = Matrix4::from(Matrix3::from_angle_x(rad(-1.8_f32)));
     while scene.start(0xFFFFFF) {
         angle = angle + add_angle;
-        scene.draw(&mesh, Matrix4::from(Matrix3::from_angle_y(angle)), &mut shader).present();
+        scene.draw(&model, Matrix4::from(Matrix3::from_angle_y(angle)), &mut shader).present();
+        // scene.draw(&model, Matrix4::from(Matrix3::from_angle_y(angle)) * to_begin, &mut shader).present();
     }
 }

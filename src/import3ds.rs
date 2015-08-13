@@ -1,7 +1,9 @@
+use std::mem::swap;
 use cgmath::*;
-use mesh::{Mesh, Vertex};
+use mesh::{Model, Mesh, Vertex};
 use memory::bytes_to_typed;
-use std::fs::File;
+use std::env;
+use std::fs;
 use std::io::{Read, Seek, SeekFrom};
 
 const CHUNK_MAIN:         u16 = 0x4D4D;
@@ -36,11 +38,12 @@ const CHUNK_TRACKROLL:    u16 = 0xB024;
 const CHUNK_TRACKCAMTGT:  u16 = 0xB004;
 
 struct Reader {
-    reader: File
+    reader: fs::File
 }
 
 pub struct Loader3ds {
     reader: Reader,
+    model: Model,
     mesh: Mesh,
 }
 
@@ -71,7 +74,7 @@ impl Header3ds {
 
 impl Reader {
     fn new(filepath: &str) -> Result<Reader, String> {
-        let f = match File::open(filepath) {
+        let f = match fs::File::open(filepath) {
             Ok(f) => f,
             Err(e) => return Err(format!("Can't open file \"{}\" with error: \"{}\"", filepath, e))
         };
@@ -179,6 +182,16 @@ impl Loader3ds {
         self.read_children(header)
     }
 
+    fn read_trimesh(&mut self, header: &mut Header3ds) -> Result<u32, String> {
+        let result = try!(self.read_children(header));
+        try!(self.mesh.calc_normal());
+        let mut mesh = Mesh::new();
+        swap(&mut mesh, &mut self.mesh);
+        self.model.add(mesh);
+
+        Ok(result)
+    }
+
     fn read_vertlist(&mut self, header: &mut Header3ds) -> Result<u32, String> {
         let num = try!(self.reader.get_u16(header)) as usize;
         let mut vb = Vec::<Vertex>::with_capacity(num);
@@ -214,7 +227,7 @@ impl Loader3ds {
             CHUNK_MESHVERSION  => self.skip_chunk(&mut header),
             CHUNK_MASTERSCALE  => self.skip_chunk(&mut header),
             CHUNK_OBJBLOCK     => self.read_objblok(&mut header),
-            CHUNK_TRIMESH      => self.read_children(&mut header),
+            CHUNK_TRIMESH      => self.read_trimesh(&mut header),
             CHUNK_VERTLIST     => self.read_vertlist(&mut header),
             CHUNK_FACELIST     => self.read_facelist(&mut header),
             CHUNK_FACEMAT      => self.skip_chunk(&mut header),
@@ -242,14 +255,31 @@ impl Loader3ds {
         }
     }
 
-    pub fn load(filepath: &str) -> Result<Mesh, String> {
+    pub fn load(filepath: &str) -> Result<Model, String> {
+        let mut cur_dir = env::current_dir().unwrap();
+        
+        loop {
+            cur_dir.push("media");
+            let is_dir = match fs::metadata(cur_dir.to_str().unwrap()) {
+                Ok(md) => md.is_dir(),
+                Err(_) => false
+            };
+            if is_dir {
+                break;
+            }
+            if !cur_dir.pop() || !cur_dir.pop() {
+                return Err("not found \"media\" directory".to_string());
+            }
+        }
+        cur_dir.push(filepath);
         let mut this = Loader3ds {
-            reader: try!(Reader::new(filepath)),
+            reader: try!(Reader::new(cur_dir.as_path().to_str().unwrap())),
+            model: Model::new(),
             mesh: Mesh::new(),
         };
         try!(this.read_chunk());
-        try!(this.mesh.calc_normal());
+        
 
-        Ok(this.mesh)
+        Ok(this.model)
     }
 }

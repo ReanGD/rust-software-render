@@ -1,5 +1,5 @@
 use cgmath::*;
-use mesh::Mesh;
+use mesh::Model;
 use device::Device;
 use shader::*;
 
@@ -50,7 +50,7 @@ impl Scene {
         }
     }
 
-    pub fn draw(&mut self, mesh: &Mesh, mat_world: Matrix4<f32>, shader: &mut Shader) -> &mut Scene {
+    pub fn draw(&mut self, mesh: &Model, mat_world: Matrix4<f32>, shader: &mut Shader) -> &mut Scene {
         shader.set_matrix(MATRIX_PROJ_VIEW_WORLD, self.mat_proj * self.mat_view * mat_world);
         shader.set_matrix(MATRIX_WORLD, mat_world);
         shader.set_vec4(VEC_NEG_LIGHT, self.vec_neg_light);
