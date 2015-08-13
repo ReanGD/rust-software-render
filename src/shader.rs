@@ -10,7 +10,6 @@ pub const IN_VS_VEC_NEG_LIGHT: usize = 8;
 pub struct Shader {
     pub matrix_arr: [Matrix4<f32>; 2], // see MATRIX_*
     pub in_vertex_data: Vec<f32>,      // see IN_VS_*
-    // pub out_vertex_data: Vec<f32>,
     pub color: Vector3<f32>,           // {r, g, b}
     pub ambient_intensity: f32,        // [0; 1]
     pub cos_nl: f32,                   // [0; 1]
