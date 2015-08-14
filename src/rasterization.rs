@@ -3,20 +3,33 @@ use std::cmp;
 use cgmath::*;
 use shader::Shader;
 
-pub fn triangle(cbuffer: &mut Vec<u32>, zbuffer: &mut Vec<f32>, x_size: usize, y_size: usize, p_a: Point3<f32>, p_b: Point3<f32>, p_c: Point3<f32>, shader: &Shader) {
-    let mut a = &p_a;
-    let mut b = &p_b;
-    let mut c = &p_c;
+pub fn triangle(cbuffer: &mut Vec<u32>,
+                zbuffer: &mut Vec<f32>,
+                x_size: usize,
+                y_size: usize,
+                points: [Point3<f32>; 3],
+                vertex_data: [Vec<f32>; 3],
+                vertex_data_cnt: usize,
+                shader: &Shader) {
+    let mut a = &points[0];
+    let mut b = &points[1];
+    let mut c = &points[2];
+    let mut va = &vertex_data[0];
+    let mut vb = &vertex_data[1];
+    let mut vc = &vertex_data[2];
 
     // a.y > b.y > c.y
     if a.y < b.y {
         mem::swap(&mut a, &mut b);
+        mem::swap(&mut va, &mut vb);
     }
     if a.y < c.y {
         mem::swap(&mut a, &mut c);
+        mem::swap(&mut va, &mut vc);
     }
     if b.y < c.y {
         mem::swap(&mut b, &mut c);
+        mem::swap(&mut vb, &mut vc);
     }
 
     // is visible
@@ -33,20 +46,35 @@ pub fn triangle(cbuffer: &mut Vec<u32>, zbuffer: &mut Vec<f32>, x_size: usize, y
     
     // steps for line
     let epsilon = 0.0001_f32;
-    let step_ab = if a.y - b.y > epsilon {
-        ((a.x - b.x) / (a.y - b.y), (a.z - b.z) / (a.y - b.y))
-    } else {
-        (0.0_f32, 0.0_f32)
+
+    let mut step_ab: Vec<f32> = vec![0.0_f32; vertex_data_cnt + 2];
+    if a.y - b.y > epsilon {
+        let inv_dy = 1.0_f32 / (a.y - b.y);
+        step_ab[0] = (a.x - b.x) * inv_dy;
+        step_ab[1] = (a.z - b.z) * inv_dy;
+        for i in 0..vertex_data_cnt {
+            step_ab[i + 2] = (va[i] - vb[i]) * inv_dy;
+        }
     };
-    let step_ac = if a.y - c.y > epsilon {
-        ((a.x - c.x) / (a.y - c.y), (a.z - c.z) / (a.y - c.y))
-    } else {
-        (0.0_f32, 0.0_f32)
+    
+    let mut step_ac: Vec<f32> = vec![0.0_f32; vertex_data_cnt + 2];
+    if a.y - c.y > epsilon {
+        let inv_dy = 1.0_f32 / (a.y - c.y);
+        step_ac[0] = (a.x - c.x) * inv_dy;
+        step_ac[1] = (a.z - c.z) * inv_dy;
+        for i in 0..vertex_data_cnt {
+            step_ac[i + 2] = (va[i] - vc[i]) * inv_dy;
+        }        
     };
-    let step_bc = if b.y - c.y > epsilon {
-        ((b.x - c.x) / (b.y - c.y), (b.z - c.z) / (b.y - c.y))
-    } else {
-        (0.0_f32, 0.0_f32)
+
+    let mut step_bc: Vec<f32> = vec![0.0_f32; vertex_data_cnt + 2];
+    if b.y - c.y > epsilon {
+        let inv_dy = 1.0_f32 / (b.y - c.y);
+        step_bc[0] = (b.x - c.x) * inv_dy;
+        step_bc[1] = (b.z - c.z) * inv_dy;
+        for i in 0..vertex_data_cnt {
+            step_bc[i + 2] = (vc[i] - vc[i]) * inv_dy;
+        }        
     };
 
     // y-ranges: [y0; y1) + [y1; y2)
@@ -54,30 +82,49 @@ pub fn triangle(cbuffer: &mut Vec<u32>, zbuffer: &mut Vec<f32>, x_size: usize, y
     let y1 = cmp::min(cmp::max((b.y + 0.5_f32) as i32, 0) as usize, y_size);
     let y2 = cmp::min(cmp::max((a.y + 0.5_f32) as i32, 0) as usize, y_size);
     let point_base = [c, a];
+    let vd_base = [vc, va];
     let y_begin = [y0, y1];
     let y_end = [y1, y2];
 
-    let step0 = if step_bc > step_ac {
-        (step_ac, step_bc)
+    let step0 = if step_bc[0] > step_ac[0] {
+        (&step_ac, &step_bc)
     } else {
-        (step_bc, step_ac)
+        (&step_bc, &step_ac)
     };
-    let step1 = if step_ab > step_ac {
-        (step_ab, step_ac)
+    let step1 = if step_ab[0] > step_ac[0] {
+        (&step_ab, &step_ac)
     } else {
-        (step_ac, step_ab)
+        (&step_ac, &step_ab)
     };
     let steps = [step0, step1];
 
     for i in (0..2) {
         if y_begin[i] < y_end[i] {
             let y_step = y_begin[i] as f32 + 0.5_f32 - point_base[i].y;
-            let ((x1_step, z1_step), (x2_step, z2_step)) = steps[i];
-            let mut x1 = point_base[i].x + y_step * x1_step + 0.5_f32 - epsilon;
-            let mut z1 = point_base[i].z + y_step * z1_step; // inverse z
-            let mut x2 = point_base[i].x + y_step * x2_step + 0.5_f32 - epsilon;
-            let dx_step = x1_step - x2_step;
-            let dz_step = z1_step - z2_step;
+            let x0_step = steps[i].0[0];
+            let x1_step = steps[i].1[0];
+            let z0_step = steps[i].0[1];
+            let z1_step = steps[i].1[1];
+            let mut vdata0_step = Vec::<f32>::new();
+            for item in &steps[i].0[2..(vertex_data_cnt + 2)] {
+                vdata0_step.push(*item);
+            }
+            let mut vdata1_step = Vec::<f32>::new();
+            for item in &steps[i].1[2..(vertex_data_cnt + 2)] {
+                vdata1_step.push(*item);
+            }
+            
+            let mut x1 = point_base[i].x + y_step * x0_step + 0.5_f32 - epsilon;
+            let mut z1 = point_base[i].z + y_step * z0_step; // inverse z
+            let mut vdata0 = Vec::<f32>::new();
+            for ind in 0..vertex_data_cnt {
+                vdata0.push(vd_base[i][ind] + y_step * vdata0_step[ind]);
+            }
+            let mut x2 = point_base[i].x + y_step * x1_step + 0.5_f32 - epsilon;
+
+            
+            let dx_step = x0_step - x1_step;
+            let dz_step = z0_step - z1_step;
             let mut dx = y_step * dx_step;
             let mut dz = y_step * dz_step;
 
@@ -98,10 +145,10 @@ pub fn triangle(cbuffer: &mut Vec<u32>, zbuffer: &mut Vec<f32>, x_size: usize, y
                         }
                     }
                 }
-                x1 += x1_step;
-                x2 += x2_step;
+                x1 += x0_step;
+                x2 += x1_step;
                 dx += dx_step;
-                z1 += z1_step;
+                z1 += z0_step;
                 dz += dz_step;
             }
         }

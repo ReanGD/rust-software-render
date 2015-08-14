@@ -74,19 +74,25 @@ impl Mesh {
             let norm = self.normal_buffer[triangle_index];
             shader.set_vec4(IN_VS_VEC_NORM, Vector4::new(norm.x, norm.y, norm.z, 0.0_f32));
             
-            let mut points: Vec<Point3<f32>> = vec![];
+            let mut points: [Point3<f32>; 3] = [Point3::<f32>::new(0.0, 0.0, 0.0); 3];
+            let mut vertex_out: [Vec<f32>; 3] = [Vec::<f32>::new(), Vec::<f32>::new(), Vec::<f32>::new()];
+            let mut vertex_out_len = 0;
             for i in 0..3 {
-                let v3 = self.vertex_buffer[indexes[i] as usize].position;
-                let v4 = Vector4::<f32>::new(v3.x, v3.y, v3.z, 1.0_f32);
-                shader.set_vec4(IN_VS_VEC_POS, v4);
-                let p_screen = shader.vertex();
+                let v = self.vertex_buffer[indexes[i] as usize].position;
+                shader.set_vec4(IN_VS_VEC_POS, Vector4::<f32>::new(v.x, v.y, v.z, 1.0_f32));
+                let (p_screen, sm) = shader.vertex();
+                vertex_out_len = sm;
                 let inverse_w = 1.0_f32 / p_screen.w;
+
+                for item in &mut shader.out_vertex_data[0..sm] {
+                    *item = *item * inverse_w;
+                }
                 
-                points.push(
-                    Point3::new(
-                        (p_screen.x * inverse_w + 1.0_f32) * device.x_size as f32 * 0.5_f32,
-                        (p_screen.y * inverse_w + 1.0_f32) * device.y_size as f32 * 0.5_f32,
-                        inverse_w));
+                vertex_out[i] = shader.out_vertex_data.clone();
+                points[i] = Point3::new(
+                    (p_screen.x * inverse_w + 1.0_f32) * device.x_size as f32 * 0.5_f32,
+                    (p_screen.y * inverse_w + 1.0_f32) * device.y_size as f32 * 0.5_f32,
+                    inverse_w);
             }
 
             let col0 = Vector3::new(points[0].x, points[1].x, points[2].x);
@@ -101,7 +107,7 @@ impl Mesh {
                      &mut device.zbuffer,
                      device.x_size,
                      device.y_size,
-                     points[0], points[1], points[2], shader);
+                     points, vertex_out, vertex_out_len, shader);
         }
 
         cnt_triangle as u32
