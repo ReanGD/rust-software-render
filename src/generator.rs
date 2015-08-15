@@ -1,11 +1,18 @@
-#[allow(dead_code)]
-pub fn generate_square() -> Result<Mesh, String> {
+use cgmath::*;
+use mesh::{Vertex, Mesh, Model};
+
+pub fn generate_plane() -> Result<Model, String> {
     let mut mesh = Mesh::new();
+    let mut model = Model::new();
     let mut vb: Vec<Vertex> = vec![Vertex::new(); 4];
     vb[0].position = Vector3::new(-0.5_f32,  0.5_f32, 0.0_f32);
+    vb[0].normal   = Vector3::new( 0.0_f32,  0.0_f32, 1.0_f32);
     vb[1].position = Vector3::new( 0.5_f32,  0.5_f32, 0.0_f32);
+    vb[1].normal   = Vector3::new( 0.0_f32,  0.0_f32, 1.0_f32);
     vb[2].position = Vector3::new( 0.5_f32, -0.5_f32, 0.0_f32);
+    vb[2].normal   = Vector3::new( 0.0_f32,  0.0_f32, 1.0_f32);
     vb[3].position = Vector3::new(-0.5_f32, -0.5_f32, 0.0_f32);
+    vb[3].normal   = Vector3::new( 0.0_f32,  0.0_f32, 1.0_f32);
     mesh.vertex(vb);
     let mut ib: Vec<u32> = vec![0; 2 * 3];
     ib[0] = 0;
@@ -15,8 +22,9 @@ pub fn generate_square() -> Result<Mesh, String> {
     ib[4] = 2;
     ib[5] = 3;
     try!(mesh.index(ib));
+    model.add(mesh);
 
-    Ok(mesh)
+    Ok(model)
 }
 
 #[allow(dead_code)]

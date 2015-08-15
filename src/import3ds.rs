@@ -196,7 +196,7 @@ impl Loader3ds {
         let num = try!(self.reader.get_u16(header)) as usize;
         let mut vb = Vec::<Vertex>::with_capacity(num);
         for v in try!(self.reader.get_f32_vec(header, num * 3)).chunks(3) {
-            vb.push(Vertex{position: Vector3::new(v[0], v[2], v[1])});
+            vb.push(Vertex{position: Vector3::new(v[0], v[2], v[1]), normal: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32)});
         }
         self.mesh.vertex(vb);
 
@@ -219,7 +219,7 @@ impl Loader3ds {
 
     fn read_chunk(& mut self) -> Result<u32, String> {
         let mut header = try!(self.reader.get_header());
-        println!("id = 0x{:x}; size={};", header.id, header.size);
+        // println!("id = 0x{:x}; size={};", header.id, header.size);
         match header.id {
             CHUNK_MAIN         => self.read_children(&mut header),
             CHUNK_VERSION      => self.skip_chunk(&mut header),

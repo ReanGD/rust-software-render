@@ -10,7 +10,7 @@ pub fn triangle(cbuffer: &mut Vec<u32>,
                 points: [Point3<f32>; 3],
                 vertex_data: [Vec<f32>; 3],
                 vertex_data_cnt: usize,
-                shader: &Shader) {
+                shader: &mut Shader) {
     let mut a = &points[0];
     let mut b = &points[1];
     let mut c = &points[2];
@@ -73,8 +73,8 @@ pub fn triangle(cbuffer: &mut Vec<u32>,
         step_bc[0] = (b.x - c.x) * inv_dy;
         step_bc[1] = (b.z - c.z) * inv_dy;
         for i in 0..vertex_data_cnt {
-            step_bc[i + 2] = (vc[i] - vc[i]) * inv_dy;
-        }        
+            step_bc[i + 2] = (vb[i] - vc[i]) * inv_dy;
+        }
     };
 
     // y-ranges: [y0; y1) + [y1; y2)
@@ -122,21 +122,44 @@ pub fn triangle(cbuffer: &mut Vec<u32>,
             }
             let mut x2 = point_base[i].x + y_step * x1_step + 0.5_f32 - epsilon;
 
-            
             let dx_step = x0_step - x1_step;
             let dz_step = z0_step - z1_step;
+            let mut dvdata_step = Vec::<f32>::new();
+            for ind in 0..vertex_data_cnt {
+                dvdata_step.push(vdata0_step[ind] - vdata1_step[ind]);
+            }
             let mut dx = y_step * dx_step;
             let mut dz = y_step * dz_step;
+            let mut dvdata = Vec::<f32>::new();
+            for ind in 0..vertex_data_cnt {
+                dvdata.push(y_step * dvdata_step[ind]);
+            }
 
             for y in y_begin[i]..y_end[i] {
                 let x1_int = cmp::min(cmp::max(x1 as i32, 0) as usize, x_size - 1);
                 let x2_int = cmp::min(cmp::max(x2 as i32, 0) as usize, x_size);
                 if x2_int > x1_int {
                     let z_step = dz / dx;
+                    let mut vdata_step = Vec::<f32>::new();
+                    for ind in 0..vertex_data_cnt {
+                        vdata_step.push(dvdata[ind] / dx);
+                    }
+
                     let mut z = z1 + z_step * (x1_int as f32 - x1 - epsilon); // inverse z
+                    let mut vdata = Vec::<f32>::new();
+                    for ind in 0..vertex_data_cnt {
+                        vdata.push(vdata0[ind] + vdata_step[ind] * (x1_int as f32 - x1 - epsilon));
+                    }
+
                     for x in (x1_int..x2_int) {
                         z += z_step;
+                        for ind in 0..vertex_data_cnt {
+                            vdata[ind] = vdata[ind] + vdata_step[ind];
+                        }
                         if zbuffer[y * x_size + x] < z {
+                            for ind in 0..vertex_data_cnt {
+                                shader.in_pixel_data[ind] = vdata[ind] / z;
+                            }
                             let clr = shader.pixel();
                             cbuffer[y * x_size + x] = (cmp::min((clr.x as u32), 0xFF) << 16) +
                                 (cmp::min((clr.y as u32), 0xFF) << 8) +
@@ -149,7 +172,13 @@ pub fn triangle(cbuffer: &mut Vec<u32>,
                 x2 += x1_step;
                 dx += dx_step;
                 z1 += z0_step;
+                for ind in 0..vertex_data_cnt {
+                    vdata0[ind] = vdata0[ind] + vdata0_step[ind];
+                }
                 dz += dz_step;
+                for ind in 0..vertex_data_cnt {
+                    dvdata[ind] = dvdata[ind] + dvdata_step[ind];
+                }
             }
         }
     }

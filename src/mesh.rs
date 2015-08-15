@@ -6,6 +6,7 @@ use rasterization::triangle;
 #[derive(Copy,Clone)]
 pub struct Vertex {
     pub position: Vector3<f32>,
+    pub normal: Vector3<f32>,
 }
 
 impl Vertex {
@@ -13,13 +14,13 @@ impl Vertex {
     pub fn new() -> Vertex {
         Vertex {
             position: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
+            normal: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
         }
     }
 }
 
 pub struct Mesh {
     pub vertex_buffer: Vec<Vertex>,
-    pub normal_buffer: Vec<Vector3<f32>>,
     pub index_buffer: Vec<u32>,
 }
 
@@ -31,7 +32,6 @@ impl Mesh {
     pub fn new() -> Mesh {
         Mesh {
             vertex_buffer: Vec::<Vertex>::new(),
-            normal_buffer: Vec::<Vector3<f32>>::new(),
             index_buffer: Vec::<u32>::new(),
         }
     }
@@ -54,15 +54,27 @@ impl Mesh {
             self.index_buffer.len() == 0 {
                 return Err("fill vertex and index buffer before calc normals".to_string());
             }
-        self.normal_buffer.clear();
         let ib = &self.index_buffer;
-        let vb = &self.vertex_buffer;
+        for vertex in &mut self.vertex_buffer {
+            vertex.normal = Vector3::<f32>::new(0.0_f32, 0.0_f32, 0.0_f32);
+        }
+        // let vb = &self.vertex_buffer;
         for i in 0..ib.len() / 3 {
             let ind = i * 3;
-            let v0 = vb[ib[ind + 0] as usize].position;
-            let v1 = vb[ib[ind + 1] as usize].position;
-            let v2 = vb[ib[ind + 2] as usize].position;
-            self.normal_buffer.push(v0.sub_v(&v1).cross(&v0.sub_v(&v2)).normalize());
+            let v0_ind = ib[ind + 0] as usize;
+            let v1_ind = ib[ind + 1] as usize;
+            let v2_ind = ib[ind + 2] as usize;
+            let v0 = self.vertex_buffer[v0_ind].position;
+            let v1 = self.vertex_buffer[v1_ind].position;
+            let v2 = self.vertex_buffer[v2_ind].position;
+            let normal = v0.sub_v(&v1).cross(&(v0.sub_v(&v2))).normalize();
+            self.vertex_buffer[v0_ind].normal.add_self_v(&normal);
+            self.vertex_buffer[v1_ind].normal.add_self_v(&normal);
+            self.vertex_buffer[v2_ind].normal.add_self_v(&normal);
+        }
+
+        for vertex in &mut self.vertex_buffer {
+            vertex.normal.normalize_self();
         }
 
         Ok(())
@@ -70,25 +82,23 @@ impl Mesh {
 
     pub fn draw(&self, shader: &mut Shader, device: &mut Device) -> u32 {
         let cnt_triangle = self.index_buffer.len() / 3;
-        for (triangle_index, indexes) in self.index_buffer.chunks(3).enumerate() {
-            let norm = self.normal_buffer[triangle_index];
-            shader.set_vec4(IN_VS_VEC_NORM, Vector4::new(norm.x, norm.y, norm.z, 0.0_f32));
-            
+        for indexes in self.index_buffer.chunks(3) {
             let mut points: [Point3<f32>; 3] = [Point3::<f32>::new(0.0, 0.0, 0.0); 3];
             let mut vertex_out: [Vec<f32>; 3] = [Vec::<f32>::new(), Vec::<f32>::new(), Vec::<f32>::new()];
             let mut vertex_out_len = 0;
             for i in 0..3 {
                 let v = self.vertex_buffer[indexes[i] as usize].position;
+                let n = self.vertex_buffer[indexes[i] as usize].normal;
                 shader.set_vec4(IN_VS_VEC_POS, Vector4::<f32>::new(v.x, v.y, v.z, 1.0_f32));
+                shader.set_vec4(IN_VS_VEC_NORM, Vector4::<f32>::new(n.x, n.y, n.z, 1.0_f32));
                 let (p_screen, sm) = shader.vertex();
                 vertex_out_len = sm;
                 let inverse_w = 1.0_f32 / p_screen.w;
 
-                for item in &mut shader.out_vertex_data[0..sm] {
-                    *item = *item * inverse_w;
+                for item in &shader.out_vertex_data[0..sm] {
+                    vertex_out[i].push((*item) * inverse_w);
                 }
                 
-                vertex_out[i] = shader.out_vertex_data.clone();
                 points[i] = Point3::new(
                     (p_screen.x * inverse_w + 1.0_f32) * device.x_size as f32 * 0.5_f32,
                     (p_screen.y * inverse_w + 1.0_f32) * device.y_size as f32 * 0.5_f32,
