@@ -27,15 +27,6 @@ const CHUNK_MATNAME:      u16 = 0xA000;
 const CHUNK_TEXTURE:      u16 = 0xA200;
 const CHUNK_MAPFILE:      u16 = 0xA300;
 const CHUNK_KEYFRAMER:    u16 = 0xB000;
-const CHUNK_TRACKINFO:    u16 = 0xB002;
-const CHUNK_TRACKOBJNAME: u16 = 0xB010;
-const CHUNK_TRACKPIVOT:   u16 = 0xB013;
-const CHUNK_TRACKPOS:     u16 = 0xB020;
-const CHUNK_TRACKROTATE:  u16 = 0xB021;
-const CHUNK_TRACKCAMERA:  u16 = 0xB003;
-const CHUNK_TRACKFOV:     u16 = 0xB023;
-const CHUNK_TRACKROLL:    u16 = 0xB024;
-const CHUNK_TRACKCAMTGT:  u16 = 0xB004;
 
 struct Reader {
     reader: fs::File
@@ -242,15 +233,6 @@ impl Loader3ds {
             CHUNK_TEXTURE      => self.skip_chunk(&mut header),
             CHUNK_MAPFILE      => self.skip_chunk(&mut header),
             CHUNK_KEYFRAMER    => self.skip_chunk(&mut header),
-            CHUNK_TRACKINFO    => self.skip_chunk(&mut header),
-            CHUNK_TRACKOBJNAME => self.skip_chunk(&mut header),
-            CHUNK_TRACKPIVOT   => self.skip_chunk(&mut header),
-            CHUNK_TRACKPOS     => self.skip_chunk(&mut header),
-            CHUNK_TRACKROTATE  => self.skip_chunk(&mut header),
-            CHUNK_TRACKCAMERA  => self.skip_chunk(&mut header),
-            CHUNK_TRACKFOV     => self.skip_chunk(&mut header),
-            CHUNK_TRACKROLL    => self.skip_chunk(&mut header),
-            CHUNK_TRACKCAMTGT  => self.skip_chunk(&mut header),
             _ => Err(format!("unknown chank id = 0x{:x}", header.id))
         }
     }
