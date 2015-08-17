@@ -97,6 +97,7 @@ pub fn triangle(cbuffer: &mut Vec<u32>,
         (&step_ac, &step_ab)
     };
     let steps = [step0, step1];
+    let pixel_func = shader.pixel_func;
 
     for i in (0..2) {
         if y_begin[i] < y_end[i] {
@@ -160,10 +161,10 @@ pub fn triangle(cbuffer: &mut Vec<u32>,
                             for ind in 0..vertex_data_cnt {
                                 shader.in_pixel_data[ind] = vdata[ind] / z;
                             }
-                            let clr = shader.pixel();
-                            cbuffer[y * x_size + x] = (cmp::min((clr.x as u32), 0xFF) << 16) +
-                                (cmp::min((clr.y as u32), 0xFF) << 8) +
-                                cmp::min((clr.z as u32), 0xFF);
+                            let clr = pixel_func(shader);
+                            cbuffer[y * x_size + x] = ((cmp::min(cmp::max((clr.x as i32), 0), 0xFF) << 16) +
+                                (cmp::min(cmp::max((clr.y as i32), 0), 0xFF) << 8) +
+                                cmp::min(cmp::max((clr.z as i32), 0), 0xFF)) as u32;
                             zbuffer[y * x_size + x] = z;
                         }
                     }
