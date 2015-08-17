@@ -8,11 +8,13 @@ pub const IN_VS_VEC_NORM: usize = 4;
 pub const IN_VS_VEC_NEG_LIGHT: usize = 8;
 pub const IN_VS_VEC_EYE_POS: usize = 12;
 
+pub const MAX_OUT_VALUES: usize = 16;
+
 pub struct Shader {
     pub matrix_arr: [Matrix4<f32>; 2], // see MATRIX_*
     pub in_vertex_data: Vec<f32>,      // see IN_VS_*
-    pub out_vertex_data: Vec<f32>,
-    pub in_pixel_data: Vec<f32>,
+    pub out_vertex_data: [f32; MAX_OUT_VALUES],
+    pub in_pixel_data: [f32; MAX_OUT_VALUES],
     pub color: Vector3<f32>,           // {r, g, b}
     pub ambient_intensity: f32,        // [0; 1]
     pub vertex_out_len: usize,
@@ -25,8 +27,8 @@ impl Shader {
         Shader {
             matrix_arr: [Matrix4::<f32>::zero(); 2],
             in_vertex_data: vec![0.0_f32; 16],
-            out_vertex_data: vec![0.0_f32; 16],
-            in_pixel_data: vec![0.0_f32; 12],
+            out_vertex_data: [0.0_f32; MAX_OUT_VALUES],
+            in_pixel_data: [0.0_f32; MAX_OUT_VALUES],
             color: color,
             ambient_intensity: ambient_intensity,
             vertex_out_len: 0,

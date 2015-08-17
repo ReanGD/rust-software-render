@@ -8,6 +8,7 @@ pub struct Scene {
     mat_proj: Matrix4<f32>,
     mat_view: Matrix4<f32>,
     vec_neg_light: Vector4<f32>,
+    vec_eye_pos: Vector4<f32>,
     cnt_triangle: u32,
 }
 
@@ -18,6 +19,7 @@ impl Scene {
             mat_proj: Matrix4::<f32>::zero(),
             mat_view: Matrix4::<f32>::zero(),
             vec_neg_light: Vector4::<f32>::zero(),
+            vec_eye_pos: Vector4::<f32>::zero(),
             cnt_triangle: 0,
         }
     }
@@ -30,6 +32,8 @@ impl Scene {
 
     pub fn view(&mut self, eye: Point3<f32>, center: Point3<f32>, up: Vector3<f32>) -> &mut Scene {
         self.mat_view = Matrix4::<f32>::look_at(&eye, &center, &up);
+        self.vec_eye_pos = Vector4::new(eye.x, eye.y, eye.z, 1.0_f32);
+        
         self
     }
 
@@ -54,6 +58,7 @@ impl Scene {
         shader.set_matrix(MATRIX_PROJ_VIEW_WORLD, self.mat_proj * self.mat_view * mat_world);
         shader.set_matrix(MATRIX_WORLD, mat_world);
         shader.set_vec4(IN_VS_VEC_NEG_LIGHT, self.vec_neg_light);
+        shader.set_vec4(IN_VS_VEC_EYE_POS, self.vec_eye_pos);
 
         self.cnt_triangle += mesh.draw(shader, &mut self.device);
 
