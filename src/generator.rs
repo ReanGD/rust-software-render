@@ -75,11 +75,11 @@ pub fn generate_sphere(cnt_vertex: usize) -> Result<Model, String> {
 
 	let plg = cnt_vertex / 2 - 1;
 	let vertex_cnt = plg * cnt_vertex + 2;
-	let index_cnt = 6 * (cnt_vertex - 1) * plg;
+	let index_cnt = 6 * cnt_vertex * plg;
     
     let mut vb: Vec<Vertex> = vec![Vertex::new(); vertex_cnt];
     let mut angle_b = rad(-std::f32::consts::PI / 2.0_f32);
-	let step_a = rad(std::f32::consts::PI * 2.0_f32 / (cnt_vertex as f32 - 1.0_f32));
+	let step_a = rad(std::f32::consts::PI * 2.0_f32 / (cnt_vertex as f32));
 	let step_b = rad(std::f32::consts::PI / (plg as f32 + 1.0_f32));
     let mut ind = 1;
     for _ in 0 .. plg {
@@ -105,38 +105,44 @@ pub fn generate_sphere(cnt_vertex: usize) -> Result<Model, String> {
     let mut ib: Vec<u32> = vec![0; index_cnt];
     let mut ind = 0;
     for ix in 0 .. (plg-1) {
-		let mut z1 = ix * cnt_vertex + 1;
-        let mut z2 = z1 + 1;
-		let mut z3 = z1 + cnt_vertex;
-        let mut z4 = z3 + 1;
-		for _ in 0 .. (cnt_vertex - 1) {
-			ib[ind + 0] = z1 as u32;
-            ib[ind + 1] = z2 as u32;
-            ib[ind + 2] = z3 as u32;
-            
-			ib[ind + 3] = z4 as u32;
-            ib[ind + 4] = z3 as u32;
-            ib[ind + 5] = z2 as u32;
-            z1 += 1;
-            z2 += 1;
-            z3 += 1;
-            z4 += 1;
+		let z1 = ix * cnt_vertex + 1;
+		let z2 = z1 + cnt_vertex;
+		for iy in 0 .. cnt_vertex {
+            let iy2 = if iy == (cnt_vertex - 1) {
+                0
+            } else {
+                iy + 1
+            };
+			ib[ind + 0] = (z1 + iy)  as u32;
+            ib[ind + 1] = (z1 + iy2) as u32;
+            ib[ind + 2] = (z2 + iy)  as u32;
+
+			ib[ind + 3] = (z2 + iy2) as u32;
+            ib[ind + 4] = (z2 + iy)  as u32;
+            ib[ind + 5] = (z1 + iy2) as u32;
             ind += 6;
 		}
 	}
-    
-	// let iy = cnt_vertex * (plg - 1);
-	// for ix in 1 .. cnt_vertex {
-	// 	ib[ind + 0] = ix as u32;
-    //     ib[ind + 1] = (ix + 1) as u32;
-    //     ib[ind + 2] = 0 as u32;
-	// 	ib[ind + 3] = (iy + ix + 1) as u32;
-    //     ib[ind + 4] = (iy + ix) as u32;
-    //     ib[ind + 5] = (vertex_cnt - 1) as u32; 
-    //     ind += 6;
-	// }
+
+    let z1 = 1;
+    let z2 = vertex_cnt - cnt_vertex - 1;
+    for ix in 0 .. cnt_vertex {
+        let ix2 = if ix == (cnt_vertex - 1) {
+            0
+        } else {
+            ix + 1
+        };
+        ib[ind + 0] = 0 as u32;
+        ib[ind + 1] = (z1 + ix2) as u32;
+        ib[ind + 2] = (z1 + ix)  as u32;
+
+        ib[ind + 3] = (vertex_cnt - 1) as u32;
+        ib[ind + 4] = (z2 + ix) as u32;
+        ib[ind + 5] = (z2 + ix2) as u32;
+        ind += 6;
+    }
     try!(mesh.index(ib));
-    mesh.calc_normal();
+    // mesh.calc_normal();
     model.add(mesh);
 
     Ok(model)
