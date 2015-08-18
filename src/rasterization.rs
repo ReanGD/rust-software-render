@@ -105,7 +105,6 @@ pub fn triangle(cbuffer: &mut Vec<u32>,
     let steps = [step0, step1];
     let pixel_func = shader.pixel_func;
 
-    
     let mut vdata0_step = [0.0_f32; MAX_OUT_VALUES];
     let mut vdata0      = [0.0_f32; MAX_OUT_VALUES];
     let mut dvdata_step = [0.0_f32; MAX_OUT_VALUES];
@@ -155,7 +154,7 @@ pub fn triangle(cbuffer: &mut Vec<u32>,
                     for x in x1_int..x2_int {
                         z += z_step;
                         for ind in 0..vertex_data_cnt {
-                            vdata[ind] = vdata[ind] + vdata_step[ind];
+                            vdata[ind] += vdata_step[ind];
                         }
                         if zbuffer[offset + x] < z {
                             for ind in 0..vertex_data_cnt {
@@ -176,8 +175,8 @@ pub fn triangle(cbuffer: &mut Vec<u32>,
                 z1 += z0_step;
                 dz += dz_step;
                 for ind in 0..vertex_data_cnt {
-                    vdata0[ind] = vdata0[ind] + vdata0_step[ind];
-                    dvdata[ind] = dvdata[ind] + dvdata_step[ind];
+                    vdata0[ind] += vdata0_step[ind];
+                    dvdata[ind] += dvdata_step[ind];
                 }
             }
         }
