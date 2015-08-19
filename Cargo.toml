@@ -1,6 +1,6 @@
 [package]
 name = "rust-software-render"
-version = "0.3.0"
+version = "0.4.0"
 authors = ["ReanGD"]
 
 [dependencies]
@@ -8,3 +8,7 @@ rand = "*"
 time = "*"
 sdl2 = "*"
 cgmath = "*"
+
+[dependencies.sdl2_image]
+git = "https://github.com/xsleonard/rust-sdl2_image"
+
