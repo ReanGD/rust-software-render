@@ -1,4 +1,5 @@
 use std;
+use cgmath::Vector3;
 
 #[allow(dead_code)]
 pub fn typed_to_bytes<T>(slice: &[T]) -> &[u8] {
@@ -13,4 +14,12 @@ pub fn bytes_to_typed<T>(slice: &mut [u8]) -> &mut [T] {
         std::slice::from_raw_parts_mut(slice.as_mut_ptr() as *mut T,
                                        slice.len() / std::mem::size_of::<T>())
     }
+}
+
+#[inline]
+pub fn vector3_to_u32(vec: &Vector3<f32>) -> u32 {
+    ((std::cmp::min(std::cmp::max((vec.x as i32), 0), 0xFF) << 16) +
+     (std::cmp::min(std::cmp::max((vec.y as i32), 0), 0xFF) << 8) +
+     (std::cmp::min(std::cmp::max((vec.z as i32), 0), 0xFF))
+     ) as u32
 }
