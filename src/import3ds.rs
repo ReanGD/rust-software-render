@@ -2,8 +2,8 @@ use std::mem::swap;
 use cgmath::*;
 use mesh::{Model, Mesh, Vertex};
 use memory::bytes_to_typed;
-use std::env;
 use std::fs;
+use utils::get_full_path;
 use std::io::{Read, Seek, SeekFrom};
 
 const CHUNK_MAIN:         u16 = 0x4D4D;
@@ -237,25 +237,10 @@ impl Loader3ds {
         }
     }
 
-    pub fn load(filepath: &str) -> Result<Model, String> {
-        let mut cur_dir = env::current_dir().unwrap();
-        
-        loop {
-            cur_dir.push("media");
-            let is_dir = match fs::metadata(cur_dir.to_str().unwrap()) {
-                Ok(md) => md.is_dir(),
-                Err(_) => false
-            };
-            if is_dir {
-                break;
-            }
-            if !cur_dir.pop() || !cur_dir.pop() {
-                return Err("not found \"media\" directory".to_string());
-            }
-        }
-        cur_dir.push(filepath);
+    pub fn load(filename: &str) -> Result<Model, String> {
+        let filepath = try!(get_full_path(filename));
         let mut this = Loader3ds {
-            reader: try!(Reader::new(cur_dir.as_path().to_str().unwrap())),
+            reader: try!(Reader::new(&filepath)),
             model: Model::new(),
             mesh: Mesh::new(),
         };

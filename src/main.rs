@@ -1,9 +1,11 @@
 extern crate sdl2;
+extern crate sdl2_image;
 extern crate rand;
 extern crate time;
 extern crate cgmath;
 
 mod mesh;
+mod utils;
 mod scene;
 mod tests;
 mod device;
@@ -26,7 +28,7 @@ pub fn main() {
     let eye;
     let center;
     let model;
-    let ind = 0;
+    let ind = 3;
     let mut material = Material::gold();
     let mut init_matrix = Matrix4::<f32>::identity();
     let mut add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);

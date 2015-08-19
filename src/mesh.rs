@@ -67,7 +67,6 @@ impl Mesh {
             let v0 = self.vertex_buffer[v0_ind].position;
             let v1 = self.vertex_buffer[v1_ind].position;
             let v2 = self.vertex_buffer[v2_ind].position;
-            // let normal = v1.sub_v(&v0).cross(&(v2.sub_v(&v1)));
             let normal = v2.sub_v(&v1).cross(&(v1.sub_v(&v0)));
             self.vertex_buffer[v0_ind].normal.add_self_v(&normal);
             self.vertex_buffer[v1_ind].normal.add_self_v(&normal);
