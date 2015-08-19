@@ -1,4 +1,5 @@
 use cgmath::*;
+use material::Material;
 
 pub const MATRIX_PROJ_VIEW_WORLD: usize = 0;
 pub const MATRIX_WORLD: usize = 1;
@@ -17,25 +18,27 @@ pub struct Shader {
     pub in_pixel_data: [f32; MAX_OUT_VALUES],
     pub ambient: Vector3<f32>,           // {r, g, b}
     pub diffuse: Vector3<f32>,           // {r, g, b}
-    pub ambient_intensity: f32,        // [0; 1]
+    pub specular: Vector3<f32>,           // {r, g, b}
+    pub ambient_intensity: f32,          // [0; 1]
     pub vertex_out_len: usize,
     pub vertex_func: fn(&mut Shader) -> Vector4<f32>,
     pub pixel_func: fn(&Shader) -> Vector3<f32>,
 }
 
 impl Shader {
-    pub fn new(ambient: Vector3<f32>, diffuse: Vector3<f32>, ambient_intensity: f32) -> Shader {
+    pub fn new(material: &Material) -> Shader {
         Shader {
             matrix_arr: [Matrix4::<f32>::zero(); 2],
             in_vertex_data: vec![0.0_f32; 16],
             out_vertex_data: [0.0_f32; MAX_OUT_VALUES],
             in_pixel_data: [0.0_f32; MAX_OUT_VALUES],
-            ambient: ambient,
-            diffuse: diffuse,
-            ambient_intensity: ambient_intensity,
+            ambient: material.ambient,
+            diffuse: material.diffuse,
+            specular: material.specular,
+            ambient_intensity: material.ambient_intensity,
             vertex_out_len: 0,
-            vertex_func: Shader::vertex_def,
-            pixel_func: Shader::pixel_def,
+            vertex_func: Shader::vertex_lambert,
+            pixel_func: Shader::pixel_lambert,
         }
     }
 
@@ -120,9 +123,10 @@ impl Shader {
     #[allow(dead_code)]
     pub fn pixel_lambert(&self) -> Vector3<f32> {
         let cos_nl = self.in_pixel_data[0];
-        let color = self.diffuse.mul_s(cos_nl.max(0.0_f32));
+        let ambient = self.ambient.mul_s(self.ambient_intensity);
+        let diffuse = self.diffuse.mul_s(cos_nl.max(0.0_f32));
 
-        color
+        ambient + diffuse
     }
 
     // out:
@@ -144,7 +148,7 @@ impl Shader {
     // 0 - Vector3 view
     // 3 - Vector3 norm
     #[allow(dead_code)]
-    pub fn pixel_phong_blinn(&self) -> Vector3<f32> {
+    pub fn pixel_phong_blinn(&mut self) -> Vector3<f32> {
         let view = Vector3::new(self.in_pixel_data[0], self.in_pixel_data[1], self.in_pixel_data[2]).normalize();
         let norm = Vector3::new(self.in_pixel_data[3], self.in_pixel_data[4], self.in_pixel_data[5]).normalize();
         let light4 = self.read_vec4(IN_VS_VEC_NEG_LIGHT);
@@ -156,11 +160,10 @@ impl Shader {
         let spec_power = 5.0_f32;
 
         let ambient = self.ambient.mul_s(self.ambient_intensity);
-        let diff = self.diffuse.mul_s(cos_nl.max(0.0_f32));
-        let specular_color = Vector3::new(160.212_f32, 141.73_f32, 93.347_f32);
-        let spec = specular_color.mul_s(cos_nh.max(0.0_f32).powf(spec_power));
+        let diffuse = self.diffuse.mul_s(cos_nl.max(0.0_f32));
+        let specular = self.specular.mul_s(cos_nh.max(0.0_f32).powf(spec_power));
 
-        ambient + diff + spec
+        ambient + diffuse + specular
     }
 
     // out:
@@ -189,7 +192,7 @@ impl Shader {
         let light = Vector3::new(light4.x, light4.y, light4.z);
         let half = view.add_v(&light).normalize();
 
-        let roughness = 0.5_f32;
+        let roughness = 0.3_f32;
         let roughness_sq = roughness * roughness;
         
         let cos_hn = half.dot(&norm).max(0.0000001_f32);
@@ -204,31 +207,10 @@ impl Shader {
         let d = pow_val.exp() / (4.0_f32 * roughness_sq * cos_hn_sq * cos_hn_sq);
         let k = (geometric * frenel * d) / (cos_vn * cos_ln + 0.0000001_f32);
 
-        let specular_color = Vector3::new(160.212_f32, 141.73_f32, 93.347_f32);
-        let spec = specular_color.mul_s(k);
         let ambient = self.ambient.mul_s(self.ambient_intensity);
-        let diff = self.diffuse.add_v(&spec).mul_s(cos_ln.max(0.0_f32));
+        let specular = self.specular.mul_s(k);
+        let diffuse_specular = self.diffuse.add_v(&specular).mul_s(cos_ln.max(0.0_f32));
         
-        ambient + diff
-    }
-
-    // out:
-    // 0 - f32 cos_nl
-    pub fn vertex_def(&mut self) -> Vector4<f32> {
-        let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
-        let norm = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_NORM)).normalize();
-        let cos_nl = norm.dot(&self.read_vec4(IN_VS_VEC_NEG_LIGHT));
-
-        self.out_f32(cos_nl);
-        pos
-    }
-
-    // in:
-    // 0 - f32 cos_nl
-    pub fn pixel_def(&self) -> Vector3<f32> {
-        let cos_nl = self.in_pixel_data[0];
-        let color = self.diffuse.mul_s(cos_nl.max(self.ambient_intensity));
-
-        color
+        ambient + diffuse_specular
     }
 }
