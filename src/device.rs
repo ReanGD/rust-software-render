@@ -1,10 +1,11 @@
 use sdl2;
+use time;
 
 struct Fps {
     pub fps: f32,
     counter_max: u32,
     counter: u32,
-    tick_start: u32,
+    time_start: u64,
 }
 
 impl Fps {
@@ -13,12 +14,12 @@ impl Fps {
             fps: 0.0_f32,
             counter_max: counter_max,
             counter: 0,
-            tick_start: 0,
+            time_start: 0,
         }
     }
 
     pub fn start(&mut self) {
-        self.tick_start = sdl2::timer::get_ticks();
+        self.time_start = time::precise_time_ns();
         self.counter = 0;
         self.fps = 0.0_f32;
     }
@@ -26,9 +27,9 @@ impl Fps {
     pub fn update(&mut self) -> bool {
         self.counter += 1;
         if self.counter == self.counter_max {
-            let cur_tick = sdl2::timer::get_ticks();
-            let dt = (cur_tick - self.tick_start) as f32;
-            self.tick_start = cur_tick;
+            let cur_time = time::precise_time_ns();
+            let dt = ((cur_time - self.time_start) / 1000000) as f32;
+            self.time_start = cur_time;
             self.fps = (self.counter_max * 1000) as f32 / dt;
             self.counter = 0;
             true
@@ -39,7 +40,7 @@ impl Fps {
 }
 
 pub struct Device {
-    context: sdl2::Sdl,
+    events: sdl2::EventPump,
     renderer: sdl2::render::Renderer<'static>,
     texture: sdl2::render::Texture,
     fps: Fps,
@@ -50,9 +51,11 @@ pub struct Device {
 
 impl Device {
     pub fn new(title: &str, width: u32, height: u32) -> Device {
-        let context = sdl2::init().video().unwrap();
+        let context = sdl2::init().unwrap();
+        let video_subsystem = context.video().unwrap();
+        let events = context.event_pump().unwrap();
 
-        let window = context.window(title, width, height)
+        let window = video_subsystem.window(title, width, height)
             .position_centered()
             .opengl()
             .build()
@@ -60,16 +63,16 @@ impl Device {
 
         let renderer = window.renderer().build().unwrap();
 
-        let format = sdl2::pixels::PixelFormatEnum::RGBX8888;
+        let format = sdl2::pixels::PixelFormatEnum::ARGB8888;
         let texture = renderer.create_texture_streaming(format, (width, height)).unwrap();
         let size = (width as usize)*(height as usize);
         let cbuffer = vec![0; size];
-
+        
         let mut fps = Fps::new(5);
         fps.start();
 
         Device {
-            context: context,
+            events: events,
             renderer: renderer,
             texture: texture,
             fps: fps,
@@ -80,8 +83,8 @@ impl Device {
     }
 
     pub fn set_title(&mut self, title: &str) {
-        let mut props = self.renderer.window_properties(&self.context).unwrap();
-        props.set_title(&title);
+        let mut window = self.renderer.window_mut().unwrap();
+        window.set_title(&title);
     }
 
     pub fn draw_fps(&mut self) {
@@ -124,16 +127,19 @@ impl Device {
 
     pub fn keyboard(&mut self) -> bool {
         let mut is_continue = true;
-        for event in self.context.event_pump().poll_iter() {
+
+        for event in self.events.poll_iter() {
             use sdl2::event::Event;
+            use sdl2::keyboard::Keycode;
 
             match event {
-                Event::Quit {..} | Event::KeyDown { keycode: Some(sdl2::keyboard::Keycode::Escape), .. } => {
+                Event::Quit {..} | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                     is_continue = false
                 },
                 _ => {}
             }
         }
+        
         is_continue
     }
 }
