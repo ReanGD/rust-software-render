@@ -1,6 +1,7 @@
 use std;
 use sdl2;
 use time;
+use sdl2_image;
 
 struct Fps {
     pub fps: f32,
@@ -64,6 +65,7 @@ impl Device {
     pub fn new(title: &str, width: u32, height: u32) -> Device {
         let context = sdl2::init().unwrap();
         let video_subsystem = context.video().unwrap();
+        sdl2_image::init(sdl2_image::INIT_PNG | sdl2_image::INIT_JPG | sdl2_image::INIT_TIF);
         let events = context.event_pump().unwrap();
 
         let window = video_subsystem.window(title, width, height)
@@ -148,4 +150,9 @@ impl Device {
         
         is_continue
     }
+
+    pub fn exit(&self) {
+        sdl2_image::quit();
+    }
+    
 }

@@ -3,6 +3,8 @@ extern crate sdl2_image;
 extern crate rand;
 extern crate time;
 extern crate cgmath;
+extern crate libc;
+extern crate sdl2_sys;
 
 mod mesh;
 mod utils;
@@ -11,14 +13,17 @@ mod tests;
 mod device;
 mod memory;
 mod shader;
+mod texture;
 mod material;
 mod import3ds;
+mod dll_import;
 mod generator;
 mod rasterization;
 
 use cgmath::*;
 use scene::Scene;
 use shader::Shader;
+use texture::Texture;
 use material::Material;
 use generator::{generate_plane, generate_sphere};
 use import3ds::Loader3ds;
@@ -54,7 +59,7 @@ pub fn main() {
             model = Loader3ds::load("monster.3ds").unwrap();
         },
         3 => {
-            eye = Point3::new(0.0_f32, 0.0_f32, 0.5_f32);
+            eye = Point3::new(0.0_f32, 0.0_f32, -0.5_f32);
 	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
             add_angle = rad(0.0_f32);
             model = generate_plane().unwrap();
@@ -75,9 +80,11 @@ pub fn main() {
     scene.proj(deg(100.0_f32), 0.1_f32, 100.0_f32)
         .view(eye, center, up)
         .light(light);
+    let texture = Texture::new("chess.png").unwrap();
 
-    let mut shader = Shader::new(&material);
-    shader.set_shaders(Shader::vertex_cook_torrance, Shader::pixel_cook_torrance);
+    let mut shader = Shader::new(&material, texture);
+    shader.set_shaders(Shader::vertex_tex, Shader::pixel_tex);
+    // shader.set_shaders(Shader::vertex_cook_torrance, Shader::pixel_cook_torrance);
     // shader.set_shaders(Shader::vertex_phong_blinn, Shader::pixel_phong_blinn);
     // shader.set_shaders(Shader::vertex_normals, Shader::pixel_normals);
     while scene.start(0xAAAAAA) {
