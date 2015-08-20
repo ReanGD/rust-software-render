@@ -8,20 +8,27 @@ pub fn generate_plane() -> Result<Model, String> {
     let mut vb: Vec<Vertex> = vec![Vertex::new(); 4];
     vb[0].position = Vector3::new(-0.5_f32,  0.5_f32, 0.0_f32);
     vb[0].normal   = Vector3::new( 0.0_f32,  0.0_f32, 1.0_f32);
+    vb[0].tex      = Vector2::new( 0.0_f32,  0.0_f32);
+    
     vb[1].position = Vector3::new( 0.5_f32,  0.5_f32, 0.0_f32);
     vb[1].normal   = Vector3::new( 0.0_f32,  0.0_f32, 1.0_f32);
+    vb[1].tex      = Vector2::new( 10.0_f32,  0.0_f32);
+    
     vb[2].position = Vector3::new( 0.5_f32, -0.5_f32, 0.0_f32);
     vb[2].normal   = Vector3::new( 0.0_f32,  0.0_f32, 1.0_f32);
+    vb[2].tex      = Vector2::new( 10.0_f32,  10.0_f32);
+    
     vb[3].position = Vector3::new(-0.5_f32, -0.5_f32, 0.0_f32);
     vb[3].normal   = Vector3::new( 0.0_f32,  0.0_f32, 1.0_f32);
+    vb[3].tex      = Vector2::new( 0.0_f32,  10.0_f32);
     mesh.vertex(vb);
     let mut ib: Vec<u32> = vec![0; 2 * 3];
     ib[0] = 0;
-    ib[1] = 1;
-    ib[2] = 2;
+    ib[2] = 1;
+    ib[1] = 2;
     ib[3] = 0;
-    ib[4] = 2;
-    ib[5] = 3;
+    ib[5] = 2;
+    ib[4] = 3;
     try!(mesh.index(ib));
     model.add(mesh);
 

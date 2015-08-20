@@ -5,10 +5,25 @@ use sdl2::surface::Surface;
 use utils::get_full_path;
 use dll_import::IMG_Load;
 
-pub struct Texture {
+pub struct Surface {
     pub size_x: usize,
     pub size_y: usize,
     pub data: Vec<Vector3<f32>>,
+}
+
+pub struct Texture {
+    pub levels: Vec<Surface>,
+}
+
+impl Surface {
+    fn new(size_x: usize, size_y: usize) -> Surface {
+        Surface {
+            size_x: size_x,
+            size_y: size_y,
+            data: Vec::<Vector3<f32>>::with_capacity(size_x * size_y),
+        }
+    }
+
 }
 
 impl Texture {
@@ -26,7 +41,6 @@ impl Texture {
         let standart = try!(Surface::new(1, 1, sdl2::pixels::PixelFormatEnum::ARGB8888));
         let mut surface: Surface = try!(surface_load.as_ref().convert(&standart.as_ref().get_pixel_format()));
 
-        
         let size_x = surface.as_ref().get_width() as usize;
         let size_y = surface.as_ref().get_height() as usize;
         let mut data = Vec::<Vector3<f32>>::with_capacity(size_x * size_y);

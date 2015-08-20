@@ -62,6 +62,7 @@ pub fn main() {
             eye = Point3::new(0.0_f32, 0.0_f32, -0.5_f32);
 	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
             add_angle = rad(0.0_f32);
+            // init_matrix = Matrix4::from(Matrix3::from_angle_x(rad(std::f32::consts::PI * 0.25_f32)));
             model = generate_plane().unwrap();
         },
         4 => {
