@@ -8,6 +8,8 @@ rand = "*"
 time = "*"
 sdl2 = "*"
 cgmath = "*"
+libc = "*"
+sdl2-sys = "*"
 
 [dependencies.sdl2_image]
 git = "https://github.com/xsleonard/rust-sdl2_image"
