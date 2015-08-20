@@ -1,13 +1,16 @@
+use std;
 use cgmath::*;
 use material::Material;
+use texture::Texture;
 
 pub const MATRIX_PROJ_VIEW_WORLD: usize = 0;
 pub const MATRIX_WORLD: usize = 1;
 
 pub const IN_VS_VEC_POS: usize = 0;
 pub const IN_VS_VEC_NORM: usize = 4;
-pub const IN_VS_VEC_NEG_LIGHT: usize = 8;
-pub const IN_VS_VEC_EYE_POS: usize = 12;
+pub const IN_VS_VEC_TEX: usize = 8;
+pub const IN_VS_VEC_NEG_LIGHT: usize = 10;
+pub const IN_VS_VEC_EYE_POS: usize = 14;
 
 pub const MAX_OUT_VALUES: usize = 16;
 
@@ -16,9 +19,10 @@ pub struct Shader {
     pub in_vertex_data: Vec<f32>,      // see IN_VS_*
     pub out_vertex_data: [f32; MAX_OUT_VALUES],
     pub in_pixel_data: [f32; MAX_OUT_VALUES],
+    pub texture: Texture,
     pub ambient: Vector3<f32>,           // {r, g, b}
     pub diffuse: Vector3<f32>,           // {r, g, b}
-    pub specular: Vector3<f32>,           // {r, g, b}
+    pub specular: Vector3<f32>,          // {r, g, b}
     pub ambient_intensity: f32,          // [0; 1]
     pub vertex_out_len: usize,
     pub vertex_func: fn(&mut Shader) -> Vector4<f32>,
@@ -26,12 +30,13 @@ pub struct Shader {
 }
 
 impl Shader {
-    pub fn new(material: &Material) -> Shader {
+    pub fn new(material: &Material, texture: Texture) -> Shader {
         Shader {
             matrix_arr: [Matrix4::<f32>::zero(); 2],
-            in_vertex_data: vec![0.0_f32; 16],
+            in_vertex_data: vec![0.0_f32; 18],
             out_vertex_data: [0.0_f32; MAX_OUT_VALUES],
             in_pixel_data: [0.0_f32; MAX_OUT_VALUES],
+            texture: texture,
             ambient: material.ambient,
             diffuse: material.diffuse,
             specular: material.specular,
@@ -42,10 +47,11 @@ impl Shader {
         }
     }
 
-    pub fn reset(&mut self, position: Vector4<f32>, normal: Vector4<f32>) {
+    pub fn reset(&mut self, position: Vector4<f32>, normal: Vector4<f32>, tex: Vector2<f32>) {
         self.vertex_out_len = 0;
         self.set_vec4(IN_VS_VEC_POS, position);
         self.set_vec4(IN_VS_VEC_NORM, normal);
+        self.set_vec2(IN_VS_VEC_TEX, tex);
     }
 
     pub fn set_shaders(&mut self,
@@ -65,6 +71,11 @@ impl Shader {
         self.in_vertex_data[sm + 2] = vector.z;
         self.in_vertex_data[sm + 3] = vector.w;
     }
+    
+    pub fn set_vec2(&mut self, sm: usize, vector: Vector2<f32>) {
+        self.in_vertex_data[sm + 0] = vector.x;
+        self.in_vertex_data[sm + 1] = vector.y;
+    }
 
     fn read_vec4(&self, sm: usize) -> Vector4<f32> {
         Vector4::new(self.in_vertex_data[sm + 0],
@@ -79,11 +90,22 @@ impl Shader {
                      self.in_vertex_data[sm + 2])
     }
 
+    fn read_vec2(&self, sm: usize) -> Vector2<f32> {
+        Vector2::new(self.in_vertex_data[sm + 0],
+                     self.in_vertex_data[sm + 1])
+    }
+
     fn out_vec3_from4(&mut self, val: &Vector4<f32>) {
         self.out_vertex_data[self.vertex_out_len + 0] = val.x;
         self.out_vertex_data[self.vertex_out_len + 1] = val.y;
         self.out_vertex_data[self.vertex_out_len + 2] = val.z;
         self.vertex_out_len += 3;
+    }
+
+    fn out_vec2(&mut self, val: &Vector2<f32>) {
+        self.out_vertex_data[self.vertex_out_len + 0] = val.x;
+        self.out_vertex_data[self.vertex_out_len + 1] = val.y;
+        self.vertex_out_len += 2;
     }
     
     fn out_f32(&mut self, val: f32) {
@@ -132,6 +154,31 @@ impl Shader {
         let diffuse = self.diffuse.mul_s(cos_nl.max(0.0_f32));
 
         ambient + diffuse
+    }
+
+    // out:
+    // 0 - Vector2 tex
+    #[allow(dead_code)]
+    pub fn vertex_tex(&mut self) -> Vector4<f32> {
+        let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
+        // let norm = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_NORM)).normalize();
+        let tex = self.read_vec2(IN_VS_VEC_TEX);
+        // println!("{};{}", tex.x, tex.y);
+
+        self.out_vec2(&tex);
+        pos
+    }
+
+    // in:
+    // 0 - Vector2 tex
+    #[allow(dead_code)]
+    pub fn pixel_tex(&self) -> Vector3<f32> {
+        let tex = Vector2::<f32>::new(self.in_pixel_data[0], self.in_pixel_data[1]);
+        let x = std::cmp::min((tex.x * ((self.texture.size_x - 1) as f32)) as usize, self.texture.size_x - 1);
+        let y = std::cmp::min((tex.y * ((self.texture.size_y - 1) as f32)) as usize, self.texture.size_y - 1);
+        let color = self.texture.data[y * self.texture.size_x + x];
+
+        color
     }
 
     // out:

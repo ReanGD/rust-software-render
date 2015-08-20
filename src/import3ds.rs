@@ -187,7 +187,9 @@ impl Loader3ds {
         let num = try!(self.reader.get_u16(header)) as usize;
         let mut vb = Vec::<Vertex>::with_capacity(num);
         for v in try!(self.reader.get_f32_vec(header, num * 3)).chunks(3) {
-            vb.push(Vertex{position: Vector3::new(v[0], v[2], v[1]), normal: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32)});
+            vb.push(Vertex{position: Vector3::new(v[0], v[2], v[1]),
+                           normal: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
+                           tex: Vector2::new(0.0_f32, 0.0_f32)});
         }
         self.mesh.vertex(vb);
 

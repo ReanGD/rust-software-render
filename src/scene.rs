@@ -50,6 +50,7 @@ impl Scene {
             self.cnt_triangle = 0;
             true
         } else {
+            self.device.exit();
             false
         }
     }

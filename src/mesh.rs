@@ -7,6 +7,7 @@ use rasterization::triangle;
 pub struct Vertex {
     pub position: Vector3<f32>,
     pub normal: Vector3<f32>,
+    pub tex: Vector2<f32>,
 }
 
 impl Vertex {
@@ -15,6 +16,7 @@ impl Vertex {
         Vertex {
             position: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
             normal: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
+            tex: Vector2::new(0.0_f32, 0.0_f32),
         }
     }
 }
@@ -90,8 +92,9 @@ impl Mesh {
             for i in 0..3 {
                 let v = self.vertex_buffer[indexes[i] as usize].position;
                 let n = self.vertex_buffer[indexes[i] as usize].normal;
+                let t = self.vertex_buffer[indexes[i] as usize].tex;
 
-                shader.reset(Vector4::<f32>::new(v.x, v.y, v.z, 1.0_f32), Vector4::<f32>::new(n.x, n.y, n.z, 1.0_f32));
+                shader.reset(Vector4::<f32>::new(v.x, v.y, v.z, 1.0_f32), Vector4::<f32>::new(n.x, n.y, n.z, 1.0_f32), t);
                 let p_screen = vertex_func(shader);
                 vertex_out_len = shader.vertex_out_len;
                 let inverse_w = 1.0_f32 / p_screen.w;
