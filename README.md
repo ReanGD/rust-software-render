@@ -1,4 +1,7 @@
-# rust-software-render [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg?branch=master)](https://travis-ci.org/ReanGD/rust-software-render)
+# rust-software-render 
+
+[v0.1](https://github.com/ReanGD/rust-software-render/tree/v01) [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg)](https://travis-ci.org/ReanGD/rust-software-render) 
+[master](https://github.com/ReanGD/rust-software-render/tree/master) [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg?branch=master)](https://travis-ci.org/ReanGD/rust-software-render)
 
 Для сборки проекта у вас должен стоять компилятор [Rust](http://www.rust-lang.org/), менеджер пакетов для него [Cargo](https://crates.io/).
 
@@ -21,4 +24,7 @@ cargo run --release
 ```
 
 Скриншоты:
+
+[v0.1](https://github.com/ReanGD/rust-software-render/tree/v01):
+
 ![Растеризация на плоскости](https://github.com/ReanGD/rust-software-render/blob/master/screenshots/scene_1.png "Растеризация на плоскости")
