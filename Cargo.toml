@@ -6,7 +6,7 @@ authors = ["ReanGD"]
 [dependencies]
 rand = "*"
 time = "*"
-sdl2 = "*"
+sdl2 = "0.8.0"
 cgmath = "*"
 libc = "*"
 sdl2-sys = "*"

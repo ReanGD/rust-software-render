@@ -163,8 +163,8 @@ impl Shader {
         let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
         // let norm = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_NORM)).normalize();
         let mut tex = self.read_vec2(IN_VS_VEC_TEX);
-        tex.x *= (self.texture.size_x - 1) as f32;
-        tex.y *= (self.texture.size_y - 1) as f32;
+        tex.x *= (self.texture.levels[0].size_x - 1) as f32;
+        tex.y *= (self.texture.levels[0].size_y - 1) as f32;
 
         self.out_vec2(&tex);
         pos
@@ -175,9 +175,9 @@ impl Shader {
     #[allow(dead_code)]
     pub fn pixel_tex(&self) -> Vector3<f32> {
         let tex = Vector2::<f32>::new(self.in_pixel_data[0], self.in_pixel_data[1]);
-        let x = std::cmp::max(tex.x as i32, 0) as usize % self.texture.size_x;
-        let y = std::cmp::max(tex.y as i32, 0) as usize % self.texture.size_y;
-        let color = self.texture.data[y * self.texture.size_x + x];
+        let x = std::cmp::max(tex.x as i32, 0) as usize % self.texture.levels[0].size_x;
+        let y = std::cmp::max(tex.y as i32, 0) as usize % self.texture.levels[0].size_y;
+        let color = self.texture.levels[0].data[y * self.texture.levels[0].size_x + x];
 
         color
     }
