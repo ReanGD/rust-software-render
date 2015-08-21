@@ -27,4 +27,5 @@ cargo run --release
 
 [v0.1](https://github.com/ReanGD/rust-software-render/tree/v01):
 
+16 тыс. случайных треугольников на экране и всего 1 fps:
 ![Растеризация на плоскости](https://github.com/ReanGD/rust-software-render/blob/master/screenshots/scene_1.png "Растеризация на плоскости")
