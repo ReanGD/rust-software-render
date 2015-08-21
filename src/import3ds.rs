@@ -219,7 +219,7 @@ impl Loader3ds {
 
     fn read_chunk(& mut self) -> Result<u32, String> {
         let mut header = try!(self.reader.get_header());
-        println!("id = 0x{:x}; size={};", header.id, header.size);
+        // println!("id = 0x{:x}; size={};", header.id, header.size);
         match header.id {
             CHUNK_MAIN         => self.read_children(&mut header),
             CHUNK_VERSION      => self.skip_chunk(&mut header),
