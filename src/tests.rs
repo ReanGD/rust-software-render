@@ -1,20 +1,27 @@
+
 #[cfg(test)]
 mod rasterization {
-    use cgmath::Point2;
+    use cgmath::{Point2, Point3, Vector3};
     use rasterization::triangle;
+    use shader::Shader;
 
-    fn triangle_test(a: Point2<f32>, b: Point2<f32>, c: Point2<f32>, buffer_except: Vec<u32>) {
+    fn triangle_test(a_screen: Point2<f32>, b_screen: Point2<f32>, c_screen: Point2<f32>, buffer_except: Vec<u32>) {
+        let a = Point3::new(a_screen.x, a_screen.y, 0.5_f32);
+        let b = Point3::new(b_screen.x, b_screen.y, 0.5_f32);
+        let c = Point3::new(c_screen.x, c_screen.y, 0.5_f32);
         let x_size: usize = 7;
         let y_size: usize = 5;
-        let mut buffer: Vec<u32> = vec![0; x_size * y_size];
-        triangle(&mut buffer, x_size, y_size, a, b, c, 1);
-        
+        let mut cbuffer: Vec<u32> = vec![0; x_size * y_size];
+        let mut zbuffer: Vec<f32> = vec![0.0_f32; x_size * y_size];
+        let shader = Shader::new(Vector3::new(100.0_f32, 100.0_f32, 100.0_f32), 0.3_f32);
+        triangle(&mut cbuffer, &mut zbuffer, x_size, y_size, a, b, c, &shader);
+
         println!("");
         println!("real: ");
         for y in (0..y_size) {
             print!("   ");
             for x in (0..x_size) {
-                print!("{}",if buffer[(y_size - y - 1) * x_size + x]==0 {0} else {1});
+                print!("{}",if cbuffer[(y_size - y - 1) * x_size + x]==0 {0} else {1});
             }
             println!("");
         }
@@ -28,7 +35,7 @@ mod rasterization {
         }
         for y in 0..y_size {
             for x in 0..x_size {
-                let val_real = buffer[y * x_size + x];
+                let val_real = cbuffer[y * x_size + x];
                 let val_except = buffer_except[(y_size - y - 1) * x_size + x];
                 debug_assert!((val_real==0) == (val_except==0),
                               "real = {}, except = {}, x = {} y = {}",
