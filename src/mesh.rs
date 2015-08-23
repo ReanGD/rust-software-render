@@ -1,3 +1,4 @@
+use std;
 use cgmath::*;
 use shader::*;
 use device::Device;
@@ -86,13 +87,15 @@ impl Mesh {
         let vertex_func = shader.vertex_func;
         let cnt_triangle = self.index_buffer.len() / 3;
         for indexes in self.index_buffer.chunks(3) {
-            let mut points: [Point3<f32>; 3] = [Point3::<f32>::new(0.0, 0.0, 0.0); 3];
+            let mut points_2d: [Point3<f32>; 3] = [Point3::<f32>::new(0.0, 0.0, 0.0); 3];
+            let mut tex_coord: [Vector2<f32>; 3] = [Vector2::<f32>::new(0.0, 0.0); 3];
             let mut vertex_out = [[0.0_f32;MAX_OUT_VALUES];3];
             let mut vertex_out_len = 0;
             for i in 0..3 {
-                let v = self.vertex_buffer[indexes[i] as usize].position;
-                let n = self.vertex_buffer[indexes[i] as usize].normal;
-                let t = self.vertex_buffer[indexes[i] as usize].tex;
+                let p = self.vertex_buffer[indexes[i] as usize];
+                let v = p.position;
+                let n = p.normal;
+                let t = p.tex;
 
                 shader.reset(Vector4::<f32>::new(v.x, v.y, v.z, 1.0_f32), Vector4::<f32>::new(n.x, n.y, n.z, 1.0_f32), t);
                 let p_screen = vertex_func(shader);
@@ -102,15 +105,16 @@ impl Mesh {
                 for ind in 0..vertex_out_len {
                     vertex_out[i][ind] = shader.out_vertex_data[ind] * inverse_w;
                 }
-                
-                points[i] = Point3::new(
+
+                tex_coord[i] = t;
+                points_2d[i] = Point3::new(
                     (p_screen.x * inverse_w + 1.0_f32) * device.x_size as f32 * 0.5_f32,
                     (p_screen.y * inverse_w + 1.0_f32) * device.y_size as f32 * 0.5_f32,
                     inverse_w);
             }
 
-            let col0 = Vector3::new(points[0].x, points[1].x, points[2].x);
-            let col1 = Vector3::new(points[0].y, points[1].y, points[2].y);
+            let col0 = Vector3::new(points_2d[0].x, points_2d[1].x, points_2d[2].x);
+            let col1 = Vector3::new(points_2d[0].y, points_2d[1].y, points_2d[2].y);
             let col2 = Vector3::new(1.0_f32,     1.0_f32,     1.0_f32    );
             let d = Matrix3::from_cols(col0, col1, col2).determinant();
             if d > 0.0_f32 {
@@ -119,12 +123,29 @@ impl Mesh {
             // if d < 0.0_f32 {
             //     continue;
             // }
-            
+
+            // calc mip level:
+            let ba_pixel = Vector2::new(points_2d[1].x, points_2d[1].y)
+                .sub_v(&Vector2::new(points_2d[0].x, points_2d[0].y));
+            let ca_pixel = Vector2::new(points_2d[2].x, points_2d[2].y)
+                .sub_v(&Vector2::new(points_2d[0].x, points_2d[0].y));
+
+            let tex_size = Vector2::new(shader.texture.levels[0].size_x as f32,
+                                        shader.texture.levels[0].size_y as f32);
+            let ba_texel = tex_coord[1].sub_v(&tex_coord[0]).mul_v(&tex_size);
+            let ca_texel = tex_coord[2].sub_v(&tex_coord[0]).mul_v(&tex_size);
+            // cross product in 2d = 2 * square of triangle
+            let sq_pixel = ba_pixel.x * ca_pixel.y - ba_pixel.y * ca_pixel.x;
+            let sq_texel = ba_texel.x * ca_texel.y - ba_texel.y * ca_texel.x;
+            let lod = (sq_texel / sq_pixel).abs().sqrt().max(1.0_f32).log2() as usize;
+            shader.texture_lod = std::cmp::min(lod, shader.texture.levels.len() - 1);
+            // println!("{}", shader.texture_lod);
+
             triangle(&mut device.cbuffer,
                      &mut device.zbuffer,
                      device.x_size,
                      device.y_size,
-                     points, vertex_out, vertex_out_len, shader);
+                     points_2d, vertex_out, vertex_out_len, shader);
         }
 
         cnt_triangle as u32
