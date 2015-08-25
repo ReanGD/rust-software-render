@@ -26,7 +26,53 @@ impl Surface {
 }
 
 impl Texture {
-    fn load_surface<'a>(filename: &str) -> Result<surface::Surface<'a>, String> {
+    pub fn from_dir(dir: &std::path::PathBuf, filename: &str) -> Result<Texture, String> {
+        let mut path = dir.clone();
+        path.push(filename);
+
+        let fullpath = match path.as_path().to_str() {
+            Some(path) => path.to_string(),
+            None => return Err(format!("error get full path for filename {}", filename))
+        };
+
+        Ok(try!(Texture::new(&fullpath, filename)))
+    }
+
+    pub fn from_def(filename: &str) -> Result<Texture, String> {
+        let fullpath = try!(get_full_path(filename));
+
+        Ok(try!(Texture::new(&fullpath, filename)))
+    }
+
+    pub fn new(fullpath: &str, filename: &str) -> Result<Texture, String> {
+        let surface = try!(Texture::load_surface(fullpath, filename));
+
+        let size_x = surface.as_ref().width() as usize;
+        let size_y = surface.as_ref().height() as usize;
+        let data_u8: &[u8] = match surface.as_ref().without_lock() {
+            Some(v) => v,
+            None => return Err(format!("can't lock surface for texture {}", filename))
+        };
+
+        let mut lvl0 = Surface::new(size_x, size_y);
+        for y in 0..size_y {
+            for x in 0..size_x {
+                lvl0.data.push(Vector3::new(
+                    data_u8[(y * size_x + size_x - x - 1) * 4 + 2] as f32,
+                    data_u8[(y * size_x + size_x - x - 1) * 4 + 1] as f32,
+                    data_u8[(y * size_x + size_x - x - 1) * 4 + 0] as f32));
+            }
+        }
+
+        this = Texture {
+            levels: vec![lvl0],
+        };
+        this.gen_mipmap();
+
+        Ok(this)
+    }
+
+    fn load_surface<'a>(fullpath: &str, filename: &str) -> Result<surface::Surface<'a>, String> {
         let standart =
             match surface::Surface::new(1, 1, sdl2::pixels::PixelFormatEnum::ARGB8888) {
                 Ok(v) => v,
@@ -34,7 +80,6 @@ impl Texture {
                                              filename, e))
             };
 
-        let fullpath = try!(get_full_path(filename));
         let surface_load =
             unsafe {
                 let raw = IMG_Load(std::ffi::CString::new(fullpath).unwrap().as_ptr());
@@ -109,31 +154,5 @@ impl Texture {
             size_y = next_size_y;
             surface_ind += 1;
         }
-    }
-
-    pub fn new(filename: &str) -> Result<Texture, String> {
-        let surface = try!(Texture::load_surface(filename));
-
-        let size_x = surface.as_ref().width() as usize;
-        let size_y = surface.as_ref().height() as usize;
-        let data_u8: &[u8] = match surface.as_ref().without_lock() {
-            Some(v) => v,
-            None => return Err(format!("can't lock surface for texture {}", filename))
-        };
-
-        let mut lvl0 = Surface::new(size_x, size_y);
-        for y in 0..size_y {
-            for x in 0..size_x {
-                lvl0.data.push(Vector3::new(
-                    data_u8[(y * size_x + size_x - x - 1) * 4 + 2] as f32,
-                    data_u8[(y * size_x + size_x - x - 1) * 4 + 1] as f32,
-                    data_u8[(y * size_x + size_x - x - 1) * 4 + 0] as f32));
-            }
-        }
-
-        let mut tex = Texture {levels: vec![lvl0], };
-        tex.gen_mipmap();
-
-        Ok(tex)
     }
 }
