@@ -64,7 +64,7 @@ impl Texture {
             }
         }
 
-        this = Texture {
+        let this = Texture {
             levels: vec![lvl0],
         };
         this.gen_mipmap();
