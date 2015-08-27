@@ -1,5 +1,6 @@
 use std;
 use cgmath::*;
+use std::rc::Rc;
 use texture::Texture;
 
 pub struct Material {
@@ -7,7 +8,7 @@ pub struct Material {
     pub diffuse: Vector3<f32>,
     pub specular: Vector3<f32>,
     pub ambient_intensity: f32,
-    pub texture: Option<Texture>,
+    pub texture: Option<Rc<Texture>>,
 }
 
 impl Material {
@@ -22,13 +23,13 @@ impl Material {
     }
 
     pub fn texture_from_dir(&mut self, dir: &std::path::PathBuf, filename: &str) -> Result<(), String> {
-        self.texture = Some(try!(Texture::from_dir(dir, filename)));
+        self.texture = Some(Rc::new(try!(Texture::from_dir(dir, filename))));
 
         Ok(())
     }
 
     pub fn texture_from_def(&mut self, filename: &str) -> Result<(), String> {
-        self.texture = Some(try!(Texture::from_def(filename)));
+        self.texture = Some(Rc::new(try!(Texture::from_def(filename))));
 
         Ok(())
     }

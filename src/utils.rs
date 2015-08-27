@@ -3,7 +3,7 @@ use std::fs;
 
 pub fn get_full_path(filename: &str) -> Result<String, String> {
     let mut cur_dir = env::current_dir().unwrap();
-    
+
     loop {
         cur_dir.push("media");
         let is_dir = match fs::metadata(cur_dir.to_str().unwrap()) {
