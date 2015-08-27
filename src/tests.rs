@@ -1,9 +1,10 @@
 
 #[cfg(test)]
 mod rasterization {
-    use cgmath::{Point2, Point3, Vector3};
+    use cgmath::{Point2, Point3};
     use rasterization::triangle;
-    use shader::Shader;
+    use shader::{Shader, MAX_OUT_VALUES};
+    use material::Material;
 
     fn triangle_test(a_screen: Point2<f32>, b_screen: Point2<f32>, c_screen: Point2<f32>, buffer_except: Vec<u32>) {
         let a = Point3::new(a_screen.x, a_screen.y, 0.5_f32);
@@ -13,8 +14,8 @@ mod rasterization {
         let y_size: usize = 5;
         let mut cbuffer: Vec<u32> = vec![0; x_size * y_size];
         let mut zbuffer: Vec<f32> = vec![0.0_f32; x_size * y_size];
-        let shader = Shader::new(Vector3::new(100.0_f32, 100.0_f32, 100.0_f32), 0.3_f32);
-        triangle(&mut cbuffer, &mut zbuffer, x_size, y_size, a, b, c, &shader);
+        let mut shader = Shader::new(&Material::gold());
+        triangle(&mut cbuffer, &mut zbuffer, x_size, y_size, [a, b, c], [[0.0_f32;MAX_OUT_VALUES]; 3], 0, &mut shader);
 
         println!("");
         println!("real: ");
@@ -73,7 +74,7 @@ mod rasterization {
                            0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0]);
     }
-    
+
     #[test]
     fn triangle_03() {
         triangle_test(Point2::new(2.5,2.5), Point2::new(2.5,2.5), Point2::new(2.5,2.5),
@@ -83,7 +84,7 @@ mod rasterization {
                            0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0]);
     }
-    
+
     #[test]
     fn triangle_04() {
         triangle_test(Point2::new(0.0,0.0), Point2::new(4.0,0.0), Point2::new(6.0,2.0),
@@ -93,7 +94,7 @@ mod rasterization {
                            0,0,0,0,1,0,0,
                            0,1,1,1,0,0,0]);
     }
-    
+
     #[test]
     fn triangle_05() {
         triangle_test(Point2::new(1.0,2.0), Point2::new(4.0,1.0), Point2::new(3.0,4.0),
