@@ -1,5 +1,4 @@
 extern crate sdl2;
-extern crate rand;
 extern crate time;
 extern crate cgmath;
 
@@ -62,7 +61,7 @@ pub fn main() {
 	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
             model = generate_sphere(50).unwrap();
         },
-        
+
         _ => return
     };
 	let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
