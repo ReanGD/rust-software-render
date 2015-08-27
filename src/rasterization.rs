@@ -39,6 +39,7 @@ fn half_triangle(cbuffer: &mut Vec<u32>,
                  x_size: usize,
                  vertex_data_cnt: usize,
                  shader: &mut Shader,
+                 pixel_func: fn(&Shader) -> Vector3<f32>,
                  point_base: &Point3<f32>,
                  vd_base: &[f32;MAX_OUT_VALUES],
                  y_begin: usize,
@@ -53,7 +54,6 @@ fn half_triangle(cbuffer: &mut Vec<u32>,
     let mut vdata_step  = [0.0_f32; MAX_OUT_VALUES];
     let mut vdata       = [0.0_f32; MAX_OUT_VALUES];
 
-    let pixel_func = shader.pixel_func;
     let y_step = y_begin as f32 + 0.5_f32 - point_base.y;
     let x0_step = step0[0];
     let x1_step = step1[0];
@@ -176,7 +176,7 @@ pub fn triangle(cbuffer: &mut Vec<u32>,
         step_ac[i + 2] = (va[i] - vc[i]) * inv_dy_ac;
         step_bc[i + 2] = (vb[i] - vc[i]) * inv_dy_bc;
     }
-    
+
     // y-ranges: [y0; y1) + [y1; y2)
     let y0 = cmp::min(cmp::max((c.y + 0.5_f32) as i32, 0) as usize, y_size - 1);
     let y1 = cmp::min(cmp::max((b.y + 0.5_f32) as i32, 0) as usize, y_size);
@@ -193,12 +193,19 @@ pub fn triangle(cbuffer: &mut Vec<u32>,
         (&step_ac, &step_ab)
     };
 
+    let pixel_func = match shader.texture {
+        None => shader.pixel_func[0],
+        Some(_) => shader.pixel_func[1],
+    };
+
+
     if y0 < y1 {
         half_triangle(cbuffer,
                       zbuffer,
                       x_size,
                       vertex_data_cnt,
                       shader,
+                      pixel_func,
                       c, vc, y0, y1,
                       step0.0,
                       step0.1
@@ -210,6 +217,7 @@ pub fn triangle(cbuffer: &mut Vec<u32>,
                       x_size,
                       vertex_data_cnt,
                       shader,
+                      pixel_func,
                       a, va, y1, y2,
                       step1.0,
                       step1.1

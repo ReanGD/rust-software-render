@@ -6,21 +6,22 @@ pub fn generate_plane() -> Result<Model, String> {
     let mut model = Model::new();
     let mut mesh = Mesh::new();
     let mut vb: Vec<Vertex> = vec![Vertex::new(); 4];
+    let k = 20.0_f32;
     vb[0].position = Vector3::new(-0.5_f32,  0.5_f32, 0.0_f32);
     vb[0].normal   = Vector3::new( 0.0_f32,  0.0_f32, 1.0_f32);
     vb[0].tex      = Vector2::new( 0.0_f32,  0.0_f32);
-    
+
     vb[1].position = Vector3::new( 0.5_f32,  0.5_f32, 0.0_f32);
     vb[1].normal   = Vector3::new( 0.0_f32,  0.0_f32, 1.0_f32);
-    vb[1].tex      = Vector2::new( 10.0_f32,  0.0_f32);
-    
+    vb[1].tex      = Vector2::new( 1.0_f32 * k,  0.0_f32);
+
     vb[2].position = Vector3::new( 0.5_f32, -0.5_f32, 0.0_f32);
     vb[2].normal   = Vector3::new( 0.0_f32,  0.0_f32, 1.0_f32);
-    vb[2].tex      = Vector2::new( 10.0_f32,  10.0_f32);
-    
+    vb[2].tex      = Vector2::new( 1.0_f32 * k,  1.0_f32 * k);
+
     vb[3].position = Vector3::new(-0.5_f32, -0.5_f32, 0.0_f32);
     vb[3].normal   = Vector3::new( 0.0_f32,  0.0_f32, 1.0_f32);
-    vb[3].tex      = Vector2::new( 0.0_f32,  10.0_f32);
+    vb[3].tex      = Vector2::new( 0.0_f32,  1.0_f32 * k);
     mesh.vertex(vb);
     let mut ib: Vec<u32> = vec![0; 2 * 3];
     ib[0] = 0;
@@ -83,7 +84,7 @@ pub fn generate_sphere(cnt_vertex: usize) -> Result<Model, String> {
 	let plg = cnt_vertex / 2 - 1;
 	let vertex_cnt = plg * cnt_vertex + 2;
 	let index_cnt = 6 * cnt_vertex * plg;
-    
+
     let mut vb: Vec<Vertex> = vec![Vertex::new(); vertex_cnt];
     let mut angle_b = rad(-std::f32::consts::PI / 2.0_f32);
 	let step_a = rad(std::f32::consts::PI * 2.0_f32 / (cnt_vertex as f32));

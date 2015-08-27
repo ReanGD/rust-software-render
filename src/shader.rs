@@ -27,8 +27,8 @@ pub struct Shader {
     pub specular: Vector3<f32>,          // {r, g, b}
     pub ambient_intensity: f32,          // [0; 1]
     pub vertex_out_len: usize,
-    pub vertex_func: fn(&mut Shader) -> Vector4<f32>,
-    pub pixel_func: fn(&Shader) -> Vector3<f32>,
+    pub vertex_func: [fn(&mut Shader) -> Vector4<f32>; 2],
+    pub pixel_func: [fn(&Shader) -> Vector3<f32>; 2],
 }
 
 impl Shader {
@@ -45,8 +45,8 @@ impl Shader {
             specular: Vector3::<f32>::zero(),
             ambient_intensity: 0.0_f32,
             vertex_out_len: 0,
-            vertex_func: Shader::vertex_lambert_texture,
-            pixel_func: Shader::pixel_lambert_texture,
+            vertex_func: [Shader::vertex_lambert_color, Shader::vertex_lambert_texture],
+            pixel_func: [Shader::pixel_lambert_color, Shader::pixel_lambert_texture],
         }
     }
 
@@ -57,16 +57,9 @@ impl Shader {
         self.set_vec2(IN_VS_VEC_TEX, tex);
     }
 
-    pub fn set_shaders(&mut self,
-                       vertex_func: fn(&mut Shader) -> Vector4<f32>,
-                       pixel_func: fn(&Shader) -> Vector3<f32>) {
-        self.vertex_func = vertex_func;
-        self.pixel_func = pixel_func;
-    }
-
     pub fn set_material(&mut self, material: & Material) {
         self.texture = match material.texture {
-            Some(v) => Some(v.clone()),
+            Some(ref v) => Some(v.clone()),
             None => None
         };
         self.texture_lod = 0;
@@ -128,6 +121,11 @@ impl Shader {
         self.vertex_out_len += 1;
     }
 
+    pub fn set_lambert(&mut self) {
+        self.vertex_func = [Shader::vertex_lambert_color, Shader::vertex_lambert_texture];
+        self.pixel_func = [Shader::pixel_lambert_color, Shader::pixel_lambert_texture];
+    }
+
     // out:
     // 0 - f32 cos_nl
     #[allow(dead_code)]
@@ -175,7 +173,10 @@ impl Shader {
         let cos_nl = self.in_pixel_data[2];
         let lod = self.texture_lod;
 
-        let texture = &self.texture.unwrap();
+        let texture = match self.texture {
+            Some(ref v) => v.clone(),
+            None => panic!("texture is none"),
+        };
         let size_x = texture.levels[self.texture_lod].size_x;
         let size_y = texture.levels[self.texture_lod].size_y;
 

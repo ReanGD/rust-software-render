@@ -308,7 +308,7 @@ impl Loader3ds {
     fn read_texfile(&mut self, header: &mut Header3ds) -> Result<u32, String> {
         let size = header.left_bytes;
         let filename = try!(self.reader.read_string(header, size));
-        try!(self.mesh.texture.load_from_dir(&self.reader.current_dir, &filename));
+        try!(self.mesh.material.texture_from_dir(&self.reader.current_dir, &filename));
 
         Ok(try!(header.check_end()))
     }
