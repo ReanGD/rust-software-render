@@ -15,7 +15,7 @@ mod memory;
 mod shader;
 mod texture;
 mod material;
-mod import3ds;
+mod import;
 mod dll_import;
 mod generator;
 mod rasterization;
@@ -26,7 +26,7 @@ use shader::Shader;
 use texture::Texture;
 use material::Material;
 use generator::{generate_plane, generate_sphere};
-use import3ds::Loader3ds;
+use import::import3ds::Import3ds;
 
 
 pub fn main() {
@@ -56,24 +56,24 @@ pub fn main() {
 	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
             // material = Material::silver();
             add_angle = rad(0.0_f32);
-            model = Loader3ds::load("ring.3ds").unwrap();
+            model = Import3ds::load("ring.3ds").unwrap();
         },
         3 => {
             eye = Point3::new(0.0_f32, 0.0_f32, -10.1_f32);
 	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
-            model = Loader3ds::load("tux.3ds").unwrap();
+            model = Import3ds::load("tux.3ds").unwrap();
         },
         4 => {
             eye = Point3::new(0.0_f32, -2.0_f32, -4.1_f32);
 	        center = Point3::new(0.0_f32, -2.0_f32, 0.0_f32);
             // material = Material::monster_skin();
             init_matrix = Matrix4::from(Matrix3::from_angle_x(rad(-1.8_f32)));
-            model = Loader3ds::load("monster.3ds").unwrap();
+            model = Import3ds::load("monster.3ds").unwrap();
         },
         5 => {
             eye = Point3::new(0.0_f32, 0.0_f32, -1.1_f32);
 	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
-            model = Loader3ds::load("yoda/yoda2.3ds").unwrap();
+            model = Import3ds::load("yoda/yoda2.3ds").unwrap();
         },
 
         _ => return
