@@ -27,7 +27,6 @@ impl Reader {
         })
     }
 
-    #[allow(dead_code)]
     pub fn get_u16(&mut self, header: &mut Header3ds) -> Result<u16, String> {
         try!(header.update_left(2));
         let mut buff = [0x0; 2];
@@ -46,12 +45,11 @@ impl Reader {
         }
     }
 
-    #[allow(dead_code)]
-    pub fn get_u32(&mut self, header: &mut Header3ds) -> Result<u32, String> {
+    pub fn get_f32(&mut self, header: &mut Header3ds) -> Result<f32, String> {
         try!(header.update_left(4));
         let mut buff = [0x0; 4];
         match self.reader.read(&mut buff) {
-            Ok(_) => Ok((buff[0] as u32) + ((buff[1] as u32) << 8) + ((buff[2] as u32) << 16) + ((buff[3] as u32) << 24)),
+            Ok(_) => Ok(bytes_to_typed::<f32>(&mut buff)[0]),
             Err(e) => Err(format!("can't read 4 bytes, err = \"{}\"", e))
         }
     }
@@ -65,7 +63,7 @@ impl Reader {
         }
     }
 
-    pub fn read_string(&mut self, header: &mut Header3ds, size: u32) -> Result<String, String> {
+    pub fn read_ascii(&mut self, header: &mut Header3ds, size: u32) -> Result<String, String> {
         try!(header.update_left(size));
         let mut buff: Vec<u8> = vec![0x0; size as usize];
         match self.reader.read(&mut buff) {
@@ -80,7 +78,32 @@ impl Reader {
         }
     }
 
-    pub fn skip_string(&mut self, header: &mut Header3ds) -> Result<u32, String> {
+    pub fn read_asciiz(&mut self, header: &mut Header3ds) -> Result<String, String> {
+        let mut result = Vec::<u8>::new();
+
+        let mut buff: Vec<u8> = vec![0xFF];
+        let mut size = 0;
+        loop {
+            match self.reader.read(&mut buff) {
+                Ok(_) => {},
+                Err(e) => return Err(format!("can't read 1 bytes, err = \"{}\"", e))
+            };
+            try!(header.update_left(1));
+            size += 1;
+            if buff[0] == 0 {
+                break;
+            } else {
+                result.push(buff[0]);
+            }
+        }
+
+        match String::from_utf8(result) {
+            Ok(v) => Ok(v),
+            Err(_) => Err(format!("can't read string"))
+        }
+    }
+
+    pub fn skip_ascii(&mut self, header: &mut Header3ds) -> Result<u32, String> {
         let mut buff: Vec<u8> = vec![0xFF];
         let mut size = 0;
         while buff[0] != 0 {

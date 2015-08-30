@@ -33,7 +33,7 @@ pub fn main() {
     let eye;
     let center;
     let model;
-    let ind = 5;
+    let ind = 6;
     // let mut material = Material::gold();
     let mut init_matrix = Matrix4::<f32>::identity();
     let mut add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
@@ -75,6 +75,12 @@ pub fn main() {
 	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
             model = Import3ds::load("yoda/yoda2.3ds").unwrap();
         },
+        6 => {
+            eye = Point3::new(0.0_f32, 0.0_f32, -1.1_f32);
+	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
+            model = Import3ds::load("nokia/nokia-n82-highres.3DS").unwrap();
+        },
+
 
         _ => return
     };
