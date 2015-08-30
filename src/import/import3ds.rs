@@ -6,7 +6,7 @@ use material::Material;
 use import::reader::Reader;
 use utils::get_full_path;
 
-pub struct Import3ds {
+pub struct Model3ds {
     reader: Reader,
     model: Model,
     mesh: Mesh,
@@ -14,7 +14,7 @@ pub struct Import3ds {
     materials: std::collections::HashMap<String, Material>,
 }
 
-impl Import3ds {
+impl Model3ds {
     fn read_children(&mut self, header: &mut Header3ds) -> Result<u32, String> {
         while header.left_bytes != 0 {
             try!(header.update_left(try!(self.read_chunk())));
@@ -191,7 +191,7 @@ impl Import3ds {
 
     pub fn load(filename: &str) -> Result<Model, String> {
         let filepath = try!(get_full_path(filename));
-        let mut this = Import3ds {
+        let mut this = Model3ds {
             reader: try!(Reader::new(&filepath)),
             model: Model::new(),
             mesh: Mesh::new(),

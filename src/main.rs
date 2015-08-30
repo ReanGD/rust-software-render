@@ -26,7 +26,7 @@ use shader::Shader;
 use texture::Texture;
 use material::Material;
 use generator::{generate_plane, generate_sphere};
-use import::import3ds::Import3ds;
+use import::import3ds::Model3ds;
 
 
 pub fn main() {
@@ -56,29 +56,29 @@ pub fn main() {
 	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
             // material = Material::silver();
             add_angle = rad(0.0_f32);
-            model = Import3ds::load("ring.3ds").unwrap();
+            model = Model3ds::load("ring.3ds").unwrap();
         },
         3 => {
             eye = Point3::new(0.0_f32, 0.0_f32, -10.1_f32);
 	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
-            model = Import3ds::load("tux.3ds").unwrap();
+            model = Model3ds::load("tux.3ds").unwrap();
         },
         4 => {
             eye = Point3::new(0.0_f32, -2.0_f32, -4.1_f32);
 	        center = Point3::new(0.0_f32, -2.0_f32, 0.0_f32);
             // material = Material::monster_skin();
             init_matrix = Matrix4::from(Matrix3::from_angle_x(rad(-1.8_f32)));
-            model = Import3ds::load("monster.3ds").unwrap();
+            model = Model3ds::load("monster.3ds").unwrap();
         },
         5 => {
             eye = Point3::new(0.0_f32, 0.0_f32, -1.1_f32);
 	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
-            model = Import3ds::load("yoda/yoda2.3ds").unwrap();
+            model = Model3ds::load("yoda/yoda2.3ds").unwrap();
         },
         6 => {
             eye = Point3::new(0.0_f32, 0.0_f32, -1.1_f32);
 	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
-            model = Import3ds::load("nokia/nokia-n82-highres.3DS").unwrap();
+            model = Model3ds::load("nokia/nokia-n82-highres.3DS").unwrap();
         },
 
 
