@@ -10,7 +10,7 @@ sdl2 = "0.8.0"
 cgmath = "*"
 libc = "*"
 sdl2-sys = "*"
+obj = "0.2.2"
 
 [dependencies.sdl2_image]
 git = "https://github.com/xsleonard/rust-sdl2_image"
-
