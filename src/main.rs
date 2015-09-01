@@ -83,7 +83,7 @@ pub fn main() {
         7 => {
             eye = Point3::new(0.0_f32, 0.0_f32, -1.1_f32);
 	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
-            model = ModelObj::load("cube2.obj").unwrap();
+            model = ModelObj::load("monster1/monster.obj").unwrap();
         },
 
 
