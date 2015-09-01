@@ -12,83 +12,41 @@ pub struct Vertex {
     pub tex: Vector2<f32>,
 }
 
-impl Vertex {
-    #[allow(dead_code)]
-    pub fn new() -> Vertex {
-        Vertex {
-            position: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
-            normal: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
-            tex: Vector2::new(0.0_f32, 0.0_f32),
-        }
-    }
-}
-
 pub struct Mesh {
-    pub vertex_buffer: Vec<Vertex>,
     pub index_buffer: Vec<u32>,
-    pub material: Material,
+    pub material_id: usize,
 }
 
 pub struct Model {
-    pub mesh_arr: Vec<Mesh>,
+    pub vertex_buffer: Vec<Vertex>,
+    pub material_list: Vec<Material>,
+    pub mesh_list: Vec<Mesh>,
+}
+
+impl Vertex {
+    pub fn new(position: &Vector3<f32>, tex: &Vector2<f32>, normal: &Vector3<f32>) -> Vertex {
+        Vertex {
+            position: position.clone(),
+            normal: normal.clone(),
+            tex: tex.clone(),
+        }
+    }
 }
 
 impl Mesh {
     pub fn new() -> Mesh {
         Mesh {
-            vertex_buffer: Vec::<Vertex>::new(),
             index_buffer: Vec::<u32>::new(),
-            material: Material::new(),
+            material_id: 0,
         }
     }
 
-    pub fn vertex(&mut self, buffer: Vec<Vertex>) {
-        self.vertex_buffer = buffer;
-    }
-
-    pub fn index(&mut self, buffer: Vec<u32>) -> Result<(), String> {
-        if buffer.len() % 3 != 0 {
-            return Err(format!("len of index buffer can be N*3, real len is {}", buffer.len()));
-        }
-        self.index_buffer = buffer;
-
-        Ok(())
-    }
-
-    pub fn calc_normal(&mut self) -> Result<(), String> {
-        if self.vertex_buffer.len() == 0 ||
-            self.index_buffer.len() == 0 {
-                return Err("fill vertex and index buffer before calc normals".to_string());
-            }
-        for vertex in &mut self.vertex_buffer {
-            vertex.normal = Vector3::<f32>::new(0.0_f32, 0.0_f32, 0.0_f32);
-        }
-        let ib = &self.index_buffer;
-        // let vb = &self.vertex_buffer;
-        for i in 0..ib.len() / 3 {
-            let ind = i * 3;
-            let v0_ind = ib[ind + 0] as usize;
-            let v1_ind = ib[ind + 1] as usize;
-            let v2_ind = ib[ind + 2] as usize;
-            let v0 = self.vertex_buffer[v0_ind].position;
-            let v1 = self.vertex_buffer[v1_ind].position;
-            let v2 = self.vertex_buffer[v2_ind].position;
-            let normal = v2.sub_v(&v1).cross(&(v1.sub_v(&v0)));
-            self.vertex_buffer[v0_ind].normal.add_self_v(&normal);
-            self.vertex_buffer[v1_ind].normal.add_self_v(&normal);
-            self.vertex_buffer[v2_ind].normal.add_self_v(&normal);
-        }
-
-        for vertex in &mut self.vertex_buffer {
-            vertex.normal.normalize_self();
-        }
-
-        Ok(())
-    }
-
-    pub fn draw(&self, shader: &mut Shader, device: &mut Device) -> u32 {
-        shader.set_material(&self.material);
-        let vertex_func = match self.material.texture {
+    fn draw(&self, shader: &mut Shader,
+            material: &Material,
+            vertex_buffer: &Vec<Vertex>,
+            device: &mut Device) -> u32 {
+        shader.set_material(material);
+        let vertex_func = match material.texture {
             None => shader.vertex_func[0],
             Some(_) => shader.vertex_func[1],
         };
@@ -99,7 +57,7 @@ impl Mesh {
             let mut vertex_out = [[0.0_f32;MAX_OUT_VALUES];3];
             let mut vertex_out_len = 0;
             for i in 0..3 {
-                let p = self.vertex_buffer[indexes[i] as usize];
+                let p = vertex_buffer[indexes[i] as usize];
                 let v = p.position;
                 let n = p.normal;
                 let t = p.tex;
@@ -132,7 +90,7 @@ impl Mesh {
             // }
 
             // calc mip level:
-            if self.material.texture.is_some() {
+            if material.texture.is_some() {
                 let texture = shader.texture.as_ref().unwrap();
                 let ba_pixel = Vector2::new(points_2d[1].x, points_2d[1].y)
                     .sub_v(&Vector2::new(points_2d[0].x, points_2d[0].y));
@@ -165,18 +123,19 @@ impl Mesh {
 impl Model {
     pub fn new() -> Model {
         Model {
-            mesh_arr: Vec::<Mesh>::new(),
+            vertex_buffer: Vec::<Vertex>::new(),
+            material_list: Vec::<Material>::new(),
+            mesh_list: Vec::<Mesh>::new(),
         }
-    }
-
-    pub fn add(&mut self, mesh: Mesh) {
-        self.mesh_arr.push(mesh);
     }
 
     pub fn draw(&self, shader: &mut Shader, device: &mut Device) -> u32 {
         let mut triangle_cnt: u32 = 0;
-        for mesh in &self.mesh_arr {
-            triangle_cnt += mesh.draw(shader, device);
+        for mesh in &self.mesh_list {
+            triangle_cnt += mesh.draw(shader,
+                                      &self.material_list[mesh.material_id],
+                                      &self.vertex_buffer,
+                                      device);
         }
 
         triangle_cnt

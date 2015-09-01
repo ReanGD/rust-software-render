@@ -10,7 +10,6 @@ pub struct Material {
     pub specular: Vector3<f32>,
     pub ambient_intensity: f32,
     pub texture: Option<Rc<Texture>>,
-    pub is_empty: bool,
 }
 
 impl Material {
@@ -21,19 +20,17 @@ impl Material {
             specular: Vector3::<f32>::zero(),
             ambient_intensity: 0.0_f32,
             texture: None,
-            is_empty: true,
         }
     }
 
     pub fn texture_from_dir(&mut self, dir: &std::path::PathBuf, filename: &str) -> Result<(), String> {
-        self.is_empty = false;
         self.texture = Some(Rc::new(try!(Texture::from_dir(dir, filename))));
 
         Ok(())
     }
 
+    #[allow(dead_code)]
     pub fn texture_from_def(&mut self, filename: &str) -> Result<(), String> {
-        self.is_empty = false;
         self.texture = Some(Rc::new(try!(Texture::from_def(filename))));
 
         Ok(())
@@ -44,7 +41,6 @@ impl Material {
         const K_VEC: Vector3<f32> = Vector3{x: 0.212671_f32, y: 0.715160_f32, z: 0.072169_f32};
         let ambient = self.ambient.mul_v(&K_VEC);
         let diffuse = self.diffuse.mul_v(&K_VEC);
-        self.is_empty = false;
         self.ambient_intensity = (ambient.x + ambient.y + ambient.z) / (diffuse.x + diffuse.y + diffuse.z);
     }
 

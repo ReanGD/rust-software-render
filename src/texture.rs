@@ -38,6 +38,7 @@ impl Texture {
         Ok(try!(Texture::new(&fullpath, filename)))
     }
 
+    #[allow(dead_code)]
     pub fn from_def(filename: &str) -> Result<Texture, String> {
         let fullpath = try!(get_full_path(filename));
 

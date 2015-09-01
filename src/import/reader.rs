@@ -82,14 +82,12 @@ impl Reader {
         let mut result = Vec::<u8>::new();
 
         let mut buff: Vec<u8> = vec![0xFF];
-        let mut size = 0;
         loop {
             match self.reader.read(&mut buff) {
                 Ok(_) => {},
                 Err(e) => return Err(format!("can't read 1 bytes, err = \"{}\"", e))
             };
             try!(header.update_left(1));
-            size += 1;
             if buff[0] == 0 {
                 break;
             } else {

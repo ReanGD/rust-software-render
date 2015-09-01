@@ -1,3 +1,4 @@
-pub mod import3ds;
-mod header3ds;
-mod reader;
+// pub mod import3ds;
+pub mod importobj;
+// mod header3ds;
+// mod reader;

@@ -49,6 +49,7 @@ pub enum MapParam {
     VOffset,
 }
 
+#[allow(dead_code)]
 pub fn chunk_id_to_str(chunk_id: u16) -> String {
     match chunk_id {
         0x4D4D => "CHUNK_MAIN",

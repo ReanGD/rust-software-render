@@ -92,6 +92,7 @@ impl Shader {
                      self.in_vertex_data[sm + 3])
     }
 
+    #[allow(dead_code)]
     fn read_vec3(&self, sm: usize) -> Vector3<f32> {
         Vector3::new(self.in_vertex_data[sm + 0],
                      self.in_vertex_data[sm + 1],
@@ -103,6 +104,7 @@ impl Shader {
                      self.in_vertex_data[sm + 1])
     }
 
+    #[allow(dead_code)]
     fn out_vec3_from4(&mut self, val: &Vector4<f32>) {
         self.out_vertex_data[self.vertex_out_len + 0] = val.x;
         self.out_vertex_data[self.vertex_out_len + 1] = val.y;
