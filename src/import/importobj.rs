@@ -6,36 +6,34 @@ use utils::get_full_path;
 use cgmath::{Vector, Vector2, Vector3};
 use mesh::{Model, Mesh, Vertex};
 use obj::{Obj, Material, IndexTuple, load};
+use memory::cast_to;
 
-pub struct ModelObj {
+pub struct ModelObj<'a> {
     model_dir: std::path::PathBuf,
     map: std::collections::HashMap<IndexTuple, u32>,
     model: Model,
-    position_buffer: Vec<Vector3<f32>>,
-    normal_buffer: Vec<Vector3<f32>>,
-    tex_buffer: Vec<Vector2<f32>>,
+    position_buffer: &'a [Vector3<f32>],
+    normal_buffer: &'a [Vector3<f32>],
+    tex_buffer: &'a [Vector2<f32>],
 }
 
-impl ModelObj {
+impl<'a> ModelObj<'a> {
     fn get_index(&mut self, index: IndexTuple) -> u32 {
         let zero2 = Vector2::new(0.0_f32, 0.0_f32);
         let zero3 = Vector3::new(0.0_f32, 0.0_f32, 0.0_f32);
-        {
-            let is_none = self.map.get(&index).is_none();
-            if is_none {
-                self.model.vertex_buffer.push(
-                    Vertex::new(
-                        &self.position_buffer[index.0],
-                        match index.1 {
-                            Some(t) => &self.tex_buffer[t],
-                            None => &zero2,
-                        },
-                        match index.2 {
-                            Some(n) => &self.normal_buffer[n],
-                            None => &zero3,
-                        }));
-            };
-        }
+        if self.map.get(&index).is_none() {
+            self.model.vertex_buffer.push(
+                Vertex::new(
+                    &self.position_buffer[index.0],
+                    &match index.1 {
+                        Some(t) => self.tex_buffer[t],
+                        None => zero2,
+                    },
+                    &match index.2 {
+                        Some(n) => self.normal_buffer[n],
+                        None => zero3,
+                    }));
+        };
         let len = self.model.vertex_buffer.len() as u32 - 1;
         self.map.entry(index).or_insert(len).clone()
     }
@@ -62,8 +60,8 @@ impl ModelObj {
                             mesh.index_buffer.push(ind0);
                             mesh.index_buffer.push(ind1);
                             mesh.index_buffer.push(ind2);
+                            mesh.index_buffer.push(ind0);
                             mesh.index_buffer.push(ind2);
-                            mesh.index_buffer.push(ind1);
                             mesh.index_buffer.push(ind3);
                         },
                     };
@@ -101,19 +99,6 @@ impl ModelObj {
         Ok(())
     }
 
-    fn fill_vertex_data(&mut self, model_obj: &Obj<Rc<Material>>) {
-        self.model.material_list.push(material::Material::new());
-        for p in model_obj.position() {
-            self.position_buffer.push(Vector3::<f32>::new(p[0], p[1], p[2]));
-        }
-        for p in model_obj.normal() {
-            self.normal_buffer.push(Vector3::<f32>::new(p[0], p[1], p[2]));
-        }
-        for p in model_obj.texture() {
-            self.tex_buffer.push(Vector2::<f32>::new(p[0], p[1]));
-        }
-    }
-
     pub fn load(filename: &str) -> Result<Model, String> {
         let filepath = try!(get_full_path(filename));
         let mut model_dir = std::path::PathBuf::from(filepath.clone());
@@ -126,11 +111,16 @@ impl ModelObj {
             model_dir: model_dir,
             map: std::collections::HashMap::<IndexTuple, u32>::new(),
             model: Model::new(),
-            position_buffer: Vec::<Vector3<f32>>::with_capacity(model_obj.position().len()),
-            normal_buffer: Vec::<Vector3<f32>>::with_capacity(model_obj.normal().len()),
-            tex_buffer: Vec::<Vector2<f32>>::with_capacity(model_obj.texture().len()),
+            position_buffer: cast_to(model_obj.position()),
+            normal_buffer: cast_to(model_obj.normal()),
+            tex_buffer: cast_to(model_obj.texture()),
         };
-        this.fill_vertex_data(&model_obj);
+
+        let mut def_mat = material::Material::new();
+        def_mat.diffuse = Vector3::new(255.0_f32, 0.0_f32, 0.0_f32);
+        def_mat.ambient = Vector3::new(255.0_f32, 0.0_f32, 0.0_f32);
+        this.model.material_list.push(def_mat);
+
         try!(this.parse(&model_obj));
 
         Ok(this.model)

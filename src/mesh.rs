@@ -81,13 +81,9 @@ impl Mesh {
             let col0 = Vector3::new(points_2d[0].x, points_2d[1].x, points_2d[2].x);
             let col1 = Vector3::new(points_2d[0].y, points_2d[1].y, points_2d[2].y);
             let col2 = Vector3::new(1.0_f32,     1.0_f32,     1.0_f32    );
-            let d = Matrix3::from_cols(col0, col1, col2).determinant();
-            if d > 0.0_f32 {
+            if Matrix3::from_cols(col0, col1, col2).determinant() < 0.0_f32 {
                 continue;
             }
-            // if d < 0.0_f32 {
-            //     continue;
-            // }
 
             // calc mip level:
             if material.texture.is_some() {

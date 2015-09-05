@@ -182,8 +182,10 @@ impl Shader {
         let size_x = texture.levels[self.texture_lod].size_x;
         let size_y = texture.levels[self.texture_lod].size_y;
 
-        let x = std::cmp::max((tex.x * (size_x as f32)) as i32, 0) as usize % size_x;
-        let y = std::cmp::max((tex.y * (size_y as f32)) as i32, 0) as usize % size_y;
+        let x = std::cmp::max(((1.0_f32 - tex.x) * (size_x as f32)) as i32, 0) as usize % size_x;
+        let y = std::cmp::max(((1.0_f32 - tex.y) * (size_y as f32)) as i32, 0) as usize % size_y;
+        // let x = std::cmp::max((tex.x * (size_x as f32)) as i32, 0) as usize % size_x;
+        // let y = std::cmp::max((tex.y * (size_y as f32)) as i32, 0) as usize % size_y;
         let color = texture.levels[lod].data[y * size_x + x];
 
         let ambient = color.mul_s(self.ambient_intensity);

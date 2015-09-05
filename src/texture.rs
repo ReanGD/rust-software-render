@@ -56,13 +56,11 @@ impl Texture {
         };
 
         let mut lvl0 = Surface::new(size_x, size_y);
-        for y in 0..size_y {
-            for x in 0..size_x {
-                lvl0.data.push(Vector3::new(
-                    data_u8[(y * size_x + size_x - x - 1) * 4 + 2] as f32,
-                    data_u8[(y * size_x + size_x - x - 1) * 4 + 1] as f32,
-                    data_u8[(y * size_x + size_x - x - 1) * 4 + 0] as f32));
-            }
+        for ind in 0..size_y * size_x {
+            lvl0.data.push(Vector3::new(
+                data_u8[ind * 4 + 2] as f32,
+                data_u8[ind * 4 + 1] as f32,
+                data_u8[ind * 4 + 0] as f32));
         }
 
         let mut this = Texture {

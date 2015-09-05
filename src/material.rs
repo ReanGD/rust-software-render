@@ -36,7 +36,6 @@ impl Material {
         Ok(())
     }
 
-
     pub fn calc_ambient_intensity(&mut self) {
         const K_VEC: Vector3<f32> = Vector3{x: 0.212671_f32, y: 0.715160_f32, z: 0.072169_f32};
         let ambient = self.ambient.mul_v(&K_VEC);
