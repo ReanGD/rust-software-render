@@ -4,10 +4,9 @@ version = "0.4.0"
 authors = ["ReanGD"]
 
 [dependencies]
-rand = "*"
-time = "*"
+time = "0.1.32"
 sdl2 = "0.8.0"
-cgmath = "*"
+cgmath = "0.2.0"
 libc = "*"
 sdl2-sys = "*"
 sdl2_image = "0.2.5"

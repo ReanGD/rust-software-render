@@ -2,7 +2,6 @@ extern crate obj;
 extern crate genmesh;
 extern crate sdl2;
 extern crate sdl2_image;
-extern crate rand;
 extern crate time;
 extern crate cgmath;
 extern crate libc;
