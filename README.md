@@ -31,7 +31,7 @@ cargo run --release
 16 тыс. случайных треугольников на экране и всего 1 fps:
 ![Растеризация на плоскости](https://github.com/ReanGD/rust-software-render/blob/master/screenshots/scene_1.png "Растеризация на плоскости")
 
-[v0.2](https://github.com/ReanGD/rust-software-render/tree/v02):
+[v0.2](https://github.com/ReanGD/rust-software-render/tree/v02)([статья](http://reangdblog.blogspot.com/2015/09/software-render-rust-3d.html)):
 
 Низкополигональная модель освещение даже не повершинное, а пограневое, чуть более 2 млн triangle per second:
 ![Кольцо и пограневое освещение](https://github.com/ReanGD/rust-software-render/blob/v02/screenshots/scene_2_1.png "Кольцо и пограневое освещение")
