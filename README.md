@@ -35,9 +35,15 @@ cargo run --release
 [v0.2](https://github.com/ReanGD/rust-software-render/tree/v02) ([статья](http://reangdblog.blogspot.com/2015/09/software-render-rust-3d.html)):
 
 Низкополигональная модель освещение даже не повершинное, а пограневое, чуть более 2 млн triangle per second:
-![Кольцо и пограневое освещение](https://github.com/ReanGD/rust-software-render/blob/v02/screenshots/scene_2_1.png "Кольцо и пограневое освещение")
+![Кольцо и пограневое освещение](https://github.com/ReanGD/rust-software-render/blob/v03/screenshots/scene_2_1.png "Кольцо и пограневое освещение")
 
 Высокополигональная модель освещение такое же, tps = 3.3 млн:
-![Высокополигональный монстр](https://github.com/ReanGD/rust-software-render/blob/v02/screenshots/scene_2_2.png "Высокополигональный монстр")
+![Высокополигональный монстр](https://github.com/ReanGD/rust-software-render/blob/v03/screenshots/scene_2_2.png "Высокополигональный монстр")
 
 [v0.3](https://github.com/ReanGD/rust-software-render/tree/v03):
+
+Шар с освещением по упрощенному [Cook-Torrance](http://www.gamedev.ru/code/articles/Cook-Torrance):
+![Шар - Cook-Torrance](https://github.com/ReanGD/rust-software-render/blob/v03/screenshots/scene_3_1.png "Шар - Cook-Torrance")
+
+Кольцо, освещение по модели Фонга-Блина:
+![Кольцо - Фонг-Блин](https://github.com/ReanGD/rust-software-render/blob/v03/screenshots/scene_3_2.png "Кольцо - Фонг-Блин")
