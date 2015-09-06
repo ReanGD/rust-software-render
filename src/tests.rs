@@ -4,7 +4,6 @@ mod rasterization {
     use cgmath::{Point2, Point3};
     use rasterization::triangle;
     use shader::{Shader, MAX_OUT_VALUES};
-    use material::Material;
 
     fn triangle_test(a_screen: Point2<f32>, b_screen: Point2<f32>, c_screen: Point2<f32>, buffer_except: Vec<u32>) {
         let a = Point3::new(a_screen.x, a_screen.y, 0.5_f32);
@@ -14,7 +13,7 @@ mod rasterization {
         let y_size: usize = 5;
         let mut cbuffer: Vec<u32> = vec![0; x_size * y_size];
         let mut zbuffer: Vec<f32> = vec![0.0_f32; x_size * y_size];
-        let mut shader = Shader::new(&Material::gold());
+        let mut shader = Shader::new();
         triangle(&mut cbuffer, &mut zbuffer, x_size, y_size, [a, b, c], [[0.0_f32;MAX_OUT_VALUES]; 3], 0, &mut shader);
 
         println!("");

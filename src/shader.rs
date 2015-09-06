@@ -45,8 +45,8 @@ impl Shader {
             specular: Vector3::<f32>::zero(),
             ambient_intensity: 0.0_f32,
             vertex_out_len: 0,
-            vertex_func: [Shader::vertex_lambert_color, Shader::vertex_lambert_texture],
-            pixel_func: [Shader::pixel_lambert_color, Shader::pixel_lambert_texture],
+            vertex_func: [Shader::vertex_default, Shader::vertex_default],
+            pixel_func: [Shader::pixel_default, Shader::pixel_default],
         }
     }
 
@@ -126,6 +126,21 @@ impl Shader {
     pub fn set_lambert(&mut self) {
         self.vertex_func = [Shader::vertex_lambert_color, Shader::vertex_lambert_texture];
         self.pixel_func = [Shader::pixel_lambert_color, Shader::pixel_lambert_texture];
+    }
+
+    // out:
+    // 0 - f32 cos_nl
+    #[allow(dead_code)]
+    pub fn vertex_default(&mut self) -> Vector4<f32> {
+        let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
+
+        pos
+    }
+
+    // in:
+    #[allow(dead_code)]
+    pub fn pixel_default(&self) -> Vector3<f32> {
+        Vector3::new(255.0_f32, 255.0_f32, 255.0_f32)
     }
 
     // out:
