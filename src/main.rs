@@ -16,7 +16,7 @@ mod memory;
 mod shader;
 mod texture;
 mod material;
-mod import;
+mod importobj;
 mod dll_import;
 // mod generator;
 mod rasterization;
@@ -25,7 +25,7 @@ use cgmath::*;
 use scene::Scene;
 use shader::Shader;
 // use generator::{generate_plane, generate_sphere};
-use import::importobj::ModelObj;
+use importobj::ModelObj;
 
 
 pub fn main() {
