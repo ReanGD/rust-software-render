@@ -33,7 +33,7 @@ impl Scene {
     pub fn view(&mut self, eye: Point3<f32>, center: Point3<f32>, up: Vector3<f32>) -> &mut Scene {
         self.mat_view = Matrix4::<f32>::look_at(&eye, &center, &up);
         self.vec_eye_pos = Vector4::new(eye.x, eye.y, eye.z, 1.0_f32);
-        
+
         self
     }
 

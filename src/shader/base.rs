@@ -1,7 +1,5 @@
 use std;
-use cgmath::*;
-use std::rc::Rc;
-use material::Material;
+use cgmath::{Vector3, Vector4, Matrix4};
 use texture::Texture;
 
 pub const MATRIX_PROJ_VIEW_WORLD: usize = 0;
@@ -20,7 +18,7 @@ pub struct Shader {
     pub in_vertex_data: Vec<f32>,      // see IN_VS_*
     pub out_vertex_data: [f32; MAX_OUT_VALUES],
     pub in_pixel_data: [f32; MAX_OUT_VALUES],
-    pub texture: Option<Rc<Texture>>,
+    pub texture: Option<std::rc::Rc<Texture>>,
     pub texture_lod: usize,
     pub ambient: Vector3<f32>,           // {r, g, b}
     pub diffuse: Vector3<f32>,           // {r, g, b}
@@ -32,183 +30,6 @@ pub struct Shader {
 }
 
 impl Shader {
-    pub fn new() -> Shader {
-        Shader {
-            matrix_arr: [Matrix4::<f32>::zero(); 2],
-            in_vertex_data: vec![0.0_f32; 18],
-            out_vertex_data: [0.0_f32; MAX_OUT_VALUES],
-            in_pixel_data: [0.0_f32; MAX_OUT_VALUES],
-            texture: None,
-            texture_lod: 0,
-            ambient: Vector3::<f32>::zero(),
-            diffuse: Vector3::<f32>::zero(),
-            specular: Vector3::<f32>::zero(),
-            ambient_intensity: 0.0_f32,
-            vertex_out_len: 0,
-            vertex_func: [Shader::vertex_default, Shader::vertex_default],
-            pixel_func: [Shader::pixel_default, Shader::pixel_default],
-        }
-    }
-
-    pub fn reset(&mut self, position: Vector4<f32>, normal: Vector4<f32>, tex: Vector2<f32>) {
-        self.vertex_out_len = 0;
-        self.set_vec4(IN_VS_VEC_POS, position);
-        self.set_vec4(IN_VS_VEC_NORM, normal);
-        self.set_vec2(IN_VS_VEC_TEX, tex);
-    }
-
-    pub fn set_material(&mut self, material: & Material) {
-        self.texture = match material.texture {
-            Some(ref v) => Some(v.clone()),
-            None => None
-        };
-        self.texture_lod = 0;
-        self.ambient = material.ambient;
-        self.diffuse = material.diffuse;
-        self.specular = material.specular;
-        self.ambient_intensity = material.ambient_intensity;
-    }
-
-    pub fn set_matrix(&mut self, ind: usize, matrix: Matrix4<f32>) {
-        self.matrix_arr[ind] = matrix;
-    }
-
-    pub fn set_vec4(&mut self, sm: usize, vector: Vector4<f32>) {
-        self.in_vertex_data[sm + 0] = vector.x;
-        self.in_vertex_data[sm + 1] = vector.y;
-        self.in_vertex_data[sm + 2] = vector.z;
-        self.in_vertex_data[sm + 3] = vector.w;
-    }
-
-    pub fn set_vec2(&mut self, sm: usize, vector: Vector2<f32>) {
-        self.in_vertex_data[sm + 0] = vector.x;
-        self.in_vertex_data[sm + 1] = vector.y;
-    }
-
-    fn read_vec4(&self, sm: usize) -> Vector4<f32> {
-        Vector4::new(self.in_vertex_data[sm + 0],
-                     self.in_vertex_data[sm + 1],
-                     self.in_vertex_data[sm + 2],
-                     self.in_vertex_data[sm + 3])
-    }
-
-    #[allow(dead_code)]
-    fn read_vec3(&self, sm: usize) -> Vector3<f32> {
-        Vector3::new(self.in_vertex_data[sm + 0],
-                     self.in_vertex_data[sm + 1],
-                     self.in_vertex_data[sm + 2])
-    }
-
-    fn read_vec2(&self, sm: usize) -> Vector2<f32> {
-        Vector2::new(self.in_vertex_data[sm + 0],
-                     self.in_vertex_data[sm + 1])
-    }
-
-    #[allow(dead_code)]
-    fn out_vec3_from4(&mut self, val: &Vector4<f32>) {
-        self.out_vertex_data[self.vertex_out_len + 0] = val.x;
-        self.out_vertex_data[self.vertex_out_len + 1] = val.y;
-        self.out_vertex_data[self.vertex_out_len + 2] = val.z;
-        self.vertex_out_len += 3;
-    }
-
-    fn out_vec2(&mut self, val: &Vector2<f32>) {
-        self.out_vertex_data[self.vertex_out_len + 0] = val.x;
-        self.out_vertex_data[self.vertex_out_len + 1] = val.y;
-        self.vertex_out_len += 2;
-    }
-
-    fn out_f32(&mut self, val: f32) {
-        self.out_vertex_data[self.vertex_out_len] = val;
-        self.vertex_out_len += 1;
-    }
-
-    pub fn set_lambert(&mut self) {
-        self.vertex_func = [Shader::vertex_lambert_color, Shader::vertex_lambert_texture];
-        self.pixel_func = [Shader::pixel_lambert_color, Shader::pixel_lambert_texture];
-    }
-
-    // out:
-    // 0 - f32 cos_nl
-    #[allow(dead_code)]
-    pub fn vertex_default(&mut self) -> Vector4<f32> {
-        let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
-
-        pos
-    }
-
-    // in:
-    #[allow(dead_code)]
-    pub fn pixel_default(&self) -> Vector3<f32> {
-        Vector3::new(255.0_f32, 255.0_f32, 255.0_f32)
-    }
-
-    // out:
-    // 0 - f32 cos_nl
-    #[allow(dead_code)]
-    pub fn vertex_lambert_color(&mut self) -> Vector4<f32> {
-        let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
-        let norm = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_NORM)).normalize();
-        let cos_nl = norm.dot(&self.read_vec4(IN_VS_VEC_NEG_LIGHT));
-
-        self.out_f32(cos_nl);
-        pos
-    }
-
-    // in:
-    // 0 - f32 cos_nl
-    #[allow(dead_code)]
-    pub fn pixel_lambert_color(&self) -> Vector3<f32> {
-        let cos_nl = self.in_pixel_data[0];
-        let ambient = self.ambient.mul_s(self.ambient_intensity);
-        let diffuse = self.diffuse.mul_s(cos_nl.max(0.0_f32));
-
-        ambient + diffuse
-    }
-
-    // out:
-    // 0 - Vector2 tex
-    // 2 - f32 cos_nl
-    #[allow(dead_code)]
-    pub fn vertex_lambert_texture(&mut self) -> Vector4<f32> {
-        let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
-        let norm = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_NORM)).normalize();
-        let tex = self.read_vec2(IN_VS_VEC_TEX);
-        let cos_nl = norm.dot(&self.read_vec4(IN_VS_VEC_NEG_LIGHT));
-
-        self.out_vec2(&tex);
-        self.out_f32(cos_nl);
-        pos
-    }
-
-    // in:
-    // 0 - Vector2 tex
-    // 2 - f32 cos_nl
-    #[allow(dead_code)]
-    pub fn pixel_lambert_texture(&self) -> Vector3<f32> {
-        let tex = Vector2::<f32>::new(self.in_pixel_data[0], self.in_pixel_data[1]);
-        let cos_nl = self.in_pixel_data[2];
-        let lod = self.texture_lod;
-
-        let texture = match self.texture {
-            Some(ref v) => v.clone(),
-            None => panic!("texture is none"),
-        };
-        let size_x = texture.levels[self.texture_lod].size_x;
-        let size_y = texture.levels[self.texture_lod].size_y;
-
-        let x = std::cmp::max(((1.0_f32 - tex.x) * (size_x as f32)) as i32, 0) as usize % size_x;
-        let y = std::cmp::max(((1.0_f32 - tex.y) * (size_y as f32)) as i32, 0) as usize % size_y;
-        // let x = std::cmp::max((tex.x * (size_x as f32)) as i32, 0) as usize % size_x;
-        // let y = std::cmp::max((tex.y * (size_y as f32)) as i32, 0) as usize % size_y;
-        let color = texture.levels[lod].data[y * size_x + x];
-
-        let ambient = color.mul_s(self.ambient_intensity);
-        let diffuse = color.mul_s(cos_nl.max(0.0_f32));
-
-        ambient + diffuse
-    }
-
     // out:
     // 0 - Vector3 normal
     // #[allow(dead_code)]

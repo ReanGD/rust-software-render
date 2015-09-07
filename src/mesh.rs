@@ -120,20 +120,20 @@ impl Model {
     pub fn new() -> Model {
         Model {
             vertex_buffer: Vec::<Vertex>::new(),
-            material_list: Vec::<Material>::new(),
-            mesh_list: Vec::<Mesh>::new(),
-        }
-    }
+                                 material_list: Vec::<Material>::new(),
+                                                      mesh_list: Vec::<Mesh>::new(),
+                                 }
+            }
 
-    pub fn draw(&self, shader: &mut Shader, device: &mut Device) -> u32 {
-        let mut triangle_cnt: u32 = 0;
-        for mesh in &self.mesh_list {
-            triangle_cnt += mesh.draw(shader,
-                                      &self.material_list[mesh.material_id],
-                                      &self.vertex_buffer,
-                                      device);
-        }
+            pub fn draw(&self, shader: &mut Shader, device: &mut Device) -> u32 {
+                let mut triangle_cnt: u32 = 0;
+                for mesh in &self.mesh_list {
+                    triangle_cnt += mesh.draw(shader,
+                                              &self.material_list[mesh.material_id],
+                                              &self.vertex_buffer,
+                                              device);
+                }
 
-        triangle_cnt
-    }
-}
+                triangle_cnt
+            }
+        }
