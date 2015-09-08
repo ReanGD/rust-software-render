@@ -1,4 +1,5 @@
 use std;
+use std::rc::Rc;
 use sdl2;
 use cgmath::*;
 use sdl2::surface;
@@ -12,7 +13,8 @@ pub struct Surface {
 }
 
 pub struct Texture {
-    pub levels: Vec<Surface>,
+    levels: Vec<Rc<Surface>>,
+    pub size: Vector2<f32>,
 }
 
 impl Surface {
@@ -22,6 +24,13 @@ impl Surface {
             size_y: size_y,
             data: Vec::<Vector3<f32>>::with_capacity(size_x * size_y),
         }
+    }
+
+    pub fn tex_2d(&self, tex: Vector2<f32>) -> Vector3<f32>
+    {
+        let y = (tex.y * (self.size_y as f32)) as usize % self.size_y;
+        let x = (tex.x * (self.size_x as f32)) as usize % self.size_x;
+        self.data[y * self.size_x + x]
     }
 }
 
@@ -56,19 +65,26 @@ impl Texture {
         };
 
         let mut lvl0 = Surface::new(size_x, size_y);
-        for ind in 0..size_y * size_x {
-            lvl0.data.push(Vector3::new(
-                data_u8[ind * 4 + 2] as f32,
-                data_u8[ind * 4 + 1] as f32,
-                data_u8[ind * 4 + 0] as f32));
-        }
+        for y in 0..size_y {
+            for x in 0..size_x {
+                let ind = ((size_y - y - 1) * size_x + x) * 4;
+                lvl0.data.push(Vector3::new(
+                    data_u8[ind + 2] as f32,
+                    data_u8[ind + 1] as f32,
+                    data_u8[ind + 0] as f32));
+            }}
 
         let mut this = Texture {
-            levels: vec![lvl0],
+            levels: vec![Rc::new(lvl0)],
+            size: Vector2::new(size_x as f32, size_y as f32),
         };
         this.gen_mipmap();
 
         Ok(this)
+    }
+
+    pub fn get_surface(&self, mip_lvl: usize) -> Rc<Surface> {
+        self.levels[std::cmp::min(mip_lvl, self.levels.len() - 1)].clone()
     }
 
     fn load_surface<'a>(fullpath: &str, filename: &str) -> Result<surface::Surface<'a>, String> {
@@ -148,7 +164,7 @@ impl Texture {
                 }
             }
 
-            self.levels.push(s);
+            self.levels.push(Rc::new(s));
             size_x = next_size_x;
             size_y = next_size_y;
             surface_ind += 1;

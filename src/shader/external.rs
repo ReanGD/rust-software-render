@@ -10,7 +10,6 @@ impl Shader {
             out_vertex_data: [0.0_f32; MAX_OUT_VALUES],
             in_pixel_data: [0.0_f32; MAX_OUT_VALUES],
             texture: None,
-            texture_lod: 0,
             ambient: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
             diffuse: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
             specular: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
@@ -29,11 +28,6 @@ impl Shader {
     }
 
     pub fn set_material(&mut self, material: &Material) {
-        self.texture = match material.texture {
-            Some(ref v) => Some(v.clone()),
-            None => None
-        };
-        self.texture_lod = 0;
         self.ambient = material.ambient;
         self.diffuse = material.diffuse;
         self.specular = material.specular;

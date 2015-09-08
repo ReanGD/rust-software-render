@@ -1,4 +1,3 @@
-use std;
 use cgmath::*;
 use shader::*;
 use device::Device;
@@ -86,24 +85,24 @@ impl Mesh {
             }
 
             // calc mip level:
-            if material.texture.is_some() {
-                let texture = shader.texture.as_ref().unwrap();
-                let ba_pixel = Vector2::new(points_2d[1].x, points_2d[1].y)
-                    .sub_v(&Vector2::new(points_2d[0].x, points_2d[0].y));
-                let ca_pixel = Vector2::new(points_2d[2].x, points_2d[2].y)
-                    .sub_v(&Vector2::new(points_2d[0].x, points_2d[0].y));
+            shader.texture = match material.texture {
+                Some(ref texture) => {
+                    let ba_pixel = Vector2::new(points_2d[1].x, points_2d[1].y)
+                        .sub_v(&Vector2::new(points_2d[0].x, points_2d[0].y));
+                    let ca_pixel = Vector2::new(points_2d[2].x, points_2d[2].y)
+                        .sub_v(&Vector2::new(points_2d[0].x, points_2d[0].y));
 
-                let tex_size = Vector2::new(texture.levels[0].size_x as f32,
-                                            texture.levels[0].size_y as f32);
-                let ba_texel = tex_coord[1].sub_v(&tex_coord[0]).mul_v(&tex_size);
-                let ca_texel = tex_coord[2].sub_v(&tex_coord[0]).mul_v(&tex_size);
-                // cross product in 2d = 2 * square of triangle
-                let sq_pixel = ba_pixel.x * ca_pixel.y - ba_pixel.y * ca_pixel.x;
-                let sq_texel = ba_texel.x * ca_texel.y - ba_texel.y * ca_texel.x;
-                let lod = (sq_texel / sq_pixel).abs().sqrt().max(1.0_f32).log2() as usize;
-                shader.texture_lod = std::cmp::min(lod, texture.levels.len() - 1);
-                // println!("{}", shader.texture_lod);
-            }
+                    let tex_size = texture.size;
+                    let ba_texel = tex_coord[1].sub_v(&tex_coord[0]).mul_v(&tex_size);
+                    let ca_texel = tex_coord[2].sub_v(&tex_coord[0]).mul_v(&tex_size);
+                    // cross product in 2d = 2 * square of triangle
+                    let sq_pixel = ba_pixel.x * ca_pixel.y - ba_pixel.y * ca_pixel.x;
+                    let sq_texel = ba_texel.x * ca_texel.y - ba_texel.y * ca_texel.x;
+                    let lod = (sq_texel / sq_pixel).abs().sqrt().max(1.0_f32).log2() as usize;
+                    Some(texture.get_surface(lod))
+                },
+                None => None,
+            };
 
             triangle(&mut device.cbuffer,
                      &mut device.zbuffer,
@@ -120,20 +119,20 @@ impl Model {
     pub fn new() -> Model {
         Model {
             vertex_buffer: Vec::<Vertex>::new(),
-                                 material_list: Vec::<Material>::new(),
-                                                      mesh_list: Vec::<Mesh>::new(),
-                                 }
-            }
-
-            pub fn draw(&self, shader: &mut Shader, device: &mut Device) -> u32 {
-                let mut triangle_cnt: u32 = 0;
-                for mesh in &self.mesh_list {
-                    triangle_cnt += mesh.draw(shader,
-                                              &self.material_list[mesh.material_id],
-                                              &self.vertex_buffer,
-                                              device);
-                }
-
-                triangle_cnt
-            }
+            material_list: Vec::<Material>::new(),
+            mesh_list: Vec::<Mesh>::new(),
         }
+    }
+
+    pub fn draw(&self, shader: &mut Shader, device: &mut Device) -> u32 {
+        let mut triangle_cnt: u32 = 0;
+        for mesh in &self.mesh_list {
+            triangle_cnt += mesh.draw(shader,
+                                      &self.material_list[mesh.material_id],
+                                      &self.vertex_buffer,
+                                      device);
+        }
+
+        triangle_cnt
+    }
+}

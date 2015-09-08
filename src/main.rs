@@ -35,8 +35,9 @@ pub fn main() {
     let ind = 7;
     // let mut material = Material::gold();
 
-    let mut init_matrix = Matrix4::<f32>::identity();
+    let init_matrix = Matrix4::<f32>::identity();
     let mut add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
+    // let add_angle = rad(0.0_f32);
     let light = Vector3::new(1.0_f32, -1.0_f32, 1.0_f32);
     match ind {
         // 0 => {
@@ -81,11 +82,12 @@ pub fn main() {
         //     model = Model3ds::load("nokia/nokia-n82-highres.3DS").unwrap();
         // },
         7 => {
-            eye = Point3::new(0.0_f32, 2.0_f32, -2.5_f32);
+            eye = Point3::new(0.0_f32, 40.0_f32, -50.5_f32);
 	        center = Point3::new(0.0_f32, 2.0_f32, 0.0_f32);
-            model = ModelObj::load("cube.obj").unwrap();
+            // model = ModelObj::load("cube.obj").unwrap();
             // model = ModelObj::load("monster1/monster.obj").unwrap();
-            // model = ModelObj::load("yoda2/yoda.obj").unwrap();
+            // model = ModelObj::load("nokia/nokia.obj").unwrap();
+            model = ModelObj::load("droid/attack_droid.obj").unwrap();
         },
 
 
@@ -93,7 +95,7 @@ pub fn main() {
     };
 	let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
 
-    let mut angle = rad(0.0_f32);
+    let mut angle = rad(std::f32::consts::PI * 0.5_f32);
 
     let mut scene = Scene::new(800, 600);
     scene.proj(deg(100.0_f32), 0.1_f32, 100.0_f32)

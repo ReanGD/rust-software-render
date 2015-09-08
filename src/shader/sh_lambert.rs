@@ -1,4 +1,3 @@
-use std;
 use cgmath::{Vector, EuclideanVector, Vector2, Vector3, Vector4, Matrix};
 use shader::base::*;
 
@@ -50,20 +49,11 @@ impl Shader {
     fn pixel_lambert_texture(&self) -> Vector3<f32> {
         let tex = Vector2::<f32>::new(self.in_pixel_data[0], self.in_pixel_data[1]);
         let cos_nl = self.in_pixel_data[2];
-        let lod = self.texture_lod;
 
-        let texture = match self.texture {
-            Some(ref v) => v.clone(),
+        let color = match self.texture {
+            Some(ref t) => t.tex_2d(tex),
             None => panic!("texture is none"),
         };
-        let size_x = texture.levels[self.texture_lod].size_x;
-        let size_y = texture.levels[self.texture_lod].size_y;
-
-        let x = std::cmp::max(((1.0_f32 - tex.x) * (size_x as f32)) as i32, 0) as usize % size_x;
-        let y = std::cmp::max(((1.0_f32 - tex.y) * (size_y as f32)) as i32, 0) as usize % size_y;
-        // let x = std::cmp::max((tex.x * (size_x as f32)) as i32, 0) as usize % size_x;
-        // let y = std::cmp::max((tex.y * (size_y as f32)) as i32, 0) as usize % size_y;
-        let color = texture.levels[lod].data[y * size_x + x];
 
         let ambient = color.mul_s(self.ambient_intensity);
         let diffuse = color.mul_s(cos_nl.max(0.0_f32));

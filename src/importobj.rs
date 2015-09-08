@@ -14,7 +14,7 @@ pub struct ModelObj<'a> {
     model: Model,
     position_buffer: &'a [Vector3<f32>],
     normal_buffer: &'a [Vector3<f32>],
-    tex_buffer: &'a [Vector2<f32>],
+    tex_buffer: Vec<Vector2<f32>>,
 }
 
 impl<'a> ModelObj<'a> {
@@ -113,8 +113,15 @@ impl<'a> ModelObj<'a> {
             model: Model::new(),
             position_buffer: cast_to(model_obj.position()),
             normal_buffer: cast_to(model_obj.normal()),
-            tex_buffer: cast_to(model_obj.texture()),
+            tex_buffer: Vec::<Vector2<f32>>::with_capacity(model_obj.texture().len()),
         };
+
+        for p in model_obj.texture() {
+            let u = p[0] % 1.0_f32;
+            let v = p[1] % 1.0_f32;
+            this.tex_buffer.push(Vector2::new(if u < 0.0_f32 { u + 1.0_f32 } else { u },
+                                              if v < 0.0_f32 { v + 1.0_f32 } else { v }));
+        }
 
         let mut def_mat = material::Material::new();
         def_mat.diffuse = Vector3::new(255.0_f32, 0.0_f32, 0.0_f32);

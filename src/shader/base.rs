@@ -1,6 +1,6 @@
 use std;
 use cgmath::{Vector3, Vector4, Matrix4};
-use texture::Texture;
+use texture::Surface;
 
 pub const MATRIX_PROJ_VIEW_WORLD: usize = 0;
 pub const MATRIX_WORLD: usize = 1;
@@ -18,8 +18,7 @@ pub struct Shader {
     pub in_vertex_data: Vec<f32>,      // see IN_VS_*
     pub out_vertex_data: [f32; MAX_OUT_VALUES],
     pub in_pixel_data: [f32; MAX_OUT_VALUES],
-    pub texture: Option<std::rc::Rc<Texture>>,
-    pub texture_lod: usize,
+    pub texture: Option<std::rc::Rc<Surface>>,
     pub ambient: Vector3<f32>,           // {r, g, b}
     pub diffuse: Vector3<f32>,           // {r, g, b}
     pub specular: Vector3<f32>,          // {r, g, b}
