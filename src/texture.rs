@@ -28,9 +28,26 @@ impl Surface {
 
     pub fn tex_2d(&self, tex: Vector2<f32>) -> Vector3<f32>
     {
-        let y = (tex.y * (self.size_y as f32)) as usize % self.size_y;
         let x = (tex.x * (self.size_x as f32)) as usize % self.size_x;
+        let y = (tex.y * (self.size_y as f32)) as usize % self.size_y;
         self.data[y * self.size_x + x]
+    }
+
+    pub fn tex_2d_bilinear(&self, tex: Vector2<f32>) -> Vector3<f32>
+    {
+        let x = (tex.x * (self.size_x as f32));
+        let y = (tex.y * (self.size_y as f32));
+
+        let x_int = x as usize % self.size_x;
+        let y_int = y as usize % self.size_y;
+        let add_x = if x_int + 1 == self.size_x {0} else {1};
+        let add_y = if y_int + 1 == self.size_y {0} else {self.size_x};
+        let ind = y_int * self.size_x + x_int;
+
+        let p1 = self.data[ind];
+        let p2 = self.data[ind + add_x];
+        let p3 = self.data[ind + add_y];
+        let p4 = self.data[ind + add_x + add_y];
     }
 }
 

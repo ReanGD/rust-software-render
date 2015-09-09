@@ -99,6 +99,22 @@ impl<'a> ModelObj<'a> {
         Ok(())
     }
 
+    fn calc_aabb(position: &[[f32; 3]]) -> (Vector3<f32>, Vector3<f32>) {
+        let p = position[0];
+        let mut min = Vector3::new(p[0], p[1], p[2]);
+        let mut max = min;
+        for p in position {
+            min.x = min.x.min(p[0]);
+            max.x = max.x.max(p[0]);
+            min.y = min.y.min(p[1]);
+            max.y = max.y.max(p[1]);
+            min.z = min.z.min(p[2]);
+            max.z = max.z.max(p[2]);
+        }
+
+        (min, max)
+    }
+
     pub fn load(filename: &str) -> Result<Model, String> {
         let filepath = try!(get_full_path(filename));
         let mut model_dir = std::path::PathBuf::from(filepath.clone());
@@ -107,10 +123,11 @@ impl<'a> ModelObj<'a> {
         }
 
         let model_obj: Obj<Rc<Material>> = load(std::path::Path::new(&filepath)).unwrap();
+        let (min, max) = ModelObj::calc_aabb(model_obj.position());
         let mut this = ModelObj {
             model_dir: model_dir,
             map: std::collections::HashMap::<IndexTuple, u32>::new(),
-            model: Model::new(),
+            model: Model::new(min, max),
             position_buffer: cast_to(model_obj.position()),
             normal_buffer: cast_to(model_obj.normal()),
             tex_buffer: Vec::<Vector2<f32>>::with_capacity(model_obj.texture().len()),
