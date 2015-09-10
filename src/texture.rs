@@ -26,6 +26,7 @@ impl Surface {
         }
     }
 
+    #[allow(dead_code)]
     pub fn tex_2d(&self, tex: Vector2<f32>) -> Vector3<f32>
     {
         let x = (tex.x * (self.size_x as f32)) as usize % self.size_x;
@@ -33,21 +34,29 @@ impl Surface {
         self.data[y * self.size_x + x]
     }
 
+    #[allow(dead_code)]
     pub fn tex_2d_bilinear(&self, tex: Vector2<f32>) -> Vector3<f32>
     {
-        let x = (tex.x * (self.size_x as f32));
-        let y = (tex.y * (self.size_y as f32));
+        let x = tex.x * (self.size_x as f32);
+        let y = tex.y * (self.size_y as f32);
 
-        let x_int = x as usize % self.size_x;
-        let y_int = y as usize % self.size_y;
+        let x_int = x as usize;
+        let y_int = y as usize;
+
+        let dx = x - (x_int as f32);
+        let dy = y - (y_int as f32);
+
         let add_x = if x_int + 1 == self.size_x {0} else {1};
         let add_y = if y_int + 1 == self.size_y {0} else {self.size_x};
+
         let ind = y_int * self.size_x + x_int;
 
-        let p1 = self.data[ind];
-        let p2 = self.data[ind + add_x];
-        let p3 = self.data[ind + add_y];
-        let p4 = self.data[ind + add_x + add_y];
+        self.data[ind].mul_s(1.0_f32 - dx).
+            add_v(&self.data[ind + add_x].mul_s(dx)).
+            mul_s(1.0_f32 - dy).
+            add_v(&self.data[ind + add_y].mul_s(1.0_f32 - dx).
+                  add_v(&self.data[ind + add_x + add_y].mul_s(dx)).
+                  mul_s(dy))
     }
 }
 
