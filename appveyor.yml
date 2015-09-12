@@ -1,0 +1,95 @@
+version: '{branch}.{build}'
+skip_tags: true
+clone_folder: c:\projects\git
+environment:
+  RUST_VERSION: rust-1.2.0
+  SDL_VERSION: 2.0.3
+  matrix:
+  - TARGET1: x86_64
+    TARGET2: x64
+  - TARGET1: i686
+    TARGET2: x86
+install:
+- ps: >-
+    New-Item c:\projects\downloads -type directory
+
+    New-Item c:\projects\cargo -type directory
+
+    New-Item c:\projects\sdl -type directory
+
+    New-Item c:\projects\git\artifacts -type directory
+
+
+    cd c:\projects\downloads
+
+    Start-FileDownload "https://static.rust-lang.org/dist/${env:RUST_VERSION}-${env:TARGET1}-pc-windows-gnu.msi"
+
+    Start-FileDownload "https://static.rust-lang.org/cargo-dist/cargo-nightly-${env:TARGET1}-pc-windows-gnu.tar.gz"
+
+    Start-FileDownload "https://www.libsdl.org/release/SDL2-${env:SDL_VERSION}-win32-${env:TARGET2}.zip"
+
+    Start-FileDownload "https://www.libsdl.org/release/SDL2-devel-${env:SDL_VERSION}-mingw.tar.gz"
+
+
+    Start-Process -FilePath msiexec -ArgumentList /i, ${env:RUST_VERSION}-${env:TARGET1}-pc-windows-gnu.msi, INSTALLDIR="c:\projects\rust", /quiet -Wait
+
+    7z x cargo-nightly-${env:TARGET1}-pc-windows-gnu.tar.gz
+
+    7z x cargo-nightly-${env:TARGET1}-pc-windows-gnu.tar
+
+    7z x SDL2-${env:SDL_VERSION}-win32-${env:TARGET2}.zip
+
+    7z x SDL2-devel-${env:SDL_VERSION}-mingw.tar.gz
+
+    7z x SDL2-devel-${env:SDL_VERSION}-mingw.tar
+
+
+    Copy-Item cargo-nightly-${env:TARGET1}-pc-windows-gnu\cargo\* c:\projects\cargo\ -recurse
+
+    Copy-Item SDL2-${env:SDL_VERSION}\${env:TARGET1}-w64-mingw32\lib\libSDL2.dll.a c:\projects\rust\bin\rustlib\${env:TARGET1}-pc-windows-gnu\lib\
+
+    Copy-Item SDL2.dll c:\projects\sdl\
+
+    Copy-Item SDL2.dll c:\projects\git\artifacts\
+
+    Copy-Item c:\projects\git\media c:\projects\git\artifacts\ -recurse
+
+
+    $env:Path += ";c:\projects\rust\bin"
+
+    $env:Path += ";c:\projects\cargo\bin"
+
+    $env:Path += ";c:\projects\sdl"
+
+    cd c:\projects\git
+
+
+    rustc -V
+
+    cargo -V
+build_script:
+- ps: >-
+    cargo build --release -v
+
+    Copy-Item target\release\rust-software-render.exe artifacts\
+test_script:
+- ps: cargo test -v
+artifacts:
+- path: artifacts
+  name: artifacts
+# http://help.appveyor.com/discussions/problems/3008-artifacts-cant-uploaded-to-github-release-400-bad-request
+# deploy:
+# - provider: GitHub
+#   tag: $(APPVEYOR_REPO_BRANCH)-win
+#   release: $(APPVEYOR_REPO_BRANCH)-$(TARGET2)-win
+#   description: $(APPVEYOR_REPO_BRANCH)-$(TARGET2) for windows
+#   auth_token:
+#     secure: /VxMVHbl3XzhHfFGCCu81O4JPgI42lbTT+n/opdJ7LW8XMsjgW3ztAPLI3u2TBro
+#   artifact: artifacts.zip
+notifications:
+- provider: Email
+  to:
+  - reangd@yandex.ru
+  on_build_success: false
+  on_build_failure: true
+  on_build_status_changed: false
