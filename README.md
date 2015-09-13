@@ -1,8 +1,9 @@
 # rust-software-render 
 
-[v0.1](https://github.com/ReanGD/rust-software-render/tree/v01) [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg?branch=v01)](https://travis-ci.org/ReanGD/rust-software-render) 
-[master](https://github.com/ReanGD/rust-software-render/tree/master) [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg?branch=master)](https://travis-ci.org/ReanGD/rust-software-render)
+[v0.1](https://github.com/ReanGD/rust-software-render/tree/v01) [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg?branch=v01)](https://travis-ci.org/ReanGD/rust-software-render) [![Build status](https://ci.appveyor.com/api/projects/status/y32wy5vu51q9hscm/branch/v01?svg=true)](https://ci.appveyor.com/project/ReanGD/rust-software-render/branch/v01)
 
+Сборка
+--
 Для сборки проекта у вас должен стоять компилятор [Rust](http://www.rust-lang.org/), менеджер пакетов для него [Cargo](https://crates.io/).
 
 Так же дополнительно требуется установить библиотеку [sdl2](https://www.libsdl.org/download-2.0.php).
@@ -23,9 +24,10 @@ sudo apt-get install libsdl2-dev
 cargo run --release
 ```
 
-Скриншоты:
+Скриншоты
+--
 
 [v0.1](https://github.com/ReanGD/rust-software-render/tree/v01) ([статья](http://reangdblog.blogspot.com/2015/08/software-render-rust.html)):
 
 16 тыс. случайных треугольников на экране и всего 1 fps:
-![Растеризация на плоскости](https://github.com/ReanGD/rust-software-render/blob/master/screenshots/scene_1.png "Растеризация на плоскости")
+![Растеризация на плоскости](https://github.com/ReanGD/rust-software-render/blob/v01/screenshots/scene_1.png "Растеризация на плоскости")
