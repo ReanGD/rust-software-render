@@ -2,27 +2,44 @@
 
 [v0.1](https://github.com/ReanGD/rust-software-render/tree/v01) [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg?branch=v01)](https://travis-ci.org/ReanGD/rust-software-render) [![Build status](https://ci.appveyor.com/api/projects/status/y32wy5vu51q9hscm/branch/v01?svg=true)](https://ci.appveyor.com/project/ReanGD/rust-software-render/branch/v01)
 
-Сборка
+Подготовка окружения
 --
-Для сборки проекта у вас должен стоять компилятор [Rust](http://www.rust-lang.org/), менеджер пакетов для него [Cargo](https://crates.io/).
+Для сборки проекта у вас должены стоять:
+- компилятор [Rust](http://www.rust-lang.org/) (для Windows тестируется только stable версия, для Linux: nightly, beta, stable)
+- менеджер пакетов для rust - [Cargo](https://crates.io/)
+ 
+Для Windows необходимо добавить папку с rustc и cargo в PATH
 
-Так же дополнительно требуется установить библиотеку [sdl2](https://www.libsdl.org/download-2.0.php).
+Дополнительные пакеты
+--
+Требуется установить библиотеку [sdl2](https://www.libsdl.org/download-2.0.php).
 
-Для arch-linux последняя ставится вот так:
+Для Arch-Linux ставится вот так:
 ```Shell
 sudo pacman -S sdl2
 ```
-Для ubuntu вот так:
+Для Ubuntu вот так:
 ```Shell
 sudo add-apt-repository ppa:team-xbmc/ppa -y
 sudo apt-get update -q
 sudo apt-get install libsdl2-dev
 ```
 
-Собрать и запустить проект можно, выполнив такую команду из корня проекта:
+Для Windows:
+- качаем [SDL2-devel-2.0.3-mingw.tar.gz](https://www.libsdl.org/release/SDL2-devel-2.0.3-mingw.tar.gz), распаковываем, ищем файл SDL2-2.0.3\TARGET-w64-mingw32\lib\libSDL2.dll.a и копируем его в RUST_PATH\bin\rustlib\TARGET-pc-windows-gnu\lib\
+- качаем [SDL2-2.0.3-win32-x86.zip](https://www.libsdl.org/release/SDL2-2.0.3-win32-x86.zip) или [SDL2-2.0.3-win32-x64.zip](https://www.libsdl.org/release/SDL2-2.0.3-win32-x64.zip) в зависимости от платформы, распаковываем и кладем либо в директорию, которая находится в PATH, либо рядом с exe который получится после компиляции проекта
+
+Сборка и запуск
+--
+Из корня проекта выполняем:
+```Shell
+cargo build --release
+```
+Если нужно сразу скопилировать и запустить, то так:
 ```Shell
 cargo run --release
 ```
+
 
 Скриншоты
 --
