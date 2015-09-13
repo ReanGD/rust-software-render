@@ -13,6 +13,11 @@ install:
   - sudo add-apt-repository ppa:team-xbmc/ppa -y
   - sudo apt-get update -q
   - sudo apt-get install libsdl2-dev
+# currently disabled, because sdl2 ppa is not yet available
+# addons:
+#   apt:
+#     packages:
+#     - libsdl2-dev
 before_script:
   - rustc -V
   - cargo -V
