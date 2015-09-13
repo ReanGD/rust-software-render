@@ -1,5 +1,4 @@
 extern crate sdl2;
-extern crate rand;
 extern crate time;
 extern crate cgmath;
 
