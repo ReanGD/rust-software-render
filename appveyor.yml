@@ -86,9 +86,6 @@ artifacts:
 #   auth_token:
 #     secure: /VxMVHbl3XzhHfFGCCu81O4JPgI42lbTT+n/opdJ7LW8XMsjgW3ztAPLI3u2TBro
 #   artifact: artifacts.zip
-deploy:
-  provider: Environment
-  name: rust-software-render
 notifications:
 - provider: Email
   to:
