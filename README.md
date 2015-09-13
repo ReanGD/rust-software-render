@@ -1,6 +1,6 @@
 # rust-software-render 
 
-[v0.3](https://github.com/ReanGD/rust-software-render/tree/v03) [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg?branch=v03)](https://travis-ci.org/ReanGD/rust-software-render) [![Build status](https://ci.appveyor.com/api/projects/status/y32wy5vu51q9hscm/branch/v02?svg=true)](https://ci.appveyor.com/project/ReanGD/rust-software-render/branch/v02)
+[v0.3](https://github.com/ReanGD/rust-software-render/tree/v03) [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg?branch=v03)](https://travis-ci.org/ReanGD/rust-software-render) [![Build status](https://ci.appveyor.com/api/projects/status/y32wy5vu51q9hscm/branch/v03?svg=true)](https://ci.appveyor.com/project/ReanGD/rust-software-render/branch/v03)
 
 Подготовка окружения
 --
@@ -49,7 +49,7 @@ cargo run --release
 16 тыс. случайных треугольников на экране и всего 1 fps:
 ![Растеризация на плоскости](https://github.com/ReanGD/rust-software-render/blob/v03/screenshots/scene_1.png "Растеризация на плоскости")
 
-[v0.2](https://github.com/ReanGD/rust-software-render/tree/v03) ([статья](http://reangdblog.blogspot.com/2015/09/software-render-rust-3d.html)):
+[v0.2](https://github.com/ReanGD/rust-software-render/tree/v02) ([статья](http://reangdblog.blogspot.com/2015/09/software-render-rust-3d.html)):
 
 Низкополигональная модель освещение даже не повершинное, а пограневое, чуть более 2 млн triangle per second:
 ![Кольцо и пограневое освещение](https://github.com/ReanGD/rust-software-render/blob/v03/screenshots/scene_2_1.png "Кольцо и пограневое освещение")
@@ -57,7 +57,7 @@ cargo run --release
 Высокополигональная модель освещение такое же, tps = 3.3 млн:
 ![Высокополигональный монстр](https://github.com/ReanGD/rust-software-render/blob/v03/screenshots/scene_2_2.png "Высокополигональный монстр")
 
-[v0.3](https://github.com/ReanGD/rust-software-render/tree/v03):
+[v0.3](https://github.com/ReanGD/rust-software-render/tree/v03) ([статья](http://reangdblog.blogspot.com/2015/09/software-render-rust.html)):
 
 Шар с освещением по упрощенному [Cook-Torrance](http://www.gamedev.ru/code/articles/Cook-Torrance):
 ![Шар - Cook-Torrance](https://github.com/ReanGD/rust-software-render/blob/v03/screenshots/scene_3_1.png "Шар - Cook-Torrance")
