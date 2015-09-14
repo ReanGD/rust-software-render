@@ -164,8 +164,8 @@ impl Texture {
 
                 // koeff table
                 // 1 2 1
-		        // 2 4 2
-		        // 1 2 1
+                // 2 4 2
+                // 1 2 1
                 for y in 0..next_size_y {
                     for x in 0..next_size_x {
                         let mut clr = Vector3::zero();
