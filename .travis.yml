@@ -12,7 +12,7 @@ install:
   # cd SDL-2.0.4-9799 && ./configure
   - sudo add-apt-repository ppa:team-xbmc/ppa -y
   - sudo apt-get update -q
-  - sudo apt-get install libsdl2-dev
+  - sudo apt-get install libsdl2-dev libsdl2-image-dev
 # currently disabled, because sdl2 ppa is not yet available
 # addons:
 #   apt:
