@@ -31,10 +31,10 @@ pub fn main() {
     let eye;
     let center;
     let model;
-    let ind = 7;
+    let ind = 3;
     // let mut material = Material::gold();
 
-    let mut add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
+    let add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
     // let add_angle = rad(0.0_f32);
     let light = Vector3::new(1.0_f32, -1.0_f32, 1.0_f32);
     match ind {
@@ -50,41 +50,12 @@ pub fn main() {
         //     center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
         //     model = generate_sphere(50).unwrap();
         // },
-        // 2 => {
-        //     eye = Point3::new(0.0_f32, 0.7_f32, -1.1_f32);
-        //     center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
-        //     // material = Material::silver();
-        //     add_angle = rad(0.0_f32);
-        //     model = Model3ds::load("ring.3ds").unwrap();
-        // },
-        // 3 => {
-        //     eye = Point3::new(0.0_f32, 0.0_f32, -10.1_f32);
-        //     center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
-        //     model = Model3ds::load("tux.3ds").unwrap();
-        // },
-        // 4 => {
-        //     eye = Point3::new(0.0_f32, -2.0_f32, -4.1_f32);
-        //     center = Point3::new(0.0_f32, -2.0_f32, 0.0_f32);
-        //     // material = Material::monster_skin();
-        //     init_matrix = Matrix4::from(Matrix3::from_angle_x(rad(-1.8_f32)));
-        //     model = Model3ds::load("monster.3ds").unwrap();
-        // },
-        // 5 => {
-        //     eye = Point3::new(0.0_f32, 0.0_f32, -1.1_f32);
-        //     center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
-        //     model = Model3ds::load("yoda/yoda2.3ds").unwrap();
-        // },
-        // 6 => {
-        //     eye = Point3::new(0.0_f32, 0.0_f32, -1.1_f32);
-        //     center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
-        //     model = Model3ds::load("nokia/nokia-n82-highres.3DS").unwrap();
-        // },
-        7 => {
+        3 => {
             eye = Point3::new(0.0_f32, 1.0_f32, -0.8_f32);
             center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
             // model = ModelObj::load("cube.obj").unwrap();
-            // model = ModelObj::load("monster1/monster.obj").unwrap();
-            model = ModelObj::load("nokia/nokia.obj").unwrap();
+            model = ModelObj::load("monster1/monster.obj").unwrap();
+            // model = ModelObj::load("nokia/nokia.obj").unwrap();
             // model = ModelObj::load("droid/attack_droid.obj").unwrap();
         },
 
