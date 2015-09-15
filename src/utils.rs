@@ -1,25 +1,26 @@
-use std::env;
-use std::fs;
+use std;
+use std::path::{Path, PathBuf};
 
-pub fn get_full_path(filename: &str) -> Result<String, String> {
-    let mut cur_dir = env::current_dir().unwrap();
+const BASE_DIR_NAME: &'static str = "media";
+
+pub fn is_dir(path: &Path) -> bool {
+    match std::fs::metadata(path) {
+        Ok(md) => md.is_dir(),
+        Err(_) => false
+    }
+}
+
+pub fn get_base_dir() -> Result<PathBuf, String> {
+    let mut cur_dir = std::env::current_dir().unwrap();
 
     loop {
-        cur_dir.push("media");
-        let is_dir = match fs::metadata(cur_dir.to_str().unwrap()) {
-            Ok(md) => md.is_dir(),
-            Err(_) => false
-        };
-        if is_dir {
-            break;
+        cur_dir.push(BASE_DIR_NAME);
+        if is_dir(&cur_dir.as_path()) {
+            return Ok(cur_dir);
         }
         if !cur_dir.pop() || !cur_dir.pop() {
-            return Err(format!("not found \"media\" directory for filename {}", filename));
+            break;
         }
     }
-    cur_dir.push(filename);
-    match cur_dir.as_path().to_str() {
-        Some(path) => Ok(path.to_string()),
-        None => Err(format!("error get full path for filename {}", filename))
-    }
+    Err(format!("not found base direcory: {}", BASE_DIR_NAME))
 }

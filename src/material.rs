@@ -23,15 +23,8 @@ impl Material {
         }
     }
 
-    pub fn texture_from_dir(&mut self, dir: &std::path::PathBuf, filename: &str) -> Result<(), String> {
-        self.texture = Some(Rc::new(try!(Texture::from_dir(dir, filename))));
-
-        Ok(())
-    }
-
-    #[allow(dead_code)]
-    pub fn texture_from_def(&mut self, filename: &str) -> Result<(), String> {
-        self.texture = Some(Rc::new(try!(Texture::from_def(filename))));
+    pub fn create_texture(&mut self, path: &std::path::Path) -> Result<(), String> {
+        self.texture = Some(Rc::new(try!(Texture::new(path))));
 
         Ok(())
     }

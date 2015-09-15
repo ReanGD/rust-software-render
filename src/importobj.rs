@@ -1,15 +1,16 @@
 use std;
+use utils;
 use material;
 use std::rc::Rc;
 use genmesh::Polygon;
-use utils::get_full_path;
+use std::path::{Path, PathBuf};
 use cgmath::{Vector, Vector2, Vector3};
 use mesh::{Model, Mesh, Vertex};
 use obj::{Obj, Material, IndexTuple, load};
 use memory::cast_to;
 
 pub struct ModelObj<'a> {
-    model_dir: std::path::PathBuf,
+    model_dir: PathBuf,
     map: std::collections::HashMap<IndexTuple, u32>,
     model: Model,
     position_buffer: &'a [Vector3<f32>],
@@ -83,7 +84,7 @@ impl<'a> ModelObj<'a> {
                             None => {},
                         };
                         match m.map_kd {
-                            Some(ref path) => try!(mat.texture_from_dir(&self.model_dir, &path)),
+                            Some(ref path) => try!(mat.create_texture(&self.model_dir.join(path).as_path())),
                             None => {},
                         };
                         mat.calc_ambient_intensity();
@@ -115,14 +116,15 @@ impl<'a> ModelObj<'a> {
         (min, max)
     }
 
-    pub fn load(filename: &str) -> Result<Model, String> {
-        let filepath = try!(get_full_path(filename));
-        let mut model_dir = std::path::PathBuf::from(filepath.clone());
-        if !model_dir.pop() {
-            return Err(format!("not found parent dir for filepath {}", filepath));
-        }
+    pub fn load(filename: &Path) -> Result<Model, String> {
+        let model_path = try!(utils::get_base_dir()).join(filename);
+        let model_dir = match model_path.parent() {
+            Some(p) => PathBuf::from(p),
+            None => return Err(format!("not found parent dir for \"{}\"", model_path.display())),
+        };
 
-        let model_obj: Obj<Rc<Material>> = load(std::path::Path::new(&filepath)).unwrap();
+        println!("load model: \"{}\"", model_path.display());
+        let model_obj: Obj<Rc<Material>> = load(model_path.as_path()).unwrap();
         let (min, max) = ModelObj::calc_aabb(model_obj.position());
         let mut this = ModelObj {
             model_dir: model_dir,

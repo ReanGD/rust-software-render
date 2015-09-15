@@ -54,7 +54,7 @@ pub fn main() {
             eye = Point3::new(0.0_f32, 1.0_f32, -0.8_f32);
             center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
             // model = ModelObj::load("cube.obj").unwrap();
-            model = ModelObj::load("monster1/monster.obj").unwrap();
+            model = ModelObj::load(std::path::Path::new("monster1/monster.obj")).unwrap();
             // model = ModelObj::load("nokia/nokia.obj").unwrap();
             // model = ModelObj::load("droid/attack_droid.obj").unwrap();
         },
