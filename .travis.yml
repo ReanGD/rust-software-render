@@ -7,10 +7,7 @@ rust:
 os:
   - linux
 install:
-  # wget http://www.libsdl.org/tmp/SDL-2.0.4-9799.tar.gz
-  # tar -xzvf SDL-2.0.4-9799.tar.gz
-  # cd SDL-2.0.4-9799 && ./configure
-  - sudo add-apt-repository ppa:team-xbmc/ppa -y
+  - sudo add-apt-repository ppa:zoogie/sdl2-snapshots -y
   - sudo apt-get update -q
   - sudo apt-get install libsdl2-dev
 before_script:
