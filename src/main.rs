@@ -32,10 +32,8 @@ pub fn main() {
     let center;
     let model;
     let ind = 3;
-    // let mut material = Material::gold();
 
     let add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
-    // let add_angle = rad(0.0_f32);
     let light = Vector3::new(1.0_f32, -1.0_f32, 1.0_f32);
     match ind {
         // 0 => {
@@ -51,7 +49,7 @@ pub fn main() {
         //     model = generate_sphere(50).unwrap();
         // },
         3 => {
-            eye = Point3::new(0.0_f32, 1.0_f32, -0.8_f32);
+            eye = Point3::new(0.0_f32, 0.3_f32, -0.6_f32);
             center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
             // model = ModelObj::load("cube.obj").unwrap();
             model = ModelObj::load(std::path::Path::new("monster1/monster.obj")).unwrap();
@@ -69,18 +67,17 @@ pub fn main() {
     let mut scene = Scene::new(800, 600);
     scene.proj(deg(100.0_f32), 0.1_f32, 100.0_f32)
         .view(eye, center, up)
-        .light(light);
-
-    // let mut texture = Texture::new();
-    // texture.load_from_def("gamma_dalai_lama_gray.jpg").unwrap();
-    // texture.load_from_def("green_monster.png").unwrap();
-    // texture.load_from_def("chess.png").unwrap();
+        .light(light)
+        .ambient_intensity(1.0_f32);
 
     let mut shader = Shader::new();
-    shader.set_lambert();
-    // shader.set_shaders(Shader::vertex_cook_torrance, Shader::pixel_cook_torrance);
-    // shader.set_shaders(Shader::vertex_phong_blinn, Shader::pixel_phong_blinn);
-    // shader.set_shaders(Shader::vertex_normals, Shader::pixel_normals);
+    let sh_ind = 0;
+    match sh_ind {
+        0 => shader.set_normal(),
+        1 => shader.set_lambert(),
+        _ => return,
+    };
+
     while scene.start(0xAAAAAA) {
         angle = angle + add_angle;
         scene.draw(&model, Matrix4::from(Matrix3::from_angle_y(angle)) * init_matrix, &mut shader).present();

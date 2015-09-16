@@ -47,7 +47,7 @@ impl Shader {
     // 0 - Vector2 tex
     // 2 - f32 cos_nl
     fn pixel_lambert_texture(&self) -> Vector3<f32> {
-        let tex = Vector2::<f32>::new(self.in_pixel_data[0], self.in_pixel_data[1]);
+        let tex = Vector2::new(self.in_pixel_data[0], self.in_pixel_data[1]);
         let cos_nl = self.in_pixel_data[2];
 
         let color = match self.texture {

@@ -29,26 +29,6 @@ pub struct Shader {
 }
 
 impl Shader {
-    // out:
-    // 0 - Vector3 normal
-    // #[allow(dead_code)]
-    // pub fn vertex_normals(&mut self) -> Vector4<f32> {
-    //     let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
-    //     let norm = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_NORM)).normalize();
-
-    //     self.out_vec3_from4(&norm);
-    //     pos
-    // }
-
-    // // in:
-    // // 0 - Vector3 normal
-    // #[allow(dead_code)]
-    // pub fn pixel_normals(&self) -> Vector3<f32> {
-    //     let color = Vector3::new(self.in_pixel_data[0], self.in_pixel_data[1], self.in_pixel_data[2]).add_s(1.0_f32).mul_s(128.0_f32);
-
-    //     color
-    // }
-
     // // out:
     // // 0 - Vector2 tex
     // #[allow(dead_code)]

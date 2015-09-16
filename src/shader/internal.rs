@@ -25,6 +25,13 @@ impl Shader {
         self.vertex_out_len += 1;
     }
 
+    pub fn out_vec3_from4(&mut self, val: &Vector4<f32>) {
+        self.out_vertex_data[self.vertex_out_len + 0] = val.x;
+        self.out_vertex_data[self.vertex_out_len + 1] = val.y;
+        self.out_vertex_data[self.vertex_out_len + 2] = val.z;
+        self.vertex_out_len += 3;
+    }
+
     // pub fn read_vec3(&self, sm: usize) -> Vector3<f32> {
     //     Vector3::new(self.in_vertex_data[sm + 0],
     //                  self.in_vertex_data[sm + 1],
@@ -32,10 +39,4 @@ impl Shader {
     // }
 
 
-    // pub fn out_vec3_from4(&mut self, val: &Vector4<f32>) {
-    //     self.out_vertex_data[self.vertex_out_len + 0] = val.x;
-    //     self.out_vertex_data[self.vertex_out_len + 1] = val.y;
-    //     self.out_vertex_data[self.vertex_out_len + 2] = val.z;
-    //     self.vertex_out_len += 3;
-    // }
 }
