@@ -9,6 +9,7 @@ pub struct Scene {
     mat_view: Matrix4<f32>,
     vec_neg_light: Vector4<f32>,
     vec_eye_pos: Vector4<f32>,
+    ambient_intensity: f32, // [0; 1]
     cnt_triangle: u32,
 }
 
@@ -20,6 +21,7 @@ impl Scene {
             mat_view: Matrix4::<f32>::zero(),
             vec_neg_light: Vector4::<f32>::zero(),
             vec_eye_pos: Vector4::<f32>::zero(),
+            ambient_intensity: 1.0_f32,
             cnt_triangle: 0,
         }
     }
@@ -44,6 +46,12 @@ impl Scene {
         self
     }
 
+    pub fn ambient_intensity(&mut self, val: f32) -> &mut Scene {
+        self.ambient_intensity = val;
+
+        self
+    }
+
     pub fn start(&mut self, color: u32) -> bool {
         if self.device.keyboard() {
             self.device.clear(color);
@@ -60,6 +68,7 @@ impl Scene {
         shader.set_matrix(MATRIX_WORLD, mat_world);
         shader.set_vec4(IN_VS_VEC_NEG_LIGHT, self.vec_neg_light);
         shader.set_vec4(IN_VS_VEC_EYE_POS, self.vec_eye_pos);
+        shader.ambient_intensity = self.ambient_intensity;
 
         self.cnt_triangle += mesh.draw(shader, &mut self.device);
 

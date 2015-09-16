@@ -31,7 +31,6 @@ impl Shader {
         self.ambient = material.ambient;
         self.diffuse = material.diffuse;
         self.specular = material.specular;
-        self.ambient_intensity = material.ambient_intensity;
     }
 
     pub fn set_matrix(&mut self, ind: usize, matrix: Matrix4<f32>) {

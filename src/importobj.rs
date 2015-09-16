@@ -87,7 +87,6 @@ impl<'a> ModelObj<'a> {
                             Some(ref path) => try!(mat.create_texture(&self.model_dir.join(path).as_path())),
                             None => {},
                         };
-                        mat.calc_ambient_intensity();
                         self.model.material_list.push(mat);
                         self.model.material_list.len() - 1
                     },
