@@ -12,17 +12,17 @@
 
 Дополнительные пакеты
 --
-Требуется установить библиотеку [sdl2](https://www.libsdl.org/download-2.0.php).
+Требуется установить библиотеку [sdl2](https://www.libsdl.org/download-2.0.php) и [sdl2_image](https://www.libsdl.org/projects/SDL_image/).
 
 Для Arch-Linux ставится вот так:
 ```Shell
-sudo pacman -S sdl2
+sudo pacman -S sdl2 sdl2_image
 ```
 Для Ubuntu вот так:
 ```Shell
 sudo add-apt-repository ppa:zoogie/sdl2-snapshots -y
 sudo apt-get update -q
-sudo apt-get install libsdl2-dev
+sudo apt-get install libsdl2-dev libsdl2-image-dev
 ```
 
 Для Windows:
