@@ -1,4 +1,4 @@
-# rust-software-render 
+# rust-software-render
 
 [master](https://github.com/ReanGD/rust-software-render/tree/master) [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg?branch=master)](https://travis-ci.org/ReanGD/rust-software-render) [![Build status](https://ci.appveyor.com/api/projects/status/y32wy5vu51q9hscm/branch/master?svg=true)](https://ci.appveyor.com/project/ReanGD/rust-software-render/branch/master)
 
@@ -7,7 +7,7 @@
 Для сборки проекта у вас должны стоять:
 - компилятор [Rust](http://www.rust-lang.org/) (для Windows тестируется только stable версия, для Linux: nightly, beta, stable)
 - менеджер пакетов для rust - [Cargo](https://crates.io/)
- 
+
 Для Windows необходимо добавить папку с rustc и cargo в PATH
 
 Дополнительные пакеты
@@ -20,7 +20,7 @@ sudo pacman -S sdl2
 ```
 Для Ubuntu вот так:
 ```Shell
-sudo add-apt-repository ppa:team-xbmc/ppa -y
+sudo add-apt-repository ppa:zoogie/sdl2-snapshots -y
 sudo apt-get update -q
 sudo apt-get install libsdl2-dev
 ```
