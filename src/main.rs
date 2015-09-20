@@ -70,6 +70,7 @@ pub fn main() {
         0 => shader.set_normal(),
         1 => shader.set_lambert(),
         2 => shader.set_phong_blinn(),
+        3 => shader.set_cook_torrance(),
         _ => return,
     };
 

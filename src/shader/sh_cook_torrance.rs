@@ -3,15 +3,15 @@ use shader::base::*;
 
 
 impl Shader {
-    pub fn set_phong_blinn(&mut self) {
-        self.vertex_func = [Shader::vertex_phong_blinn_color, Shader::vertex_phong_blinn_texture];
-        self.pixel_func = [Shader::pixel_phong_blinn_color, Shader::pixel_phong_blinn_texture];
+    pub fn set_cook_torrance(&mut self) {
+        self.vertex_func = [Shader::vertex_cook_torrance_color, Shader::vertex_cook_torrance_texture];
+        self.pixel_func = [Shader::pixel_cook_torrance_color, Shader::pixel_cook_torrance_texture];
     }
 
     // out:
     // 0 - Vector3 view
     // 3 - Vector3 norm
-    fn vertex_phong_blinn_color(&mut self) -> Vector4<f32> {
+    fn vertex_cook_torrance_color(&mut self) -> Vector4<f32> {
         let pos_pvw = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
         let pos_w = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
         let norm = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_NORM)).normalize();
@@ -26,28 +26,39 @@ impl Shader {
     // 0 - Vector3 view
     // 3 - Vector3 norm
     #[allow(dead_code)]
-    fn pixel_phong_blinn_color(&self) -> Vector3<f32> {
+    fn pixel_cook_torrance_color(&self) -> Vector3<f32> {
         let view = Vector3::new(self.in_pixel_data[0], self.in_pixel_data[1], self.in_pixel_data[2]).normalize();
         let norm = Vector3::new(self.in_pixel_data[3], self.in_pixel_data[4], self.in_pixel_data[5]).normalize();
         let light = self.read_vec3(IN_VS_VEC_NEG_LIGHT);
         let half = view.add_v(&light).normalize();
-        let cos_nh = norm.dot(&half).max(0.0_f32);
-        let cos_nl = norm.dot(&light).max(0.0_f32);
 
-        const POWER: i32 = 5;
+        const ROUGHNESS: f32 = 0.3_f32;
+        const ROUGHNESS_SQ: f32 = ROUGHNESS * ROUGHNESS;
+
+        let cos_hn = half.dot(&norm).max(0.0000001_f32);
+        let cos_hn_sq = cos_hn * cos_hn;
+        let cos_vn = view.dot(&norm).max(0.0_f32);
+        let cos_ln = light.dot(&norm).max(0.0_f32);
+        let cos_vh = view.dot(&half).max(0.0_f32);
+
+        let geometric = 1.0_f32.min((2.0_f32 * cos_hn * cos_vn.min(cos_ln)) / cos_vh);
+        let frenel = 1.0_f32 / (1.0_f32 + cos_vn);
+        let pow_val = (cos_hn_sq - 1.0_f32) / (ROUGHNESS_SQ * cos_hn_sq);
+        let d = pow_val.exp() / (4.0_f32 * ROUGHNESS_SQ * cos_hn_sq * cos_hn_sq);
+        let k = (geometric * frenel * d) / (cos_vn * cos_ln + 0.0000001_f32);
 
         let ambient = self.ambient.mul_s(self.ambient_intensity);
-        let diffuse = self.diffuse.mul_s(cos_nl);
-        let specular = self.specular.mul_s(cos_nh.powi(POWER));
+        let specular = self.specular.mul_s(k);
+        let diffuse_specular = self.diffuse.add_v(&specular).mul_s(cos_ln.max(0.0_f32));
 
-        ambient + diffuse + specular
+        ambient + diffuse_specular
     }
 
     // out:
     // 0 - Vector2 tex
     // 2 - Vector3 view
     // 5 - Vector3 norm
-    fn vertex_phong_blinn_texture(&mut self) -> Vector4<f32> {
+    fn vertex_cook_torrance_texture(&mut self) -> Vector4<f32> {
         let pos_pvw = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
         let pos_w = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
         let mut norm = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_NORM)).normalize();
@@ -65,16 +76,27 @@ impl Shader {
     // 0 - Vector2 tex
     // 2 - Vector3 view
     // 5 - Vector3 norm
-    fn pixel_phong_blinn_texture(&self) -> Vector3<f32> {
+    fn pixel_cook_torrance_texture(&self) -> Vector3<f32> {
         let tex = Vector2::new(self.in_pixel_data[0], self.in_pixel_data[1]);
         let view = Vector3::new(self.in_pixel_data[2], self.in_pixel_data[3], self.in_pixel_data[4]).normalize();
         let norm = Vector3::new(self.in_pixel_data[5], self.in_pixel_data[6], self.in_pixel_data[7]).normalize();
         let light = self.read_vec3(IN_VS_VEC_NEG_LIGHT);
         let half = view.add_v(&light).normalize();
-        let cos_nh = norm.dot(&half).max(0.0_f32);
-        let cos_nl = norm.dot(&light).max(0.0_f32);
 
-        const POWER: i32 = 5;
+        const ROUGHNESS: f32 = 0.3_f32;
+        const ROUGHNESS_SQ: f32 = ROUGHNESS * ROUGHNESS;
+
+        let cos_hn = half.dot(&norm).max(0.0000001_f32);
+        let cos_hn_sq = cos_hn * cos_hn;
+        let cos_vn = view.dot(&norm).max(0.0_f32);
+        let cos_ln = light.dot(&norm).max(0.0_f32);
+        let cos_vh = view.dot(&half).max(0.0_f32);
+
+        let geometric = 1.0_f32.min((2.0_f32 * cos_hn * cos_vn.min(cos_ln)) / cos_vh);
+        let frenel = 1.0_f32 / (1.0_f32 + cos_vn);
+        let pow_val = (cos_hn_sq - 1.0_f32) / (ROUGHNESS_SQ * cos_hn_sq);
+        let d = pow_val.exp() / (4.0_f32 * ROUGHNESS_SQ * cos_hn_sq * cos_hn_sq);
+        let k = (geometric * frenel * d) / (cos_vn * cos_ln + 0.0000001_f32);
 
         let color = match self.texture {
             Some(ref t) => t.tex_2d(tex),
@@ -82,9 +104,9 @@ impl Shader {
         };
 
         let ambient = color.mul_s(self.ambient_intensity);
-        let diffuse = color.mul_s(cos_nl);
-        let specular = self.specular.mul_s(cos_nh.powi(POWER));
+        let specular = self.specular.mul_s(k);
+        let diffuse_specular = color.add_v(&specular).mul_s(cos_ln.max(0.0_f32));
 
-        ambient + diffuse + specular
+        ambient + diffuse_specular
     }
 }
