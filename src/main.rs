@@ -23,7 +23,6 @@ mod rasterization;
 
 use cgmath::*;
 use scene::Scene;
-use shader::Shader;
 // use generator::{generate_plane, generate_sphere};
 use importobj::ModelObj;
 
@@ -32,7 +31,7 @@ pub fn main() {
     let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
     let center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
     let model;
-    let shader_index = 2;
+    let shader_type = shader::ShaderType::PhongBlinn;
     let model_index = 3;
 
     let mut angle = rad(0.0_f32);
@@ -58,21 +57,13 @@ pub fn main() {
     };
 
     let init_matrix = model.to_center_matrix();
+    let mut shader = shader::Shader::new(shader_type);
 
     let mut scene = Scene::new(800, 600);
     scene.proj(deg(100.0_f32), 0.1_f32, 100.0_f32)
         .view(eye, center, up)
         .light(Vector3::new(1.0_f32, 1.0_f32, -1.0_f32))
         .ambient_intensity(1.0_f32);
-
-    let mut shader = Shader::new();
-    match shader_index {
-        0 => shader.set_normal(),
-        1 => shader.set_lambert(),
-        2 => shader.set_phong_blinn(),
-        3 => shader.set_cook_torrance(),
-        _ => return,
-    };
 
     while scene.start(0xAAAAAA) {
         angle = angle + add_angle;

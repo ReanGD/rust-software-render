@@ -3,9 +3,9 @@ use shader::base::*;
 
 
 impl Shader {
-    pub fn set_lambert(&mut self) {
-        self.vertex_func = [Shader::vertex_lambert_color, Shader::vertex_lambert_texture];
-        self.pixel_func = [Shader::pixel_lambert_color, Shader::pixel_lambert_texture];
+    pub fn shader_lambert() -> ShadersType {
+        ([Shader::vertex_lambert_color, Shader::vertex_lambert_texture],
+         [Shader::pixel_lambert_color, Shader::pixel_lambert_texture])
     }
 
     // out:

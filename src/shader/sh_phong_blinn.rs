@@ -3,9 +3,9 @@ use shader::base::*;
 
 
 impl Shader {
-    pub fn set_phong_blinn(&mut self) {
-        self.vertex_func = [Shader::vertex_phong_blinn_color, Shader::vertex_phong_blinn_texture];
-        self.pixel_func = [Shader::pixel_phong_blinn_color, Shader::pixel_phong_blinn_texture];
+    pub fn shader_phong_blinn() -> ShadersType {
+        ([Shader::vertex_phong_blinn_color, Shader::vertex_phong_blinn_texture],
+         [Shader::pixel_phong_blinn_color, Shader::pixel_phong_blinn_texture])
     }
 
     // out:

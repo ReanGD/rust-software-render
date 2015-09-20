@@ -3,9 +3,9 @@ use shader::base::*;
 
 
 impl Shader {
-    pub fn set_cook_torrance(&mut self) {
-        self.vertex_func = [Shader::vertex_cook_torrance_color, Shader::vertex_cook_torrance_texture];
-        self.pixel_func = [Shader::pixel_cook_torrance_color, Shader::pixel_cook_torrance_texture];
+    pub fn shader_cook_torrance() -> ShadersType {
+        ([Shader::vertex_cook_torrance_color, Shader::vertex_cook_torrance_texture],
+         [Shader::pixel_cook_torrance_color, Shader::pixel_cook_torrance_texture])
     }
 
     // out:
@@ -25,7 +25,6 @@ impl Shader {
     // in:
     // 0 - Vector3 view
     // 3 - Vector3 norm
-    #[allow(dead_code)]
     fn pixel_cook_torrance_color(&self) -> Vector3<f32> {
         let view = Vector3::new(self.in_pixel_data[0], self.in_pixel_data[1], self.in_pixel_data[2]).normalize();
         let norm = Vector3::new(self.in_pixel_data[3], self.in_pixel_data[4], self.in_pixel_data[5]).normalize();

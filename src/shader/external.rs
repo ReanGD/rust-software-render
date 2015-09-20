@@ -3,7 +3,15 @@ use shader::base::*;
 use material::Material;
 
 impl Shader {
-    pub fn new() -> Shader {
+    pub fn new(shader_type: ShaderType) -> Shader {
+        let (vertex_func, pixel_func) = match shader_type {
+            ShaderType::Default => Shader::shader_default(),
+            ShaderType::Normal => Shader::shader_normal(),
+            ShaderType::Lambert => Shader::shader_lambert(),
+            ShaderType::PhongBlinn => Shader::shader_phong_blinn(),
+            ShaderType::CookTorrance => Shader::shader_cook_torrance(),
+        };
+
         Shader {
             matrix_arr: [Matrix4::<f32>::zero(); 2],
             in_vertex_data: vec![0.0_f32; 18],
@@ -15,8 +23,8 @@ impl Shader {
             specular: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
             ambient_intensity: 0.0_f32,
             vertex_out_len: 0,
-            vertex_func: [Shader::vertex_default, Shader::vertex_default],
-            pixel_func: [Shader::pixel_default, Shader::pixel_default],
+            vertex_func: vertex_func,
+            pixel_func: pixel_func,
         }
     }
 
