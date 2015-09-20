@@ -33,6 +33,8 @@ install:
 
     Start-FileDownload "https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-${env:SDL_IMAGE_VERSION}-mingw.tar.gz"
 
+    Start-FileDownload "https://www.libsdl.org/projects/SDL_image/release/SDL2_image-${env:SDL_IMAGE_VERSION}-win32-${env:TARGET2}.zip"
+
 
     Start-Process -FilePath msiexec -ArgumentList /i, ${env:RUST_VERSION}-${env:TARGET1}-pc-windows-gnu.msi, INSTALLDIR="c:\projects\rust", /quiet -Wait
 
@@ -50,6 +52,8 @@ install:
 
     7z x SDL2_image-devel-${env:SDL_IMAGE_VERSION}-mingw.tar
 
+    7z x SDL2_image-${env:SDL_IMAGE_VERSION}-win32-${env:TARGET2}.zip
+
 
     Copy-Item cargo-nightly-${env:TARGET1}-pc-windows-gnu\cargo\* c:\projects\cargo\ -recurse
 
@@ -57,9 +61,9 @@ install:
 
     Copy-Item SDL2_image-${env:SDL_IMAGE_VERSION}\${env:TARGET1}-w64-mingw32\lib\libSDL2_image.dll.a c:\projects\rust\bin\rustlib\${env:TARGET1}-pc-windows-gnu\lib\
 
-    Copy-Item SDL2.dll c:\projects\sdl\
+    Copy-Item *.dll c:\projects\sdl\
 
-    Copy-Item SDL2.dll c:\projects\git\artifacts\
+    Copy-Item *.dll c:\projects\git\artifacts\
 
     Copy-Item c:\projects\git\media c:\projects\git\artifacts\ -recurse
 
