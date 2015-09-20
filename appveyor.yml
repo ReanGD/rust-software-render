@@ -4,6 +4,7 @@ clone_folder: c:\projects\git
 environment:
   RUST_VERSION: rust-1.2.0
   SDL_VERSION: 2.0.3
+  SDL_IMAGE_VERSION: 2.0.0
   matrix:
   - TARGET1: x86_64
     TARGET2: x64
@@ -30,6 +31,8 @@ install:
 
     Start-FileDownload "https://www.libsdl.org/release/SDL2-devel-${env:SDL_VERSION}-mingw.tar.gz"
 
+    Start-FileDownload "https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-${env:SDL_IMAGE_VERSION}-mingw.tar.gz"
+
 
     Start-Process -FilePath msiexec -ArgumentList /i, ${env:RUST_VERSION}-${env:TARGET1}-pc-windows-gnu.msi, INSTALLDIR="c:\projects\rust", /quiet -Wait
 
@@ -43,10 +46,16 @@ install:
 
     7z x SDL2-devel-${env:SDL_VERSION}-mingw.tar
 
+    7z x SDL2_image-devel-${env:SDL_IMAGE_VERSION}-mingw.tar.gz
+
+    7z x SDL2_image-devel-${env:SDL_IMAGE_VERSION}-mingw.tar
+
 
     Copy-Item cargo-nightly-${env:TARGET1}-pc-windows-gnu\cargo\* c:\projects\cargo\ -recurse
 
     Copy-Item SDL2-${env:SDL_VERSION}\${env:TARGET1}-w64-mingw32\lib\libSDL2.dll.a c:\projects\rust\bin\rustlib\${env:TARGET1}-pc-windows-gnu\lib\
+
+    Copy-Item SDL2_image-${env:SDL_IMAGE_VERSION}\${env:TARGET1}-w64-mingw32\lib\libSDL2_image.dll.a c:\projects\rust\bin\rustlib\${env:TARGET1}-pc-windows-gnu\lib\
 
     Copy-Item SDL2.dll c:\projects\sdl\
 
