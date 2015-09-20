@@ -1,4 +1,4 @@
-use cgmath::{Vector2, Vector4};
+use cgmath::{Vector2, Vector3, Vector4};
 use shader::base::Shader;
 
 impl Shader {
@@ -12,6 +12,12 @@ impl Shader {
                      self.in_vertex_data[sm + 1],
                      self.in_vertex_data[sm + 2],
                      self.in_vertex_data[sm + 3])
+    }
+
+    pub fn read_vec3(&self, sm: usize) -> Vector3<f32> {
+        Vector3::new(self.in_vertex_data[sm + 0],
+                     self.in_vertex_data[sm + 1],
+                     self.in_vertex_data[sm + 2])
     }
 
     pub fn out_vec2(&mut self, val: &Vector2<f32>) {
@@ -31,12 +37,4 @@ impl Shader {
         self.out_vertex_data[self.vertex_out_len + 2] = val.z;
         self.vertex_out_len += 3;
     }
-
-    // pub fn read_vec3(&self, sm: usize) -> Vector3<f32> {
-    //     Vector3::new(self.in_vertex_data[sm + 0],
-    //                  self.in_vertex_data[sm + 1],
-    //                  self.in_vertex_data[sm + 2])
-    // }
-
-
 }

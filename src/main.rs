@@ -29,52 +29,47 @@ use importobj::ModelObj;
 
 pub fn main() {
     let eye;
-    let center;
+    let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
+    let center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
     let model;
-    let ind = 3;
+    let shader_index = 2;
+    let model_index = 3;
 
+    let mut angle = rad(0.0_f32);
     let add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
-    let light = Vector3::new(1.0_f32, -1.0_f32, 1.0_f32);
-    match ind {
+    match model_index {
         // 0 => {
         //     eye = Point3::new(0.0_f32, 0.0_f32, -0.5_f32);
-        //     center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
         //     add_angle = rad(0.0_f32);
         //     init_matrix = Matrix4::from(Matrix3::from_angle_x(rad(std::f32::consts::PI * 0.25_f32)));
         //     model = generate_plane().unwrap();
         // },
         // 1 => {
         //     eye = Point3::new(0.0_f32, 0.0_f32, -2.0_f32);
-        //     center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
         //     model = generate_sphere(50).unwrap();
         // },
         3 => {
-            eye = Point3::new(0.0_f32, 0.3_f32, -0.6_f32);
-            center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
-            // model = ModelObj::load("cube.obj").unwrap();
+            eye = Point3::new(0.0_f32, 0.3_f32, 0.6_f32);
             model = ModelObj::load(std::path::Path::new("monster1/monster.obj")).unwrap();
             // model = ModelObj::load("nokia/nokia.obj").unwrap();
             // model = ModelObj::load("droid/attack_droid.obj").unwrap();
         },
-
         _ => return
     };
-    let init_matrix = model.to_center_matrix();
-    let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
 
-    let mut angle = rad(std::f32::consts::PI * 0.5_f32);
+    let init_matrix = model.to_center_matrix();
 
     let mut scene = Scene::new(800, 600);
     scene.proj(deg(100.0_f32), 0.1_f32, 100.0_f32)
         .view(eye, center, up)
-        .light(light)
+        .light(Vector3::new(1.0_f32, 1.0_f32, -1.0_f32))
         .ambient_intensity(1.0_f32);
 
     let mut shader = Shader::new();
-    let sh_ind = 0;
-    match sh_ind {
+    match shader_index {
         0 => shader.set_normal(),
         1 => shader.set_lambert(),
+        2 => shader.set_phong_blinn(),
         _ => return,
     };
 

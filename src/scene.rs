@@ -7,7 +7,7 @@ pub struct Scene {
     device: Device,
     mat_proj: Matrix4<f32>,
     mat_view: Matrix4<f32>,
-    vec_neg_light: Vector4<f32>,
+    vec_light: Vector4<f32>,
     vec_eye_pos: Vector4<f32>,
     ambient_intensity: f32, // [0; 1]
     cnt_triangle: u32,
@@ -19,7 +19,7 @@ impl Scene {
             device: Device::new("rust software render", width, height),
             mat_proj: Matrix4::<f32>::zero(),
             mat_view: Matrix4::<f32>::zero(),
-            vec_neg_light: Vector4::<f32>::zero(),
+            vec_light: Vector4::<f32>::zero(),
             vec_eye_pos: Vector4::<f32>::zero(),
             ambient_intensity: 1.0_f32,
             cnt_triangle: 0,
@@ -40,8 +40,7 @@ impl Scene {
     }
 
     pub fn light(&mut self, vec: Vector3<f32>) -> &mut Scene {
-        self.vec_neg_light = Vector4::new(vec.x, vec.y, vec.z, 0.0_f32).normalize();
-        self.vec_neg_light.neg_self();
+        self.vec_light = Vector4::new(vec.x, vec.y, vec.z, 0.0_f32).normalize();
 
         self
     }
@@ -66,7 +65,7 @@ impl Scene {
     pub fn draw(&mut self, mesh: &Model, mat_world: Matrix4<f32>, shader: &mut Shader) -> &mut Scene {
         shader.set_matrix(MATRIX_PROJ_VIEW_WORLD, self.mat_proj * self.mat_view * mat_world);
         shader.set_matrix(MATRIX_WORLD, mat_world);
-        shader.set_vec4(IN_VS_VEC_NEG_LIGHT, self.vec_neg_light);
+        shader.set_vec4(IN_VS_VEC_NEG_LIGHT, self.vec_light);
         shader.set_vec4(IN_VS_VEC_EYE_POS, self.vec_eye_pos);
         shader.ambient_intensity = self.ambient_intensity;
 
