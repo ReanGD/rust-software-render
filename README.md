@@ -28,6 +28,8 @@ sudo apt-get install libsdl2-dev libsdl2-image-dev
 Для Windows:
 - качаем [SDL2-devel-2.0.3-mingw.tar.gz](https://www.libsdl.org/release/SDL2-devel-2.0.3-mingw.tar.gz), распаковываем, ищем файл SDL2-2.0.3\TARGET-w64-mingw32\lib\libSDL2.dll.a и копируем его в RUST_PATH\bin\rustlib\TARGET-pc-windows-gnu\lib\
 - качаем [SDL2-2.0.3-win32-x86.zip](https://www.libsdl.org/release/SDL2-2.0.3-win32-x86.zip) или [SDL2-2.0.3-win32-x64.zip](https://www.libsdl.org/release/SDL2-2.0.3-win32-x64.zip) в зависимости от платформы, распаковываем и кладем либо в директорию, которая находится в PATH, либо рядом с exe который получится после компиляции проекта
+- качаем [SDL2_image-devel-2.0.0-mingw.tar.gz](https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.0-mingw.tar.gz), распаковываем, ищем файл SDL2_image-2.0.0\TARGET-w64-mingw32\lib\libSDL2_image.dll.a и копируем его в RUST_PATH\bin\rustlib\TARGET-pc-windows-gnu\lib\
+- качаем [SDL2_image-2.0.0-win32-x86.zip](https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.0-win32-x86.zip) или [SDL2_image-2.0.0-win32-x64.zip](https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.0-win32-x64.zip) в зависимости от платформы, распаковываем и кладем либо в директорию, которая находится в PATH, либо рядом с exe который получится после компиляции проекта
 
 Сборка и запуск
 --
