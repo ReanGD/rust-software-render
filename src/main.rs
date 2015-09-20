@@ -4,8 +4,6 @@ extern crate sdl2;
 extern crate sdl2_image;
 extern crate time;
 extern crate cgmath;
-extern crate libc;
-extern crate sdl2_sys;
 
 mod mesh;
 mod utils;
@@ -17,7 +15,6 @@ mod shader;
 mod texture;
 mod material;
 mod importobj;
-mod dll_import;
 // mod generator;
 mod rasterization;
 

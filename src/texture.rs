@@ -1,10 +1,9 @@
 use std;
 use sdl2;
 use cgmath::*;
-use dll_import;
 use std::rc::Rc;
-use sdl2::surface;
 use std::path::Path;
+use sdl2_image::LoadSurface;
 
 pub struct Surface {
     pub size_x: usize,
@@ -94,27 +93,21 @@ impl Texture {
         self.levels[std::cmp::min(mip_lvl, self.levels.len() - 1)].clone()
     }
 
-    fn load_surface<'a>(path: &Path) -> Result<surface::Surface<'a>, String> {
+    fn load_surface<'a>(path: &Path) -> Result<sdl2::surface::Surface<'a>, String> {
         println!("load texture: \"{}\"", path.display());
 
         let standart =
-            match surface::Surface::new(1, 1, sdl2::pixels::PixelFormatEnum::ARGB8888) {
+            match sdl2::surface::Surface::new(1, 1, sdl2::pixels::PixelFormatEnum::ARGB8888) {
                 Ok(v) => v,
                 Err(e) => return Err(format!("can't create standart surface for texture \"{}\", error = \"{}\"",
                                              path.display(), e))
             };
 
-        let c_path = match path.to_str() {
-            Some(s) => std::ffi::CString::new(s).unwrap().as_ptr(),
-            None => return Err(format!("can't convert path \"{}\" to string", path.display())),
+        let surface_load = match sdl2::surface::Surface::from_file(path) {
+            Ok(v) => v,
+            Err(e) => return Err(format!("can't load texture \"{}\", error = \"{}\"",
+                                         path.display(), e))
         };
-
-        let raw = unsafe { dll_import::IMG_Load(c_path) };
-        if (raw as *mut ()).is_null() {
-            return Err(format!("can't load texture \"{}\", error = \"{}\"",
-                               path.display(), sdl2::get_error()));
-        }
-        let surface_load = unsafe { surface::Surface::from_ll(raw) };
 
         match surface_load.as_ref().convert(&standart.as_ref().pixel_format()) {
             Ok(v) => Ok(v),
