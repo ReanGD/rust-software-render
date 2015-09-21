@@ -93,10 +93,9 @@ test_script:
 artifacts:
 - path: artifacts
   name: artifacts
-# http://help.appveyor.com/discussions/problems/3008-artifacts-cant-uploaded-to-github-release-400-bad-request
 deploy:
 - provider: GitHub
-  tag: $(APPVEYOR_REPO_BRANCH)-win
+  tag: $(APPVEYOR_REPO_BRANCH)-$(TARGET2)-win
   release: $(APPVEYOR_REPO_BRANCH)-$(TARGET2)-win
   description: $(APPVEYOR_REPO_BRANCH)-$(TARGET2) for windows
   auth_token:
