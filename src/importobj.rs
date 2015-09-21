@@ -128,7 +128,7 @@ impl<'a> ModelObj<'a> {
         let mut this = ModelObj {
             model_dir: model_dir,
             map: std::collections::HashMap::<IndexTuple, u32>::new(),
-            model: Model::new(min, max),
+            model: Model::with_normalize(min, max),
             position_buffer: cast_to(model_obj.position()),
             normal_buffer: cast_to(model_obj.normal()),
             tex_buffer: Vec::<Vector2<f32>>::with_capacity(model_obj.texture().len()),

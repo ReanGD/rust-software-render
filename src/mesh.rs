@@ -22,6 +22,7 @@ pub struct Model {
     pub mesh_list: Vec<Mesh>,
     min: Vector3<f32>,
     max: Vector3<f32>,
+    normalize: bool,
 }
 
 impl Vertex {
@@ -118,13 +119,25 @@ impl Mesh {
 }
 
 impl Model {
-    pub fn new(min: Vector3<f32>, max: Vector3<f32>) -> Model {
+    pub fn new() -> Model {
+        Model {
+            vertex_buffer: Vec::<Vertex>::new(),
+            material_list: Vec::<Material>::new(),
+            mesh_list: Vec::<Mesh>::new(),
+            min: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
+            max: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
+            normalize: false,
+        }
+    }
+
+    pub fn with_normalize(min: Vector3<f32>, max: Vector3<f32>) -> Model {
         Model {
             vertex_buffer: Vec::<Vertex>::new(),
             material_list: Vec::<Material>::new(),
             mesh_list: Vec::<Mesh>::new(),
             min: min,
             max: max,
+            normalize: true,
         }
     }
 
@@ -141,11 +154,15 @@ impl Model {
     }
 
     pub fn to_center_matrix(&self) -> Matrix4<f32> {
-        let size = self.max.sub_v(&self.min);
-        let scale = Vector3::from_value(1.0_f32/(size.x.max(size.y).max(size.z)));
-        let center = self.min.add_v(&size.mul_s(0.5_f32));
-        let mat_move = Matrix4::from_translation(&center.mul_s(-1.0_f32));
-        let mat_scale = Matrix4::from(Matrix3::from_diagonal(&scale));
-        mat_scale * mat_move
+        if self.normalize {
+            let size = self.max.sub_v(&self.min);
+            let scale = Vector3::from_value(1.0_f32/(size.x.max(size.y).max(size.z)));
+            let center = self.min.add_v(&size.mul_s(0.5_f32));
+            let mat_move = Matrix4::from_translation(&center.mul_s(-1.0_f32));
+            let mat_scale = Matrix4::from(Matrix3::from_diagonal(&scale));
+            mat_scale * mat_move
+        } else {
+            Matrix4::identity()
+        }
     }
 }
