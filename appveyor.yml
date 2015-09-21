@@ -30,6 +30,8 @@ install:
 
     Start-FileDownload "https://www.libsdl.org/release/SDL2-devel-${env:SDL_VERSION}-mingw.tar.gz"
 
+    Start-FileDownload "http://sourceforge.net/projects/mingw/files/MinGW/Base/gcc/Version4/gcc-4.8.1-4/gcc-core-4.8.1-4-mingw32-dll.tar.lzma"
+
 
     Start-Process -FilePath msiexec -ArgumentList /i, ${env:RUST_VERSION}-${env:TARGET1}-pc-windows-gnu.msi, INSTALLDIR="c:\projects\rust", /quiet -Wait
 
@@ -43,6 +45,10 @@ install:
 
     7z x SDL2-devel-${env:SDL_VERSION}-mingw.tar
 
+    7z x gcc-core-4.8.1-4-mingw32-dll.tar.lzma
+
+    7z x gcc-core-4.8.1-4-mingw32-dll.tar
+
 
     Copy-Item cargo-nightly-${env:TARGET1}-pc-windows-gnu\cargo\* c:\projects\cargo\ -recurse
 
@@ -51,6 +57,8 @@ install:
     Copy-Item SDL2.dll c:\projects\sdl\
 
     Copy-Item SDL2.dll c:\projects\git\artifacts\
+
+    Copy-Item bin\libgcc_s_dw2-1.dll c:\projects\git\artifacts\
 
     Copy-Item c:\projects\git\media c:\projects\git\artifacts\ -recurse
 
