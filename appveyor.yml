@@ -49,6 +49,9 @@ install:
 
     If (${env:TARGET2} -eq "x86") {
     7z x gcc-core-4.8.1-4-mingw32-dll.tar.lzma
+    }
+
+    If (${env:TARGET2} -eq "x86") {
     7z x gcc-core-4.8.1-4-mingw32-dll.tar
     }
 
@@ -91,14 +94,14 @@ artifacts:
 - path: artifacts
   name: artifacts
 # http://help.appveyor.com/discussions/problems/3008-artifacts-cant-uploaded-to-github-release-400-bad-request
-# deploy:
-# - provider: GitHub
-#   tag: $(APPVEYOR_REPO_BRANCH)-win
-#   release: $(APPVEYOR_REPO_BRANCH)-$(TARGET2)-win
-#   description: $(APPVEYOR_REPO_BRANCH)-$(TARGET2) for windows
-#   auth_token:
-#     secure: /VxMVHbl3XzhHfFGCCu81O4JPgI42lbTT+n/opdJ7LW8XMsjgW3ztAPLI3u2TBro
-#   artifact: artifacts.zip
+deploy:
+- provider: GitHub
+  tag: $(APPVEYOR_REPO_BRANCH)-win
+  release: $(APPVEYOR_REPO_BRANCH)-$(TARGET2)-win
+  description: $(APPVEYOR_REPO_BRANCH)-$(TARGET2) for windows
+  auth_token:
+    secure: /VxMVHbl3XzhHfFGCCu81O4JPgI42lbTT+n/opdJ7LW8XMsjgW3ztAPLI3u2TBro
+  artifact: artifacts.zip
 notifications:
 - provider: Email
   to:
