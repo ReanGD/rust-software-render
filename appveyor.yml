@@ -2,6 +2,8 @@ version: '{branch}.{build}'
 skip_tags: true
 clone_folder: c:\projects\git
 environment:
+  token:
+    secure: /VxMVHbl3XzhHfFGCCu81O4JPgI42lbTT+n/opdJ7LW8XMsjgW3ztAPLI3u2TBro
   RUST_VERSION: rust-1.3.0
   SDL_VERSION: 2.0.3
   matrix:
@@ -20,6 +22,12 @@ install:
     New-Item c:\projects\git\artifacts -type directory
 
 
+    cd c:\Python27\Scripts\
+
+    ./easy_install pip
+
+    ./pip install --disable-pip-version-check --pre github3.py
+
     cd c:\projects\downloads
 
     Start-FileDownload "https://static.rust-lang.org/dist/${env:RUST_VERSION}-${env:TARGET1}-pc-windows-gnu.msi"
@@ -29,6 +37,10 @@ install:
     Start-FileDownload "https://www.libsdl.org/release/SDL2-${env:SDL_VERSION}-win32-${env:TARGET2}.zip"
 
     Start-FileDownload "https://www.libsdl.org/release/SDL2-devel-${env:SDL_VERSION}-mingw.tar.gz"
+
+    If (${env:TARGET2} -eq "x86") {
+    Start-FileDownload "http://sourceforge.net/projects/mingw/files/MinGW/Base/gcc/Version4/gcc-4.8.1-4/gcc-core-4.8.1-4-mingw32-dll.tar.lzma"
+    }
 
 
     Start-Process -FilePath msiexec -ArgumentList /i, ${env:RUST_VERSION}-${env:TARGET1}-pc-windows-gnu.msi, INSTALLDIR="c:\projects\rust", /quiet -Wait
@@ -43,6 +55,14 @@ install:
 
     7z x SDL2-devel-${env:SDL_VERSION}-mingw.tar
 
+    If (${env:TARGET2} -eq "x86") {
+    7z x gcc-core-4.8.1-4-mingw32-dll.tar.lzma
+    }
+
+    If (${env:TARGET2} -eq "x86") {
+    7z x gcc-core-4.8.1-4-mingw32-dll.tar
+    }
+
 
     Copy-Item cargo-nightly-${env:TARGET1}-pc-windows-gnu\cargo\* c:\projects\cargo\ -recurse
 
@@ -51,6 +71,10 @@ install:
     Copy-Item SDL2.dll c:\projects\sdl\
 
     Copy-Item SDL2.dll c:\projects\git\artifacts\
+
+    If (${env:TARGET2} -eq "x86") {
+    Copy-Item bin\libgcc_s_dw2-1.dll c:\projects\git\artifacts\
+    }
 
     Copy-Item c:\projects\git\media c:\projects\git\artifacts\ -recurse
 
@@ -74,18 +98,19 @@ build_script:
     Copy-Item target\release\rust-software-render.exe artifacts\
 test_script:
 - ps: cargo test -v
+before_deploy:
+- ps: python -c"from github3 import login;import os;map(lambda x:x.delete(),[it for it in login(token=os.environ['token']).repository('ReanGD','rust-software-render').releases() if it.tag_name==os.environ['APPVEYOR_REPO_BRANCH']+'-'+os.environ['TARGET2']+'-win'])"
 artifacts:
 - path: artifacts
   name: artifacts
-# http://help.appveyor.com/discussions/problems/3008-artifacts-cant-uploaded-to-github-release-400-bad-request
-# deploy:
-# - provider: GitHub
-#   tag: $(APPVEYOR_REPO_BRANCH)-win
-#   release: $(APPVEYOR_REPO_BRANCH)-$(TARGET2)-win
-#   description: $(APPVEYOR_REPO_BRANCH)-$(TARGET2) for windows
-#   auth_token:
-#     secure: /VxMVHbl3XzhHfFGCCu81O4JPgI42lbTT+n/opdJ7LW8XMsjgW3ztAPLI3u2TBro
-#   artifact: artifacts.zip
+deploy:
+- provider: GitHub
+  tag: $(APPVEYOR_REPO_BRANCH)-$(TARGET2)-win
+  release: $(APPVEYOR_REPO_BRANCH)-$(TARGET2)-win
+  description: $(APPVEYOR_REPO_BRANCH)-$(TARGET2) for windows
+  auth_token:
+    secure: /VxMVHbl3XzhHfFGCCu81O4JPgI42lbTT+n/opdJ7LW8XMsjgW3ztAPLI3u2TBro
+  artifact: artifacts.zip
 notifications:
 - provider: Email
   to:
