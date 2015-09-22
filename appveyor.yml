@@ -2,6 +2,8 @@ version: '{branch}.{build}'
 skip_tags: true
 clone_folder: c:\projects\git
 environment:
+  token:
+    secure: /VxMVHbl3XzhHfFGCCu81O4JPgI42lbTT+n/opdJ7LW8XMsjgW3ztAPLI3u2TBro
   RUST_VERSION: rust-1.3.0
   SDL_VERSION: 2.0.3
   matrix:
@@ -19,6 +21,12 @@ install:
 
     New-Item c:\projects\git\artifacts -type directory
 
+
+    cd c:\Python27\Scripts\
+
+    ./easy_install pip
+
+    ./pip install --disable-pip-version-check --pre github3.py
 
     cd c:\projects\downloads
 
@@ -90,6 +98,8 @@ build_script:
     Copy-Item target\release\rust-software-render.exe artifacts\
 test_script:
 - ps: cargo test -v
+build_success:
+- ps: python -c"from github3 import login;import os;map(lambda x:x.delete(),[it for it in login(token=os.environ['token']).repository('ReanGD','rust-software-render').releases() if it.tag_name==os.environ['APPVEYOR_REPO_BRANCH']+'-'+os.environ['TARGET2']+'-win'])"
 artifacts:
 - path: artifacts
   name: artifacts
