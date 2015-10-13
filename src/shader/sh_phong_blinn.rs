@@ -77,7 +77,7 @@ impl Shader {
         const POWER: i32 = 5;
 
         let color = match self.texture {
-            Some(ref t) => t.tex_2d(tex),
+            Some(ref t) => t.tex_2d_bilinear(tex),
             None => panic!("texture is none"),
         };
 

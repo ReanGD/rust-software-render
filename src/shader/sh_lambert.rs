@@ -51,7 +51,7 @@ impl Shader {
         let cos_nl = self.in_pixel_data[2];
 
         let color = match self.texture {
-            Some(ref t) => t.tex_2d(tex),
+            Some(ref t) => t.tex_2d_bilinear(tex),
             None => panic!("texture is none"),
         };
 

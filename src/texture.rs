@@ -39,11 +39,14 @@ impl Surface {
         let x = tex.x * (self.size_x as f32);
         let y = tex.y * (self.size_y as f32);
 
-        let x_int = x as usize;
-        let y_int = y as usize;
+        let mut x_int = x as usize;
+        let mut y_int = y as usize;
 
         let dx = x - (x_int as f32);
         let dy = y - (y_int as f32);
+
+        x_int %= self.size_x;
+        y_int %= self.size_y;
 
         let add_x = if x_int + 1 == self.size_x {0} else {1};
         let add_y = if y_int + 1 == self.size_y {0} else {self.size_x};
@@ -90,17 +93,17 @@ impl Texture {
     }
 
     pub fn get_surface(&self, mip_lvl: usize) -> Rc<Surface> {
-        self.levels[std::cmp::min(mip_lvl, self.levels.len() - 1)].clone()
-    }
+    self.levels[std::cmp::min(mip_lvl, self.levels.len() - 1)].clone()
+}
 
-    fn load_surface<'a>(path: &Path) -> Result<sdl2::surface::Surface<'a>, String> {
-        println!("load texture: \"{}\"", path.display());
+fn load_surface<'a>(path: &Path) -> Result<sdl2::surface::Surface<'a>, String> {
+println!("load texture: \"{}\"", path.display());
 
-        let standart =
-            match sdl2::surface::Surface::new(1, 1, sdl2::pixels::PixelFormatEnum::ARGB8888) {
-                Ok(v) => v,
-                Err(e) => return Err(format!("can't create standart surface for texture \"{}\", error = \"{}\"",
-                                             path.display(), e))
+let standart =
+    match sdl2::surface::Surface::new(1, 1, sdl2::pixels::PixelFormatEnum::ARGB8888) {
+        Ok(v) => v,
+Err(e) => return Err(format!("can't create standart surface for texture \"{}\", error = \"{}\"",
+                             path.display(), e))
             };
 
         let surface_load = match sdl2::surface::Surface::from_file(path) {

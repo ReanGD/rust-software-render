@@ -98,7 +98,7 @@ impl Shader {
         let k = (geometric * frenel * d) / (cos_vn * cos_ln + 0.0000001_f32);
 
         let color = match self.texture {
-            Some(ref t) => t.tex_2d(tex),
+            Some(ref t) => t.tex_2d_bilinear(tex),
             None => panic!("texture is none"),
         };
 
