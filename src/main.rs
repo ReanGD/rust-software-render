@@ -28,10 +28,11 @@ pub fn main() {
     let model;
     let init_matrix;
     let shader_type = shader::ShaderType::Lambert;
-    let model_index = 0;
+    let model_index = 1;
 
     let mut angle = rad(0.0_f32);
-    let mut add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
+    let add_angle;
+    // let mut add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
     match model_index {
         0 => {
             eye = Point3::new(0.0_f32, 0.0_f32, -0.5_f32);
@@ -43,9 +44,8 @@ pub fn main() {
         },
         1 => {
             eye = Point3::new(0.0_f32, 0.3_f32, 0.6_f32);
-            model = ModelObj::load(std::path::Path::new("monster1/monster.obj")).unwrap();
-            // model = ModelObj::load("nokia/nokia.obj").unwrap();
-            // model = ModelObj::load("droid/attack_droid.obj").unwrap();
+            add_angle = rad(0.0_f32);
+            model = ModelObj::load(std::path::Path::new("monster/monster.obj")).unwrap();
             init_matrix = model.to_center_matrix();
         },
         _ => return
