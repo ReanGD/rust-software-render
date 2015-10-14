@@ -93,17 +93,17 @@ impl Texture {
     }
 
     pub fn get_surface(&self, mip_lvl: usize) -> Rc<Surface> {
-    self.levels[std::cmp::min(mip_lvl, self.levels.len() - 1)].clone()
-}
+        self.levels[std::cmp::min(mip_lvl, self.levels.len() - 1)].clone()
+    }
 
-fn load_surface<'a>(path: &Path) -> Result<sdl2::surface::Surface<'a>, String> {
-println!("load texture: \"{}\"", path.display());
+    fn load_surface<'a>(path: &Path) -> Result<sdl2::surface::Surface<'a>, String> {
+        println!("load texture: \"{}\"", path.display());
 
-let standart =
-    match sdl2::surface::Surface::new(1, 1, sdl2::pixels::PixelFormatEnum::ARGB8888) {
-        Ok(v) => v,
-Err(e) => return Err(format!("can't create standart surface for texture \"{}\", error = \"{}\"",
-                             path.display(), e))
+        let standart =
+            match sdl2::surface::Surface::new(1, 1, sdl2::pixels::PixelFormatEnum::ARGB8888) {
+                Ok(v) => v,
+                Err(e) => return Err(format!("can't create standart surface for texture \"{}\", error = \"{}\"",
+                                             path.display(), e))
             };
 
         let surface_load = match sdl2::surface::Surface::from_file(path) {
@@ -137,7 +137,7 @@ Err(e) => return Err(format!("can't create standart surface for texture \"{}\", 
 
         while std::cmp::min(size_x, size_y) != 1 {
             let next_size_x = size_x >> 1;
-            let next_size_y = size_y >> 1;
+    let next_size_y = size_y >> 1;
             let mut s = Surface::new(next_size_x as usize, next_size_y as usize);
             {
                 let src = &(self.levels[surface_ind]);
