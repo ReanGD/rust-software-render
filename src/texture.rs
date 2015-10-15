@@ -137,7 +137,7 @@ impl Texture {
 
         while std::cmp::min(size_x, size_y) != 1 {
             let next_size_x = size_x >> 1;
-    let next_size_y = size_y >> 1;
+            let next_size_y = size_y >> 1;
             let mut s = Surface::new(next_size_x as usize, next_size_y as usize);
             {
                 let src = &(self.levels[surface_ind]);
