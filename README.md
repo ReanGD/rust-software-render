@@ -73,3 +73,14 @@ cargo run --release
 ![Кольцо - Фонг-Блин](https://github.com/ReanGD/rust-software-render/blob/v04/screenshots/scene_3_2.png "Кольцо - Фонг-Блин")
 
 [v0.4](https://github.com/ReanGD/rust-software-render/tree/v04):
+
+Текстурированные модельки:
+
+Дроид, по крайней мере так написал автор модели:
+![Дроид](https://github.com/ReanGD/rust-software-render/blob/v04/screenshots/scene_4_1.png "Дроид")
+
+Личинка Буратино:
+![Полено](https://github.com/ReanGD/rust-software-render/blob/v04/screenshots/scene_4_2.png "Полено")
+
+Ужасный монстр в желеных шортиках:
+![Монстр](https://github.com/ReanGD/rust-software-render/blob/v04/screenshots/scene_4_3.png "Монстр")
