@@ -1,6 +1,6 @@
 # rust-software-render
 
-[v0.4](https://github.com/ReanGD/rust-software-render/tree/v04) [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg?branch=v04)](https://travis-ci.org/ReanGD/rust-software-render) [![Build status](https://ci.appveyor.com/api/projects/status/y32wy5vu51q9hscm/branch/v04?svg=true)](https://ci.appveyor.com/project/ReanGD/rust-software-render/branch/v04)
+[master](https://github.com/ReanGD/rust-software-render/tree/master) [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg?branch=master)](https://travis-ci.org/ReanGD/rust-software-render) [![Build status](https://ci.appveyor.com/api/projects/status/y32wy5vu51q9hscm/branch/master?svg=true)](https://ci.appveyor.com/project/ReanGD/rust-software-render/branch/master)
 
 Подготовка окружения
 --
@@ -54,23 +54,23 @@ cargo run --release
 [v0.1](https://github.com/ReanGD/rust-software-render/tree/v01) ([статья](http://reangdblog.blogspot.com/2015/08/software-render-rust.html)):
 
 16 тыс. случайных треугольников на экране и всего 1 fps:
-![Растеризация на плоскости](https://github.com/ReanGD/rust-software-render/blob/v04/screenshots/scene_1.png "Растеризация на плоскости")
+![Растеризация на плоскости](https://github.com/ReanGD/rust-software-render/blob/master/screenshots/scene_1.png "Растеризация на плоскости")
 
 [v0.2](https://github.com/ReanGD/rust-software-render/tree/v02) ([статья](http://reangdblog.blogspot.com/2015/09/software-render-rust-3d.html)):
 
 Низкополигональная модель освещение даже не повершинное, а пограневое, чуть более 2 млн triangle per second:
-![Кольцо и пограневое освещение](https://github.com/ReanGD/rust-software-render/blob/v04/screenshots/scene_2_1.png "Кольцо и пограневое освещение")
+![Кольцо и пограневое освещение](https://github.com/ReanGD/rust-software-render/blob/master/screenshots/scene_2_1.png "Кольцо и пограневое освещение")
 
 Высокополигональная модель освещение такое же, tps = 3.3 млн:
-![Высокополигональный монстр](https://github.com/ReanGD/rust-software-render/blob/v04/screenshots/scene_2_2.png "Высокополигональный монстр")
+![Высокополигональный монстр](https://github.com/ReanGD/rust-software-render/blob/master/screenshots/scene_2_2.png "Высокополигональный монстр")
 
 [v0.3](https://github.com/ReanGD/rust-software-render/tree/v03) ([статья](http://reangdblog.blogspot.com/2015/09/software-render-rust.html)):
 
 Шар с освещением по упрощенному [Cook-Torrance](http://www.gamedev.ru/code/articles/Cook-Torrance):
-![Шар - Cook-Torrance](https://github.com/ReanGD/rust-software-render/blob/v04/screenshots/scene_3_1.png "Шар - Cook-Torrance")
+![Шар - Cook-Torrance](https://github.com/ReanGD/rust-software-render/blob/master/screenshots/scene_3_1.png "Шар - Cook-Torrance")
 
 Кольцо, освещение по модели Фонга-Блина:
-![Кольцо - Фонг-Блин](https://github.com/ReanGD/rust-software-render/blob/v04/screenshots/scene_3_2.png "Кольцо - Фонг-Блин")
+![Кольцо - Фонг-Блин](https://github.com/ReanGD/rust-software-render/blob/master/screenshots/scene_3_2.png "Кольцо - Фонг-Блин")
 
 [v0.4](https://github.com/ReanGD/rust-software-render/tree/v04)
 ([статья](http://reangdblog.blogspot.com/2015/10/software-render-rust.html)):
@@ -78,10 +78,10 @@ cargo run --release
 Текстурированные модельки:
 
 Дроид, по крайней мере так написал автор модели:
-![Дроид](https://github.com/ReanGD/rust-software-render/blob/v04/screenshots/scene_4_1.png "Дроид")
+![Дроид](https://github.com/ReanGD/rust-software-render/blob/master/screenshots/scene_4_1.png "Дроид")
 
 Личинка Буратино:
-![Полено](https://github.com/ReanGD/rust-software-render/blob/v04/screenshots/scene_4_2.png "Полено")
+![Полено](https://github.com/ReanGD/rust-software-render/blob/master/screenshots/scene_4_2.png "Полено")
 
 Ужасный монстр в желеных шортиках:
-![Монстр](https://github.com/ReanGD/rust-software-render/blob/v04/screenshots/scene_4_3.png "Монстр")
+![Монстр](https://github.com/ReanGD/rust-software-render/blob/master/screenshots/scene_4_3.png "Монстр")
