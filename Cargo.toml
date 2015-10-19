@@ -9,7 +9,4 @@ sdl2 = "0.9.1"
 cgmath = "0.3.1"
 obj = "0.3.0"
 genmesh = "0.3.*"
-
-[dependencies.sdl2_image]
-git = "https://github.com/xsleonard/rust-sdl2_image"
-version = "0.3.0"
+sdl2_image = "0.3.0"
