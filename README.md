@@ -72,7 +72,8 @@ cargo run --release
 Кольцо, освещение по модели Фонга-Блина:
 ![Кольцо - Фонг-Блин](https://github.com/ReanGD/rust-software-render/blob/v04/screenshots/scene_3_2.png "Кольцо - Фонг-Блин")
 
-[v0.4](https://github.com/ReanGD/rust-software-render/tree/v04):
+[v0.4](https://github.com/ReanGD/rust-software-render/tree/v04)
+([статья](http://reangdblog.blogspot.com/2015/10/software-render-rust.html)):
 
 Текстурированные модельки:
 
