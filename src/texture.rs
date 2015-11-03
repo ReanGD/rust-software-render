@@ -16,6 +16,10 @@ pub struct Texture {
     pub size: Vector2<f32>,
 }
 
+pub struct TextureCube {
+    textures: [Texture; 6],
+}
+
 impl Surface {
     fn new(size_x: usize, size_y: usize) -> Surface {
         Surface {
@@ -176,5 +180,18 @@ impl Texture {
             size_y = next_size_y;
             surface_ind += 1;
         }
+    }
+}
+
+impl TextureCube {
+    pub fn new(dir_path: &Path, image_extension: &str) -> Result<TextureCube, String> {
+        let textures: [Texture; 6] = [
+            try!(Texture::new(&dir_path.join(format!("posx.{}", image_extension)))),
+            try!(Texture::new(&dir_path.join(format!("posy.{}", image_extension)))),
+            try!(Texture::new(&dir_path.join(format!("posz.{}", image_extension)))),
+            try!(Texture::new(&dir_path.join(format!("negx.{}", image_extension)))),
+            try!(Texture::new(&dir_path.join(format!("negy.{}", image_extension)))),
+            try!(Texture::new(&dir_path.join(format!("negz.{}", image_extension))))];
+        Ok(TextureCube {textures: textures})
     }
 }

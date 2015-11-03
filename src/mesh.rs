@@ -1,8 +1,10 @@
+use std;
 use cgmath::*;
 use shader::*;
 use device::Device;
 use material::Material;
 use rasterization::triangle;
+use texture::TextureCube;
 
 #[derive(Copy,Clone)]
 pub struct Vertex {
@@ -139,6 +141,15 @@ impl Model {
             max: max,
             normalize: true,
         }
+    }
+
+    pub fn add_texture_cube(&mut self, dir_path: &std::path::Path, image_extension: &str) -> Result<(), String> {
+        let texture = std::rc::Rc::new(try!(TextureCube::new(dir_path, image_extension)));
+        for material in &mut self.material_list {
+            material.add_texture_cube(texture.clone());
+        }
+
+        Ok(())
     }
 
     pub fn draw(&self, shader: &mut Shader, device: &mut Device) -> u32 {

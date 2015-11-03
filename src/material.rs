@@ -1,7 +1,7 @@
 use std;
 use cgmath::*;
 use std::rc::Rc;
-use texture::Texture;
+use texture::{Texture, TextureCube};
 
 #[derive(Clone)]
 pub struct Material {
@@ -9,6 +9,7 @@ pub struct Material {
     pub diffuse: Vector3<f32>,
     pub specular: Vector3<f32>,
     pub texture: Option<Rc<Texture>>,
+    pub texture_cube: Option<Rc<TextureCube>>,
 }
 
 impl Material {
@@ -18,6 +19,7 @@ impl Material {
             diffuse: Vector3::<f32>::zero(),
             specular: Vector3::<f32>::zero(),
             texture: None,
+            texture_cube: None,
         }
     }
 
@@ -26,4 +28,8 @@ impl Material {
 
         Ok(())
     }
+
+    pub fn add_texture_cube(&mut self, texture: Rc<TextureCube>) {
+        self.texture_cube = Some(texture);
+        }
 }
