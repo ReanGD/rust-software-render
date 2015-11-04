@@ -18,11 +18,13 @@ impl Shader {
             out_vertex_data: [0.0_f32; MAX_OUT_VALUES],
             in_pixel_data: [0.0_f32; MAX_OUT_VALUES],
             texture: None,
+            texture_cube: None,
             ambient: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
             diffuse: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
             specular: Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
             ambient_intensity: 0.0_f32,
             vertex_out_len: 0,
+            vertex_out2_base: 0,
             vertex_func: vertex_func,
             pixel_func: pixel_func,
         }
@@ -30,6 +32,7 @@ impl Shader {
 
     pub fn reset(&mut self, position: Vector4<f32>, normal: Vector4<f32>, tex: Vector2<f32>) {
         self.vertex_out_len = 0;
+        self.vertex_out2_base = 0;
         self.set_vec4(IN_VS_VEC_POS, position);
         self.set_vec4(IN_VS_VEC_NORM, normal);
         self.set_vec2(IN_VS_VEC_TEX, tex);

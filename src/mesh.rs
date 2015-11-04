@@ -54,12 +54,19 @@ impl Mesh {
             None => shader.vertex_func[0],
             Some(_) => shader.vertex_func[1],
         };
+        let is_cubemap = match material.texture_cube {
+            None => false,
+            Some(_) => true,
+        };
+        shader.texture_cube = match material.texture_cube {
+            None => None,
+            Some(ref t) => Some(t.clone()),
+        };
         let cnt_triangle = self.index_buffer.len() / 3;
         for indexes in self.index_buffer.chunks(3) {
             let mut points_2d: [Point3<f32>; 3] = [Point3::<f32>::new(0.0, 0.0, 0.0); 3];
             let mut tex_coord: [Vector2<f32>; 3] = [Vector2::<f32>::new(0.0, 0.0); 3];
             let mut vertex_out = [[0.0_f32;MAX_OUT_VALUES];3];
-            let mut vertex_out_len = 0;
             for i in 0..3 {
                 let p = vertex_buffer[indexes[i] as usize];
                 let v = p.position;
@@ -68,10 +75,13 @@ impl Mesh {
 
                 shader.reset(Vector4::<f32>::new(v.x, v.y, v.z, 1.0_f32), Vector4::<f32>::new(n.x, n.y, n.z, 1.0_f32), t);
                 let p_screen = vertex_func(shader);
-                vertex_out_len = shader.vertex_out_len;
+                if is_cubemap {
+                    shader.vertex_out2_base = shader.vertex_out_len;
+                    shader.vertex_cubemap();
+                }
                 let inverse_w = 1.0_f32 / p_screen.w;
 
-                for ind in 0..vertex_out_len {
+                for ind in 0..shader.vertex_out_len {
                     vertex_out[i][ind] = shader.out_vertex_data[ind] * inverse_w;
                 }
 
@@ -113,7 +123,7 @@ impl Mesh {
                      &mut device.zbuffer,
                      device.x_size,
                      device.y_size,
-                     points_2d, vertex_out, vertex_out_len, shader);
+                     points_2d, vertex_out, shader);
         }
 
         cnt_triangle as u32
