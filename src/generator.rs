@@ -43,7 +43,7 @@ pub fn generate_plane(model_material: material::Material) -> Result<Model, Strin
 }
 
 pub fn generate_sphere(points_in_circle: u32, model_material: material::Material) -> Result<Model, String> {
-    let k = 5.0_f32;
+    let k = 4.0_f32;
     let mut model = Model::new();
     model.material_list.push(model_material);
 
@@ -51,16 +51,9 @@ pub fn generate_sphere(points_in_circle: u32, model_material: material::Material
 	let step_tx = 1.0_f32 / (points_in_circle as f32);
     let step_ty = 2.0_f32 / (points_in_circle as f32);
 
-    model.vertex_buffer.push(
-        Vertex::new(&Vector3::new(0.0_f32, -1.0_f32, 0.0_f32),
-                    &Vector2::new(0.5_f32 * k,  0.0_f32),
-                    &Vector3::new(0.0_f32, -1.0_f32, 0.0_f32)));
-
     let mut ty = 0.0_f32;
     let mut angle_b = rad(-consts::PI / 2.0_f32);
-    for _ in 1 .. points_in_circle / 2 {
-        ty += step_ty;
-		angle_b = angle_b + step_angle;
+    for _ in 0 .. points_in_circle / 2 + 1 {
         let (y, radius) = sin_cos(angle_b);
 
         let mut tx = 0.0_f32;
@@ -78,17 +71,15 @@ pub fn generate_sphere(points_in_circle: u32, model_material: material::Material
             tx += step_tx;
             angle_a = angle_a + step_angle;
 		}
+        ty += step_ty;
+		angle_b = angle_b + step_angle;
 	}
-    model.vertex_buffer.push(
-        Vertex::new(&Vector3::new(0.0_f32, 1.0_f32, 0.0_f32),
-                    &Vector2::new(0.5_f32 * k, 1.0_f32 * k),
-                    &Vector3::new(0.0_f32, 1.0_f32, 0.0_f32)));
 
     let mut mesh = Mesh::new();
     mesh.material_id = 0;
 
-    for ix in 0 .. (points_in_circle / 2 - 2) {
-		let z1 = ix * (points_in_circle + 1) + 1;
+    for ix in 0 .. points_in_circle / 2 {
+		let z1 = ix * (points_in_circle + 1);
 		let z2 = z1 + (points_in_circle + 1);
 		for iy in 0 .. points_in_circle {
 			mesh.index_buffer.push((z1 + iy)  as u32);
@@ -100,18 +91,6 @@ pub fn generate_sphere(points_in_circle: u32, model_material: material::Material
             mesh.index_buffer.push((z2 + iy)  as u32);
 		}
 	}
-
-    let z1 = 0;
-    let z2 = model.vertex_buffer.len() as u32 - 1;
-    for ix in 0 .. points_in_circle {
-        mesh.index_buffer.push(z1);
-        mesh.index_buffer.push(z1 + ix + 1);
-        mesh.index_buffer.push(z1 + ix + 2);
-
-        mesh.index_buffer.push(z2);
-        mesh.index_buffer.push(z2 - ix - 1);
-        mesh.index_buffer.push(z2 - ix - 2);
-    }
     model.mesh_list.push(mesh);
 
     Ok(model)
