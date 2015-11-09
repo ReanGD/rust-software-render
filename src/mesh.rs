@@ -73,7 +73,7 @@ impl Mesh {
                 let n = p.normal;
                 let t = p.tex;
 
-                shader.reset(Vector4::<f32>::new(v.x, v.y, v.z, 1.0_f32), Vector4::<f32>::new(n.x, n.y, n.z, 1.0_f32), t);
+                shader.reset(Vector4::<f32>::new(v.x, v.y, v.z, 1.0_f32), Vector4::<f32>::new(n.x, n.y, n.z, 0.0_f32), t);
                 let p_screen = vertex_func(shader);
                 if is_cubemap {
                     shader.vertex_out2_base = shader.vertex_out_len;
