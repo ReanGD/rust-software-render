@@ -3,7 +3,8 @@ use cgmath::{Vector3, Vector4, Matrix4};
 use texture::{Surface, TextureCube};
 
 pub const MATRIX_PROJ_VIEW_WORLD: usize = 0;
-pub const MATRIX_WORLD: usize = 1;
+pub const MATRIX_VIEW_WORLD: usize = 1;
+pub const MATRIX_WORLD: usize = 2;
 
 pub const IN_VS_VEC_POS: usize = 0;
 pub const IN_VS_VEC_NORM: usize = 4;
@@ -18,7 +19,7 @@ pub type ShadersPixel = [fn(&Shader) -> Vector3<f32>; 2];
 pub type ShadersType = (ShadersVertex, ShadersPixel);
 
 pub struct Shader {
-    pub matrix_arr: [Matrix4<f32>; 2], // see MATRIX_*
+    pub matrix_arr: [Matrix4<f32>; 3], // see MATRIX_*
     pub in_vertex_data: Vec<f32>,      // see IN_VS_*
     pub out_vertex_data: [f32; MAX_OUT_VALUES],
     pub in_pixel_data: [f32; MAX_OUT_VALUES],

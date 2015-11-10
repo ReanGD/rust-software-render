@@ -13,7 +13,7 @@ impl Shader {
         };
 
         Shader {
-            matrix_arr: [Matrix4::<f32>::zero(); 2],
+            matrix_arr: [Matrix4::<f32>::zero(); 3],
             in_vertex_data: vec![0.0_f32; 18],
             out_vertex_data: [0.0_f32; MAX_OUT_VALUES],
             in_pixel_data: [0.0_f32; MAX_OUT_VALUES],
