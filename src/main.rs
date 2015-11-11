@@ -25,13 +25,14 @@ pub fn main() {
     let eye;
     let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
     let center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
-    let model;
+    let mut model;
     let init_matrix;
-    let shader_type = shader::ShaderType::Lambert;
-    let model_index = 1;
+    let shader_type = shader::ShaderType::CookTorrance;
+    let model_index = 2;
 
     let mut angle = rad(0.0_f32);
     let add_angle;
+    let cube_map_path = utils::get_base_dir().unwrap().join("cubemap/3/");
     // let mut add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
     match model_index {
         0 => {
@@ -41,11 +42,29 @@ pub fn main() {
             let mut mat = material::Material::new();
             mat.create_texture(utils::get_base_dir().unwrap().join("lego.png").as_path()).unwrap();
             model = generator::generate_plane(mat).unwrap();
+            model.add_texture_cube(&cube_map_path, "jpg").unwrap();
         },
         1 => {
+            eye = Point3::new(0.0_f32, 1.5_f32, -1.5_f32);
+            add_angle = rad(0.01_f32);
+            let mut mat = material::Material::new();
+            mat.create_texture(utils::get_base_dir().unwrap().join("lego.png").as_path()).unwrap();
+            model = generator::generate_sphere(40, mat).unwrap();
+            model.add_texture_cube(&cube_map_path, "jpg").unwrap();
+            init_matrix = model.to_center_matrix();
+        },
+        2 => {
             eye = Point3::new(0.0_f32, 0.3_f32, 0.6_f32);
-            add_angle = rad(0.0_f32);
+            add_angle = rad(0.01_f32);
             model = ModelObj::load(std::path::Path::new("monster/monster.obj")).unwrap();
+            model.add_texture_cube(&cube_map_path, "jpg").unwrap();
+            init_matrix = model.to_center_matrix();
+        },
+        3 => {
+            eye = Point3::new(0.0_f32, 0.25_f32, 0.75_f32);
+            add_angle = rad(0.01_f32);
+            model = ModelObj::load(std::path::Path::new("ring.obj")).unwrap();
+            model.add_texture_cube(&cube_map_path, "jpg").unwrap();
             init_matrix = model.to_center_matrix();
         },
         _ => return

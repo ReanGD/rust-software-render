@@ -14,7 +14,7 @@ impl Shader {
     fn vertex_cook_torrance_color(&mut self) -> Vector4<f32> {
         let pos_pvw = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
         let pos_w = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
-        let norm = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_NORM)).normalize();
+        let norm = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_NORM).normalize()).normalize();
         let view = self.read_vec4(IN_VS_VEC_EYE_POS).sub_v(&pos_w).normalize();
 
         self.out_vec3_from4(&view);
