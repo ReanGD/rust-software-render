@@ -14,7 +14,8 @@ mod rasterization {
         let mut cbuffer: Vec<u32> = vec![0; x_size * y_size];
         let mut zbuffer: Vec<f32> = vec![0.0_f32; x_size * y_size];
         let mut shader = Shader::new(ShaderType::Default);
-        triangle(&mut cbuffer, &mut zbuffer, x_size, y_size, [a, b, c], [[0.0_f32;MAX_OUT_VALUES]; 3], 0, &mut shader);
+        shader.vertex_out_len = 3;
+        triangle(&mut cbuffer, &mut zbuffer, x_size, y_size, [a, b, c], [[0.0_f32;MAX_OUT_VALUES]; 3], &mut shader);
 
         println!("");
         println!("real: ");
