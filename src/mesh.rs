@@ -92,7 +92,7 @@ impl Mesh {
                 let v = self.vertex_buffer[indexes[i] as usize].position;
                 let n = self.vertex_buffer[indexes[i] as usize].normal;
 
-                shader.reset(Vector4::<f32>::new(v.x, v.y, v.z, 1.0_f32), Vector4::<f32>::new(n.x, n.y, n.z, 1.0_f32));
+                shader.reset(Vector4::<f32>::new(v.x, v.y, v.z, 1.0_f32), Vector4::<f32>::new(n.x, n.y, n.z, 0.0_f32));
                 let p_screen = vertex_func(shader);
                 vertex_out_len = shader.vertex_out_len;
                 let inverse_w = 1.0_f32 / p_screen.w;
@@ -100,7 +100,7 @@ impl Mesh {
                 for ind in 0..vertex_out_len {
                     vertex_out[i][ind] = shader.out_vertex_data[ind] * inverse_w;
                 }
-                
+
                 points[i] = Point3::new(
                     (p_screen.x * inverse_w + 1.0_f32) * device.x_size as f32 * 0.5_f32,
                     (p_screen.y * inverse_w + 1.0_f32) * device.y_size as f32 * 0.5_f32,
@@ -117,7 +117,7 @@ impl Mesh {
             // if d < 0.0_f32 {
             //     continue;
             // }
-            
+
             triangle(&mut device.cbuffer,
                      &mut device.zbuffer,
                      device.x_size,
