@@ -1,4 +1,4 @@
-use cgmath::{Vector2, Vector3, Vector4, Matrix4};
+use cgmath::{Vector2, Vector3, Vector4, Matrix, Matrix4};
 use shader::base::*;
 use material::Material;
 

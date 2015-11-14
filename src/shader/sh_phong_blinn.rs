@@ -40,7 +40,7 @@ impl Shader {
         let diffuse = self.diffuse.mul_s(cos_nl);
         let specular = self.specular.mul_s(cos_nh.powi(POWER));
 
-        ambient + diffuse + specular
+        ambient.add_v(&diffuse).add_v(&specular)
     }
 
     // out:
@@ -85,6 +85,6 @@ impl Shader {
         let diffuse = color.mul_s(cos_nl);
         let specular = self.specular.mul_s(cos_nh.powi(POWER));
 
-        ambient + diffuse + specular
+        ambient.add_v(&diffuse).add_v(&specular)
     }
 }

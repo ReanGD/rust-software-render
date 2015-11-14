@@ -10,7 +10,7 @@ impl Shader {
         let norm = self.matrix_arr[MATRIX_VIEW_WORLD]
             // .invert().unwrap()
             .mul_v(&self.read_vec4(IN_VS_VEC_NORM).normalize()).normalize();
-        let reflection = eye - norm.mul_s(norm.dot(&eye) * 2.0_f32);
+        let reflection = eye.sub_v(&norm.mul_s(norm.dot(&eye) * 2.0_f32));
 
         self.out_vec3_from4(&reflection)
     }
