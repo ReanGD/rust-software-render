@@ -85,7 +85,7 @@ impl Shader {
         self.out_vertex_data[self.vertex_out_len + 2] = val.z;
         self.vertex_out_len += 3;
     }
-    
+
     fn out_f32(&mut self, val: f32) {
         self.out_vertex_data[self.vertex_out_len] = val;
         self.vertex_out_len += 1;
@@ -131,7 +131,7 @@ impl Shader {
         let ambient = self.ambient.mul_s(self.ambient_intensity);
         let diffuse = self.diffuse.mul_s(cos_nl.max(0.0_f32));
 
-        ambient + diffuse
+        ambient.add_v(&diffuse)
     }
 
     // out:
@@ -167,7 +167,7 @@ impl Shader {
         let diffuse = self.diffuse.mul_s(cos_nl);
         let specular = self.specular.mul_s(cos_nh.powi(POWER));
 
-        ambient + diffuse + specular
+        ambient.add_v(&diffuse).add_v(&specular)
     }
 
     // out:
@@ -197,7 +197,7 @@ impl Shader {
 
         const ROUGHNESS: f32 = 0.3_f32;
         const ROUGHNESS_SQ: f32 = ROUGHNESS * ROUGHNESS;
-        
+
         let cos_hn = half.dot(&norm).max(0.0000001_f32);
         let cos_hn_sq = cos_hn * cos_hn;
         let cos_vn = view.dot(&norm).max(0.0_f32);
@@ -213,7 +213,7 @@ impl Shader {
         let ambient = self.ambient.mul_s(self.ambient_intensity);
         let specular = self.specular.mul_s(k);
         let diffuse_specular = self.diffuse.add_v(&specular).mul_s(cos_ln.max(0.0_f32));
-        
-        ambient + diffuse_specular
+
+        ambient.add_v(&diffuse_specular)
     }
 }
