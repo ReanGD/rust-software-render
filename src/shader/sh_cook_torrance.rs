@@ -50,7 +50,7 @@ impl Shader {
         let specular = self.specular.mul_s(k);
         let diffuse_specular = self.diffuse.add_v(&specular).mul_s(cos_ln.max(0.0_f32));
 
-        ambient + diffuse_specular
+        ambient.add_v(&diffuse_specular)
     }
 
     // out:
@@ -106,6 +106,6 @@ impl Shader {
         let specular = self.specular.mul_s(k);
         let diffuse_specular = color.add_v(&specular).mul_s(cos_ln.max(0.0_f32));
 
-        ambient + diffuse_specular
+        ambient.add_v(&diffuse_specular)
     }
 }

@@ -160,9 +160,9 @@ impl Model {
             let center = self.min.add_v(&size.mul_s(0.5_f32));
             let mat_move = Matrix4::from_translation(&center.mul_s(-1.0_f32));
             let mat_scale = Matrix4::from(Matrix3::from_diagonal(&scale));
-            mat_scale * mat_move
+            mat_scale.mul_m(&mat_move)
         } else {
-            Matrix4::identity()
+            Matrix4::one()
         }
     }
 }

@@ -61,6 +61,6 @@ pub fn main() {
 
     while scene.start(0xAAAAAA) {
         angle = angle + add_angle;
-        scene.draw(&model, Matrix4::from(Matrix3::from_angle_y(angle)) * init_matrix, &mut shader).present();
+        scene.draw(&model, Matrix4::from(Matrix3::from_angle_y(angle)).mul_m(&init_matrix), &mut shader).present();
     }
 }

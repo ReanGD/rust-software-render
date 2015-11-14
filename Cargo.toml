@@ -5,8 +5,8 @@ authors = ["ReanGD"]
 
 [dependencies]
 time = "0.1.32"
-sdl2 = "0.9.1"
-cgmath = "0.3.1"
+sdl2 = "0.10.0"
+cgmath = "0.4.0"
 obj = "0.3.0"
 genmesh = "0.3.*"
-sdl2_image = "0.3.0"
+sdl2_image = "0.4.0"

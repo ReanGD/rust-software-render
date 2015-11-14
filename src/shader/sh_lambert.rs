@@ -26,7 +26,7 @@ impl Shader {
         let ambient = self.ambient.mul_s(self.ambient_intensity);
         let diffuse = self.diffuse.mul_s(cos_nl.max(0.0_f32));
 
-        ambient + diffuse
+        ambient.add_v(&diffuse)
     }
 
     // out:
@@ -58,6 +58,6 @@ impl Shader {
         let ambient = color.mul_s(self.ambient_intensity);
         let diffuse = color.mul_s(cos_nl.max(0.0_f32));
 
-        ambient + diffuse
+        ambient.add_v(&diffuse)
     }
 }
