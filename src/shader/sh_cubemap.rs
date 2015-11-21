@@ -6,9 +6,7 @@ impl Shader {
     // 0 - Vector3 reflection
     pub fn vertex_cubemap(&mut self) {
         let eye = self.matrix_arr[MATRIX_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS)).normalize();
-        // let view = self.read_vec4(IN_VS_VEC_EYE_POS).sub_v(&pos_w).normalize();
         let norm = self.matrix_arr[MATRIX_VIEW_WORLD]
-            // .invert().unwrap()
             .mul_v(&self.read_vec4(IN_VS_VEC_NORM).normalize()).normalize();
         let reflection = eye.sub_v(&norm.mul_s(norm.dot(&eye) * 2.0_f32));
 
@@ -66,16 +64,5 @@ impl Shader {
                 .lerp(&base_color, 0.3_f32),
             None => panic!("texture_cube is not set"),
         }
-
-        // reflection.add_s(1.0_f32).mul_s(128.0_f32)
-        // match index {
-        //     0 => Vector3::new(256.0_f32, 0.0_f32, 256.0_f32),
-        //     1 => Vector3::new(0.0_f32, 256.0_f32, 256.0_f32),
-        //     2 => Vector3::new(256.0_f32, 256.0_f32, 0.0_f32),
-        //     3 => Vector3::new(0.0_f32, 0.0_f32, 256.0_f32),
-        //     4 => Vector3::new(0.0_f32, 256.0_f32, 0.0_f32),
-        //     5 => Vector3::new(256.0_f32, 0.0_f32, 0.0_f32),
-        //     _ => Vector3::new(0.0_f32, 0.0_f32, 0.0_f32),
-        // }
     }
 }
