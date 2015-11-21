@@ -31,12 +31,10 @@ pub fn main() {
     let model_index = 1;
 
     let mut angle = rad(0.0_f32);
-    let add_angle;
-    // let mut add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
+    let add_angle = rad(std::f32::consts::PI / 180.0_f32);
     match model_index {
         0 => {
             eye = Point3::new(0.0_f32, 0.0_f32, -0.5_f32);
-            add_angle = rad(0.0_f32);
             init_matrix = Matrix4::from(Matrix3::from_angle_x(rad(std::f32::consts::PI * 0.25_f32)));
             let mut mat = material::Material::new();
             mat.create_texture(utils::get_base_dir().unwrap().join("lego.png").as_path()).unwrap();
@@ -44,7 +42,6 @@ pub fn main() {
         },
         1 => {
             eye = Point3::new(0.0_f32, 0.3_f32, 0.6_f32);
-            add_angle = rad(0.0_f32);
             model = ModelObj::load(std::path::Path::new("monster/monster.obj")).unwrap();
             init_matrix = model.to_center_matrix();
         },
