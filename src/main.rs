@@ -27,26 +27,26 @@ pub fn main() {
     match ind {
         0 => {
             eye = Point3::new(0.0_f32, 0.0_f32, -1.1_f32);
-	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
+	          center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
             color = Vector3::<f32>::new(0xff as f32, 0xd7 as f32, 0x00 as f32);
             path = "ring.3ds";
         },
         1 => {
             eye = Point3::new(0.0_f32, 0.0_f32, -10.1_f32);
-	        center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
+	          center = Point3::new(0.0_f32, 0.0_f32, 0.0_f32);
             color = Vector3::<f32>::new(0xbb as f32, 0xbb as f32, 0xbb as f32);
             path = "tux.3ds";
         },
         2 => {
             eye = Point3::new(0.0_f32, -2.0_f32, -4.1_f32);
-	        center = Point3::new(0.0_f32, -2.0_f32, 0.0_f32);
+	          center = Point3::new(0.0_f32, -2.0_f32, 0.0_f32);
             color = Vector3::<f32>::new(0xbb as f32, 0xbb as f32, 0xbb as f32);
             init_matrix = Matrix4::from(Matrix3::from_angle_x(rad(-1.8_f32)));
             path = "monster.3ds";
         },
         _ => return
     };
-	let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
+	  let up = Vector3::new(0.0_f32, 1.0_f32, 0.0_f32);
 
     let mut angle = rad(0.0_f32);
     let add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
