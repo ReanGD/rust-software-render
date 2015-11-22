@@ -1,0 +1,12 @@
+# Blender MTL File: 'skull.blend'
+# Material Count: 1
+
+newmtl Metal_Gold
+Ns 96.078431
+Ka 0.247250 0.199500 0.074500
+Kd 0.751640 0.606480 0.226480
+Ks 0.628281 0.555802 0.366065
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
