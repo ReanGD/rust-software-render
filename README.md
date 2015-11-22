@@ -1,6 +1,6 @@
 # rust-software-render
 
-[v0.4](https://github.com/ReanGD/rust-software-render/tree/v05) [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg?branch=v05)](https://travis-ci.org/ReanGD/rust-software-render) [![Build status](https://ci.appveyor.com/api/projects/status/y32wy5vu51q9hscm/branch/v05?svg=true)](https://ci.appveyor.com/project/ReanGD/rust-software-render/branch/v05)
+[v0.5](https://github.com/ReanGD/rust-software-render/tree/v05) [![Build Status](https://travis-ci.org/ReanGD/rust-software-render.svg?branch=v05)](https://travis-ci.org/ReanGD/rust-software-render) [![Build status](https://ci.appveyor.com/api/projects/status/y32wy5vu51q9hscm/branch/v05?svg=true)](https://ci.appveyor.com/project/ReanGD/rust-software-render/branch/v05)
 
 Подготовка окружения
 --
