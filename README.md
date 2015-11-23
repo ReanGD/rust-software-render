@@ -86,7 +86,7 @@ cargo run --release
 Ужасный монстр в желеных шортиках:
 ![Монстр](https://github.com/ReanGD/rust-software-render/blob/v05/screenshots/scene_4_3.png "Монстр")
 
-[v0.5](https://github.com/ReanGD/rust-software-render/tree/v05)([статья](http://reangdblog.blogspot.com/2015/11/software-render-rust.html)):
+[v0.5](https://github.com/ReanGD/rust-software-render/tree/v05) ([статья](http://reangdblog.blogspot.com/2015/11/software-render-rust.html)):
 
 Кольцо с кубической текстурой:
 ![Кольцо](https://github.com/ReanGD/rust-software-render/blob/v05/screenshots/scene_5_1.png "Кольцо")
