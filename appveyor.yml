@@ -66,6 +66,8 @@ install:
 
     Copy-Item cargo-nightly-${env:TARGET1}-pc-windows-gnu\cargo\* c:\projects\cargo\ -recurse
 
+    dir c:\projects\rust\bin\
+
     Copy-Item SDL2-${env:SDL_VERSION}\${env:TARGET1}-w64-mingw32\lib\libSDL2.dll.a c:\projects\rust\bin\rustlib\${env:TARGET1}-pc-windows-gnu\lib\
 
     Copy-Item SDL2.dll c:\projects\sdl\
