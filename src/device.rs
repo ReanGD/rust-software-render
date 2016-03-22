@@ -64,10 +64,10 @@ impl Device {
         let renderer = window.renderer().build().unwrap();
 
         let format = sdl2::pixels::PixelFormatEnum::ARGB8888;
-        let texture = renderer.create_texture_streaming(format, (width, height)).unwrap();
+        let texture = renderer.create_texture_streaming(format, width, height).unwrap();
         let size = (width as usize)*(height as usize);
         let cbuffer = vec![0; size];
-        
+
         let mut fps = Fps::new(5);
         fps.start();
 
@@ -84,7 +84,7 @@ impl Device {
 
     pub fn set_title(&mut self, title: &str) {
         let mut window = self.renderer.window_mut().unwrap();
-        window.set_title(&title);
+        window.set_title(&title).unwrap();
     }
 
     pub fn draw_fps(&mut self) {
@@ -99,11 +99,11 @@ impl Device {
         let y_size = self.y_size;
         let x_size = self.x_size;
         self.texture.with_lock(None, |buffer: &mut [u8], pitch: usize| {
-            for y in (0..y_size) {
-                for x in (0..x_size) {
+            for y in 0..y_size {
+                for x in 0..x_size {
                     let offset = y*pitch + x*4;
                     let c = cbuffer[(y_size - y - 1)*x_size + x];
-                    
+
                     buffer[offset + 0] = 0            as u8;
                     buffer[offset + 1] = c            as u8;
                     buffer[offset + 2] = (c >> (8*1)) as u8;
@@ -112,14 +112,14 @@ impl Device {
             }
         }).unwrap();
         self.renderer.clear();
-        let rect = sdl2::rect::Rect::new_unwrap(0, 0, x_size as u32, y_size as u32);
+        let rect = sdl2::rect::Rect::new(0, 0, x_size as u32, y_size as u32);
         self.renderer.copy(&self.texture, None, Some(rect));
         self.renderer.present();
     }
 
     pub fn clear(&mut self, color: u32) {
-        for y in (0..self.y_size) {
-            for x in (0..self.x_size) {
+        for y in 0..self.y_size {
+            for x in 0..self.x_size {
                 self.cbuffer[y*self.x_size+x] = color;
             }
         }
@@ -139,7 +139,7 @@ impl Device {
                 _ => {}
             }
         }
-        
+
         is_continue
     }
 }

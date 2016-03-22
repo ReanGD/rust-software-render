@@ -4,8 +4,8 @@ clone_folder: c:\projects\git
 environment:
   token:
     secure: /VxMVHbl3XzhHfFGCCu81O4JPgI42lbTT+n/opdJ7LW8XMsjgW3ztAPLI3u2TBro
-  RUST_VERSION: rust-1.4.0
-  SDL_VERSION: 2.0.3
+  RUST_VERSION: rust-1.7.0
+  SDL_VERSION: 2.0.4
   matrix:
   - TARGET1: x86_64
     TARGET2: x64

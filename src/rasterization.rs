@@ -29,7 +29,7 @@ pub fn triangle(buffer: &mut Vec<u32>, x_size: usize, y_size: usize, p_a: Point2
         (a.x > max_x && b.x > max_x && c.x > max_x) {
             return;
         }
-    
+
     // steps for line
     let epsilon = 0.0001_f32;
     let step_ab = if a.y - b.y > epsilon {
@@ -68,7 +68,7 @@ pub fn triangle(buffer: &mut Vec<u32>, x_size: usize, y_size: usize, p_a: Point2
     };
     let steps = [step0, step1];
 
-    for i in (0..2) {
+    for i in 0..2 {
         if y_begin[i] < y_end[i] {
             let y_step = y_begin[i] as f32 + 0.5_f32 - point_base[i].y;
             let (x1_step, x2_step) = steps[i];
@@ -78,10 +78,10 @@ pub fn triangle(buffer: &mut Vec<u32>, x_size: usize, y_size: usize, p_a: Point2
             for y in y_begin[i]..y_end[i] {
                 let x1_int = cmp::min(cmp::max(x1 as i32, 0) as usize, x_size - 1);
                 let x2_int = cmp::min(cmp::max(x2 as i32, 0) as usize, x_size);
-                for x in (x1_int..x2_int) {
+                for x in x1_int..x2_int {
                     buffer[y * x_size + x] = color;
                 }
-                
+
                 x1 += x1_step;
                 x2 += x2_step;
             }

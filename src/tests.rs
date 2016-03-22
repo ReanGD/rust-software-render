@@ -8,20 +8,20 @@ mod rasterization {
         let y_size: usize = 5;
         let mut buffer: Vec<u32> = vec![0; x_size * y_size];
         triangle(&mut buffer, x_size, y_size, a, b, c, 1);
-        
+
         println!("");
         println!("real: ");
-        for y in (0..y_size) {
+        for y in 0..y_size {
             print!("   ");
-            for x in (0..x_size) {
+            for x in 0..x_size {
                 print!("{}",if buffer[(y_size - y - 1) * x_size + x]==0 {0} else {1});
             }
             println!("");
         }
         println!("except: ");
-        for y in (0..y_size) {
+        for y in 0..y_size {
             print!("   ");
-            for x in (0..x_size) {
+            for x in 0..x_size {
                 print!("{}",if buffer_except[y * x_size + x]==0 {0} else {1});
             }
             println!("");
@@ -66,7 +66,7 @@ mod rasterization {
                            0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0]);
     }
-    
+
     #[test]
     fn triangle_03() {
         triangle_test(Point2::new(2.5,2.5), Point2::new(2.5,2.5), Point2::new(2.5,2.5),
@@ -76,7 +76,7 @@ mod rasterization {
                            0,0,0,0,0,0,0,
                            0,0,0,0,0,0,0]);
     }
-    
+
     #[test]
     fn triangle_04() {
         triangle_test(Point2::new(0.0,0.0), Point2::new(4.0,0.0), Point2::new(6.0,2.0),
@@ -86,7 +86,7 @@ mod rasterization {
                            0,0,0,0,1,0,0,
                            0,1,1,1,0,0,0]);
     }
-    
+
     #[test]
     fn triangle_05() {
         triangle_test(Point2::new(1.0,2.0), Point2::new(4.0,1.0), Point2::new(3.0,4.0),
