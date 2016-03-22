@@ -30,7 +30,7 @@ pub fn triangle(cbuffer: &mut Vec<u32>, zbuffer: &mut Vec<f32>, x_size: usize, y
         (a.x > max_x && b.x > max_x && c.x > max_x) {
             return;
         }
-    
+
     // steps for line
     let epsilon = 0.0001_f32;
     let step_ab = if a.y - b.y > epsilon {
@@ -69,7 +69,7 @@ pub fn triangle(cbuffer: &mut Vec<u32>, zbuffer: &mut Vec<f32>, x_size: usize, y
     };
     let steps = [step0, step1];
 
-    for i in (0..2) {
+    for i in 0..2 {
         if y_begin[i] < y_end[i] {
             let y_step = y_begin[i] as f32 + 0.5_f32 - point_base[i].y;
             let ((x1_step, z1_step), (x2_step, z2_step)) = steps[i];
@@ -87,7 +87,7 @@ pub fn triangle(cbuffer: &mut Vec<u32>, zbuffer: &mut Vec<f32>, x_size: usize, y
                 if x2_int > x1_int {
                     let z_step = dz / dx;
                     let mut z = z1 + z_step * (x1_int as f32 - x1 - epsilon); // inverse z
-                    for x in (x1_int..x2_int) {
+                    for x in x1_int..x2_int {
                         z += z_step;
                         if zbuffer[y * x_size + x] < z {
                             let clr = shader.pixel();

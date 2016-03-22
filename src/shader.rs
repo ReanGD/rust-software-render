@@ -1,4 +1,5 @@
 use cgmath::*;
+use std::ops::Mul;
 
 pub const MATRIX_PROJ_VIEW_WORLD: usize = 0;
 pub const MATRIX_WORLD: usize = 1;
@@ -49,15 +50,15 @@ impl Shader {
     }
 
     pub fn vertex(&mut self) -> Vector4<f32> {
-        let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
-        let norm = self.matrix_arr[MATRIX_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_NORM)).normalize();
-        self.cos_nl = norm.dot(&self.read_vec4(IN_VS_VEC_NEG_LIGHT)).max(0.0_f32);
+        let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul(&self.read_vec4(IN_VS_VEC_POS));
+        let norm = self.matrix_arr[MATRIX_WORLD].mul(&self.read_vec4(IN_VS_VEC_NORM)).normalize();
+        self.cos_nl = norm.dot(self.read_vec4(IN_VS_VEC_NEG_LIGHT)).max(0.0_f32);
 
         pos
     }
 
     pub fn pixel(&self) -> Vector3<f32> {
-        let color = self.color.mul_s(self.cos_nl.max(self.ambient_intensity));
+        let color = self.color.mul(self.cos_nl.max(self.ambient_intensity));
 
         color
     }

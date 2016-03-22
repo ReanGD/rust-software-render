@@ -15,7 +15,7 @@ use cgmath::*;
 use scene::Scene;
 use shader::Shader;
 use import3ds::Loader3ds;
-
+use std::ops::Mul;
 
 pub fn main() {
     let eye;
@@ -23,7 +23,7 @@ pub fn main() {
     let path;
     let color;
     let ind = 0;
-    let mut init_matrix = Matrix4::<f32>::one();
+    let mut init_matrix = Matrix4::<f32>::from_scale(1.0_f32);
     match ind {
         0 => {
             eye = Point3::new(0.0_f32, 0.0_f32, -1.1_f32);
@@ -60,6 +60,6 @@ pub fn main() {
     let mut shader = Shader::new(color, 0.3_f32);
     while scene.start(0xFFFFFF) {
         angle = angle + add_angle;
-        scene.draw(&model, Matrix4::from(Matrix3::from_angle_y(angle)).mul_m(&init_matrix), &mut shader).present();
+        scene.draw(&model, Matrix4::from(Matrix3::from_angle_y(angle)).mul(&init_matrix), &mut shader).present();
     }
 }

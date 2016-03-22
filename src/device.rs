@@ -75,7 +75,7 @@ impl Device {
         let renderer = window.renderer().build().unwrap();
 
         let format = sdl2::pixels::PixelFormatEnum::ARGB8888;
-        let texture = renderer.create_texture_streaming(format, (width, height)).unwrap();
+        let texture = renderer.create_texture_streaming(format, width, height).unwrap();
         let size = (width as usize)*(height as usize);
         let cbuffer = vec![0; size];
         let zbuffer = vec![0.0_f32; size];
@@ -97,7 +97,7 @@ impl Device {
 
     pub fn set_title(&mut self, title: &str) {
         let mut window = self.renderer.window_mut().unwrap();
-        window.set_title(&title);
+        window.set_title(&title).unwrap();
     }
 
     pub fn update_fps(&mut self, cnt_triangle: u32) {
@@ -117,8 +117,8 @@ impl Device {
             }
         }).unwrap();
         // self.renderer.clear();
-        let rect = sdl2::rect::Rect::new_unwrap(0, 0, x_size as u32, y_size as u32);
-        self.renderer.copy_ex(&self.texture, None, Some(rect), 0.0_f64, None, (false, true));
+        let rect = sdl2::rect::Rect::new(0, 0, x_size as u32, y_size as u32);
+        self.renderer.copy_ex(&self.texture, None, Some(rect), 0.0_f64, None, false, true).unwrap();
         self.renderer.present();
     }
 
@@ -145,7 +145,7 @@ impl Device {
                 _ => {}
             }
         }
-        
+
         is_continue
     }
 }

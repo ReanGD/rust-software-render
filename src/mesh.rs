@@ -2,6 +2,7 @@ use cgmath::*;
 use shader::*;
 use device::Device;
 use rasterization::triangle;
+use std::ops::Sub;
 
 #[derive(Copy,Clone)]
 pub struct Vertex {
@@ -62,7 +63,7 @@ impl Mesh {
             let v0 = vb[ib[ind + 0] as usize].position;
             let v1 = vb[ib[ind + 1] as usize].position;
             let v2 = vb[ib[ind + 2] as usize].position;
-            self.normal_buffer.push(v0.sub_v(&v1).cross(&v0.sub_v(&v2)).normalize());
+            self.normal_buffer.push(v0.sub(&v1).cross(v0.sub(&v2)).normalize());
         }
 
         Ok(())
@@ -73,7 +74,7 @@ impl Mesh {
         for (triangle_index, indexes) in self.index_buffer.chunks(3).enumerate() {
             let norm = self.normal_buffer[triangle_index];
             shader.set_vec4(IN_VS_VEC_NORM, Vector4::new(norm.x, norm.y, norm.z, 0.0_f32));
-            
+
             let mut points: Vec<Point3<f32>> = vec![];
             for i in 0..3 {
                 let v3 = self.vertex_buffer[indexes[i] as usize].position;
@@ -81,7 +82,7 @@ impl Mesh {
                 shader.set_vec4(IN_VS_VEC_POS, v4);
                 let p_screen = shader.vertex();
                 let inverse_w = 1.0_f32 / p_screen.w;
-                
+
                 points.push(
                     Point3::new(
                         (p_screen.x * inverse_w + 1.0_f32) * device.x_size as f32 * 0.5_f32,
@@ -96,7 +97,7 @@ impl Mesh {
             if d > 0.0_f32 {
                 continue;
             }
-            
+
             triangle(&mut device.cbuffer,
                      &mut device.zbuffer,
                      device.x_size,
