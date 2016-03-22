@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["ReanGD"]
 
 [dependencies]
+libc = "0.2.8"
 rand = "0.3.11"
 time = "0.1.34"
 sdl2 = "0.16.1"
