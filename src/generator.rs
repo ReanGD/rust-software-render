@@ -76,7 +76,7 @@ pub fn generate_sphere(cnt_vertex: usize) -> Result<Model, String> {
 	let plg = cnt_vertex / 2 - 1;
 	let vertex_cnt = plg * cnt_vertex + 2;
 	let index_cnt = 6 * cnt_vertex * plg;
-    
+
     let mut vb: Vec<Vertex> = vec![Vertex::new(); vertex_cnt];
     let mut angle_b = rad(-std::f32::consts::PI / 2.0_f32);
 	let step_a = rad(std::f32::consts::PI * 2.0_f32 / (cnt_vertex as f32));
@@ -84,11 +84,13 @@ pub fn generate_sphere(cnt_vertex: usize) -> Result<Model, String> {
     let mut ind = 1;
     for _ in 0 .. plg {
 		angle_b = angle_b + step_b;
-        let (y, radius) = sin_cos(angle_b);
+        let y = angle_b.sin();
+        let radius = angle_b.cos();
 
         let mut angle_a = rad(0.0_f32);
         for _ in 0 .. cnt_vertex {
-            let (sin_a, cos_a) = sin_cos(angle_a);
+            let sin_a = angle_a.sin();
+            let cos_a = angle_a.cos();
 			vb[ind].position = Vector3::new(radius * cos_a, y, radius * sin_a);
 			vb[ind].normal   = Vector3::new(radius * cos_a, y, radius * sin_a).normalize();
             ind += 1;

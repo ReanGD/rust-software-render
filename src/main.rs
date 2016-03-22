@@ -19,7 +19,7 @@ use shader::Shader;
 use material::Material;
 use generator::{generate_plane, generate_sphere};
 use import3ds::Loader3ds;
-
+use std::ops::Mul;
 
 pub fn main() {
     let eye;
@@ -27,7 +27,7 @@ pub fn main() {
     let model;
     let ind = 0;
     let mut material = Material::gold();
-    let mut init_matrix = Matrix4::<f32>::one();
+    let mut init_matrix = Matrix4::<f32>::from_scale(1.0_f32);
     let add_angle = rad(2.0_f32 * std::f32::consts::PI / 180.0_f32);
     let light = Vector3::new(1.0_f32, -1.0_f32, 1.0_f32);
     match ind {
@@ -77,6 +77,6 @@ pub fn main() {
     // shader.set_shaders(Shader::vertex_normals, Shader::pixel_normals);
     while scene.start(0xAAAAAA) {
         angle = angle + add_angle;
-        scene.draw(&model, Matrix4::from(Matrix3::from_angle_y(angle)).mul_m(&init_matrix), &mut shader).present();
+        scene.draw(&model, Matrix4::from(Matrix3::from_angle_y(angle)).mul(&init_matrix), &mut shader).present();
     }
 }

@@ -2,6 +2,7 @@ use cgmath::*;
 use shader::*;
 use device::Device;
 use rasterization::triangle;
+use std::ops::{Sub, Add};
 
 #[derive(Copy,Clone)]
 pub struct Vertex {
@@ -67,15 +68,15 @@ impl Mesh {
             let v0 = self.vertex_buffer[v0_ind].position;
             let v1 = self.vertex_buffer[v1_ind].position;
             let v2 = self.vertex_buffer[v2_ind].position;
-            // let normal = v1.sub_v(&v0).cross(&(v2.sub_v(&v1)));
-            let normal = v2.sub_v(&v1).cross(&(v1.sub_v(&v0)));
-            self.vertex_buffer[v0_ind].normal.add_self_v(&normal);
-            self.vertex_buffer[v1_ind].normal.add_self_v(&normal);
-            self.vertex_buffer[v2_ind].normal.add_self_v(&normal);
+            // let normal = v1.sub_v(&v0).cross(v2.sub_v(&v1));
+            let normal = v2.sub(&v1).cross(v1.sub(&v0));
+            self.vertex_buffer[v0_ind].normal = self.vertex_buffer[v0_ind].normal.add(normal);
+            self.vertex_buffer[v1_ind].normal = self.vertex_buffer[v1_ind].normal.add(normal);
+            self.vertex_buffer[v2_ind].normal = self.vertex_buffer[v2_ind].normal.add(normal);
         }
 
         for vertex in &mut self.vertex_buffer {
-            vertex.normal.normalize_self();
+            vertex.normal = vertex.normal.normalize();
         }
 
         Ok(())
