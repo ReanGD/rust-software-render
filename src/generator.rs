@@ -1,6 +1,6 @@
 use material;
 use std::f32::consts;
-use cgmath::{Vector2, Vector3, EuclideanVector, rad, sin_cos};
+use cgmath::{Vector2, Vector3, EuclideanVector, rad, Angle};
 use mesh::{Vertex, Mesh, Model};
 
 pub fn generate_plane(model_material: material::Material) -> Result<Model, String> {
@@ -54,7 +54,7 @@ pub fn generate_sphere(points_in_circle: u32, model_material: material::Material
     let mut ty = 0.0_f32;
     let mut angle_b = rad(-consts::PI / 2.0_f32);
     for _ in 0 .. points_in_circle / 2 + 1 {
-        let (y, radius) = sin_cos(angle_b);
+        let (y, radius) = angle_b.sin_cos();
 
         let mut tx = 0.0_f32;
         let mut angle_a = rad(0.0_f32);
@@ -63,7 +63,7 @@ pub fn generate_sphere(points_in_circle: u32, model_material: material::Material
                 tx = 1.0_f32;
                 angle_a = rad(0.0_f32);
             }
-            let (sin_a, cos_a) = sin_cos(angle_a);
+            let (sin_a, cos_a) = angle_a.sin_cos();
             model.vertex_buffer.push(
                 Vertex::new(&Vector3::new(radius * cos_a, y, radius * sin_a),
                             &Vector2::new(tx * k, ty * k),

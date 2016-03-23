@@ -1,5 +1,6 @@
-use cgmath::{Vector3, Vector4, Matrix};
+use cgmath::{Vector3, Vector4};
 use shader::base::*;
+use std::ops::Mul;
 
 impl Shader {
     pub fn shader_default() -> ShadersType {
@@ -9,7 +10,7 @@ impl Shader {
 
     // out:
     fn vertex_default_color(&mut self) -> Vector4<f32> {
-        let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS));
+        let pos = self.matrix_arr[MATRIX_PROJ_VIEW_WORLD].mul(self.read_vec4(IN_VS_VEC_POS));
 
         pos
     }

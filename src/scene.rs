@@ -1,4 +1,5 @@
 use cgmath::*;
+use std::ops::Mul;
 use mesh::Model;
 use device::Device;
 use shader::*;
@@ -26,14 +27,14 @@ impl Scene {
         }
     }
 
-    pub fn proj<A: Angle<f32>>(&mut self, fovy: A, near: f32, far: f32) -> &mut Scene {
+    pub fn proj<A: Into<Rad<f32>>>(&mut self, fovy: A, near: f32, far: f32) -> &mut Scene {
         let aspect = self.device.x_size as f32 / self.device.y_size as f32;
         self.mat_proj = perspective(fovy, aspect, near, far);
         self
     }
 
     pub fn view(&mut self, eye: Point3<f32>, center: Point3<f32>, up: Vector3<f32>) -> &mut Scene {
-        self.mat_view = Matrix4::<f32>::look_at(&eye, &center, &up);
+        self.mat_view = Matrix4::<f32>::look_at(eye, center, up);
         self.vec_eye_pos = Vector4::new(eye.x, eye.y, eye.z, 1.0_f32);
 
         self
@@ -57,14 +58,13 @@ impl Scene {
             self.cnt_triangle = 0;
             true
         } else {
-            self.device.exit();
             false
         }
     }
 
     pub fn draw(&mut self, mesh: &Model, mat_world: Matrix4<f32>, shader: &mut Shader) -> &mut Scene {
-        shader.set_matrix(MATRIX_PROJ_VIEW_WORLD, self.mat_proj.mul_m(&self.mat_view).mul_m(&mat_world));
-        shader.set_matrix(MATRIX_VIEW_WORLD, self.mat_view.mul_m(&mat_world));
+        shader.set_matrix(MATRIX_PROJ_VIEW_WORLD, self.mat_proj.mul(&self.mat_view).mul(&mat_world));
+        shader.set_matrix(MATRIX_VIEW_WORLD, self.mat_view.mul(&mat_world));
         shader.set_matrix(MATRIX_WORLD, mat_world);
         shader.set_vec4(IN_VS_VEC_NEG_LIGHT, self.vec_light);
         shader.set_vec4(IN_VS_VEC_EYE_POS, self.vec_eye_pos);
