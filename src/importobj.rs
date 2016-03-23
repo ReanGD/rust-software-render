@@ -4,10 +4,11 @@ use material;
 use std::rc::Rc;
 use genmesh::Polygon;
 use std::path::{Path, PathBuf};
-use cgmath::{Vector, Vector2, Vector3};
+use cgmath::{Vector2, Vector3};
 use mesh::{Model, Mesh, Vertex};
 use obj::{Obj, Material, IndexTuple, load};
 use memory::cast_to;
+use std::ops::Mul;
 
 pub struct ModelObj<'a> {
     model_dir: PathBuf,
@@ -72,15 +73,15 @@ impl<'a> ModelObj<'a> {
                     Some(m) => {
                         let mut mat = material::Material::new();
                         match m.ka {
-                            Some(v) => mat.ambient = Vector3::new(v[0], v[1], v[2]).mul_s(255.0_f32),
+                            Some(v) => mat.ambient = Vector3::new(v[0], v[1], v[2]).mul(255.0_f32),
                             None => {},
                         };
                         match m.kd {
-                            Some(v) => mat.diffuse = Vector3::new(v[0], v[1], v[2]).mul_s(255.0_f32),
+                            Some(v) => mat.diffuse = Vector3::new(v[0], v[1], v[2]).mul(255.0_f32),
                             None => {},
                         };
                         match m.ks {
-                            Some(v) => mat.specular = Vector3::new(v[0], v[1], v[2]).mul_s(255.0_f32),
+                            Some(v) => mat.specular = Vector3::new(v[0], v[1], v[2]).mul(255.0_f32),
                             None => {},
                         };
                         match m.map_kd {

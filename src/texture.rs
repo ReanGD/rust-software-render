@@ -4,6 +4,7 @@ use cgmath::*;
 use std::rc::Rc;
 use std::path::Path;
 use sdl2_image::LoadSurface;
+use std::ops::{Add, Mul, Div};
 
 pub struct Surface {
     pub size_x: usize,
@@ -53,12 +54,12 @@ impl Surface {
 
         let ind = y_int * self.size_x + x_int;
 
-        self.data[ind].mul_s(1.0_f32 - dx).
-            add_v(&self.data[ind + add_x].mul_s(dx)).
-            mul_s(1.0_f32 - dy).
-            add_v(&self.data[ind + add_y].mul_s(1.0_f32 - dx).
-                  add_v(&self.data[ind + add_x + add_y].mul_s(dx)).
-                  mul_s(dy))
+        self.data[ind].mul(1.0_f32 - dx).
+            add(&self.data[ind + add_x].mul(dx)).
+            mul(1.0_f32 - dy).
+            add(&self.data[ind + add_y].mul(1.0_f32 - dx).
+                  add(&self.data[ind + add_x + add_y].mul(dx)).
+                  mul(dy))
     }
 }
 
@@ -123,7 +124,7 @@ impl Texture {
     fn add_color(clr: &mut Vector3<f32>, src: &Surface, x: i32, y: i32, k: u32) -> u32 {
         if x >= 0 && y >= 0 && x < (src.size_x as i32) && y < (src.size_y as i32) {
             let ind = (y as usize) * src.size_x + x as usize;
-            clr.add_self_v(&src.data[ind].mul_s(k as f32));
+            *clr = clr.add(&src.data[ind].mul(k as f32));
             k
         } else {
             0
@@ -166,7 +167,7 @@ impl Texture {
                             cnt += f( 0,  1, 2);
                             cnt += f( 1,  1, 1);
                         }
-                        dst.push(clr.div_s(cnt as f32));
+                        dst.push(clr.div(cnt as f32));
                     }
                 }
             }

@@ -26,10 +26,10 @@ sudo apt-get install libsdl2-dev libsdl2-image-dev
 ```
 
 Для Windows:
-- качаем [SDL2-devel-2.0.3-mingw.tar.gz](https://www.libsdl.org/release/SDL2-devel-2.0.3-mingw.tar.gz), распаковываем, ищем файл SDL2-2.0.3\TARGET-w64-mingw32\lib\libSDL2.dll.a и копируем его в RUST_PATH\bin\rustlib\TARGET-pc-windows-gnu\lib\
-- качаем [SDL2-2.0.3-win32-x86.zip](https://www.libsdl.org/release/SDL2-2.0.3-win32-x86.zip) или [SDL2-2.0.3-win32-x64.zip](https://www.libsdl.org/release/SDL2-2.0.3-win32-x64.zip) в зависимости от платформы, распаковываем и кладем либо в директорию, которая находится в PATH, либо рядом с exe который получится после компиляции проекта
-- качаем [SDL2_image-devel-2.0.0-mingw.tar.gz](https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.0-mingw.tar.gz), распаковываем, ищем файл SDL2_image-2.0.0\TARGET-w64-mingw32\lib\libSDL2_image.dll.a и копируем его в RUST_PATH\bin\rustlib\TARGET-pc-windows-gnu\lib\
-- качаем [SDL2_image-2.0.0-win32-x86.zip](https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.0-win32-x86.zip) или [SDL2_image-2.0.0-win32-x64.zip](https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.0-win32-x64.zip) в зависимости от платформы, распаковываем и кладем либо в директорию, которая находится в PATH, либо рядом с exe который получится после компиляции проекта
+- качаем [SDL2-devel-2.0.4-mingw.tar.gz](https://www.libsdl.org/release/SDL2-devel-2.0.4-mingw.tar.gz), распаковываем, ищем файл SDL2-2.0.4\TARGET-w64-mingw32\lib\libSDL2.dll.a и копируем его в RUST_PATH\lib\rustlib\TARGET-pc-windows-gnu\lib\
+- качаем [SDL2-2.0.4-win32-x86.zip](https://www.libsdl.org/release/SDL2-2.0.4-win32-x86.zip) или [SDL2-2.0.4-win32-x64.zip](https://www.libsdl.org/release/SDL2-2.0.4-win32-x64.zip) в зависимости от платформы, распаковываем и кладем либо в директорию, которая находится в PATH, либо рядом с exe который получится после компиляции проекта
+- качаем [SDL2_image-devel-2.0.1-mingw.tar.gz](https://www.libsdl.org/projects/SDL_image/release/SDL2_image-devel-2.0.1-mingw.tar.gz), распаковываем, ищем файл SDL2_image-2.0.1\TARGET-w64-mingw32\lib\libSDL2_image.dll.a и копируем его в RUST_PATH\lib\rustlib\TARGET-pc-windows-gnu\lib\
+- качаем [SDL2_image-2.0.1-win32-x86.zip](https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.1-win32-x86.zip) или [SDL2_image-2.0.1-win32-x64.zip](https://www.libsdl.org/projects/SDL_image/release/SDL2_image-2.0.1-win32-x64.zip) в зависимости от платформы, распаковываем и кладем либо в директорию, которая находится в PATH, либо рядом с exe который получится после компиляции проекта
 - для x86 платформы качаем [gcc-core-4.8.1-4-mingw32-dll.tar.lzma](http://sourceforge.net/projects/mingw/files/MinGW/Base/gcc/Version4/gcc-4.8.1-4/gcc-core-4.8.1-4-mingw32-dll.tar.lzma), распоковываем и libgcc_s_dw2-1.dll кладем либо в директорию, которая находится в PATH, либо рядом с exe который получится после компиляции проекта
 
 Готовые сборки:

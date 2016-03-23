@@ -18,17 +18,17 @@ mod rasterization {
 
         println!("");
         println!("real: ");
-        for y in (0..y_size) {
+        for y in 0..y_size {
             print!("   ");
-            for x in (0..x_size) {
+            for x in 0..x_size {
                 print!("{}",if cbuffer[(y_size - y - 1) * x_size + x]==0 {0} else {1});
             }
             println!("");
         }
         println!("except: ");
-        for y in (0..y_size) {
+        for y in 0..y_size {
             print!("   ");
-            for x in (0..x_size) {
+            for x in 0..x_size {
                 print!("{}",if buffer_except[y * x_size + x]==0 {0} else {1});
             }
             println!("");

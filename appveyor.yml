@@ -4,9 +4,9 @@ clone_folder: c:\projects\git
 environment:
   token:
     secure: /VxMVHbl3XzhHfFGCCu81O4JPgI42lbTT+n/opdJ7LW8XMsjgW3ztAPLI3u2TBro
-  RUST_VERSION: rust-1.4.0
-  SDL_VERSION: 2.0.3
-  SDL_IMAGE_VERSION: 2.0.0
+  RUST_VERSION: rust-1.7.0
+  SDL_VERSION: 2.0.4
+  SDL_IMAGE_VERSION: 2.0.1
   matrix:
   - TARGET1: x86_64
     TARGET2: x64
@@ -77,9 +77,9 @@ install:
 
     Copy-Item cargo-nightly-${env:TARGET1}-pc-windows-gnu\cargo\* c:\projects\cargo\ -recurse
 
-    Copy-Item SDL2-${env:SDL_VERSION}\${env:TARGET1}-w64-mingw32\lib\libSDL2.dll.a c:\projects\rust\bin\rustlib\${env:TARGET1}-pc-windows-gnu\lib\
+    Copy-Item SDL2-${env:SDL_VERSION}\${env:TARGET1}-w64-mingw32\lib\libSDL2.dll.a c:\projects\rust\lib\rustlib\${env:TARGET1}-pc-windows-gnu\lib\
 
-    Copy-Item SDL2_image-${env:SDL_IMAGE_VERSION}\${env:TARGET1}-w64-mingw32\lib\libSDL2_image.dll.a c:\projects\rust\bin\rustlib\${env:TARGET1}-pc-windows-gnu\lib\
+    Copy-Item SDL2_image-${env:SDL_IMAGE_VERSION}\${env:TARGET1}-w64-mingw32\lib\libSDL2_image.dll.a c:\projects\rust\lib\rustlib\${env:TARGET1}-pc-windows-gnu\lib\
 
     Copy-Item *.dll c:\projects\sdl\
 

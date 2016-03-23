@@ -3,6 +3,7 @@ use shader::*;
 use device::Device;
 use material::Material;
 use rasterization::triangle;
+use std::ops::{Sub, Add, Mul};
 
 #[derive(Copy,Clone)]
 pub struct Vertex {
@@ -91,13 +92,13 @@ impl Mesh {
             shader.texture = match material.texture {
                 Some(ref texture) => {
                     let ba_pixel = Vector2::new(points_2d[1].x, points_2d[1].y)
-                        .sub_v(&Vector2::new(points_2d[0].x, points_2d[0].y));
+                        .sub(Vector2::new(points_2d[0].x, points_2d[0].y));
                     let ca_pixel = Vector2::new(points_2d[2].x, points_2d[2].y)
-                        .sub_v(&Vector2::new(points_2d[0].x, points_2d[0].y));
+                        .sub(Vector2::new(points_2d[0].x, points_2d[0].y));
 
                     let tex_size = texture.size;
-                    let ba_texel = tex_coord[1].sub_v(&tex_coord[0]).mul_v(&tex_size);
-                    let ca_texel = tex_coord[2].sub_v(&tex_coord[0]).mul_v(&tex_size);
+                    let ba_texel = tex_coord[1].sub(tex_coord[0]).mul(&tex_size);
+                    let ca_texel = tex_coord[2].sub(tex_coord[0]).mul(&tex_size);
                     // cross product in 2d = 2 * square of triangle
                     let sq_pixel = ba_pixel.x * ca_pixel.y - ba_pixel.y * ca_pixel.x;
                     let sq_texel = ba_texel.x * ca_texel.y - ba_texel.y * ca_texel.x;
@@ -155,14 +156,14 @@ impl Model {
 
     pub fn to_center_matrix(&self) -> Matrix4<f32> {
         if self.normalize {
-            let size = self.max.sub_v(&self.min);
+            let size = self.max.sub(&self.min);
             let scale = Vector3::from_value(1.0_f32/(size.x.max(size.y).max(size.z)));
-            let center = self.min.add_v(&size.mul_s(0.5_f32));
-            let mat_move = Matrix4::from_translation(&center.mul_s(-1.0_f32));
-            let mat_scale = Matrix4::from(Matrix3::from_diagonal(&scale));
-            mat_scale.mul_m(&mat_move)
+            let center = self.min.add(&size.mul(0.5_f32));
+            let mat_move = Matrix4::from_translation(center.mul(-1.0_f32));
+            let mat_scale = Matrix4::from(Matrix3::from_diagonal(scale));
+            mat_scale.mul(&mat_move)
         } else {
-            Matrix4::one()
+            Matrix4::from_scale(1.0_f32)
         }
     }
 }
