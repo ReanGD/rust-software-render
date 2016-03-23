@@ -1,14 +1,15 @@
-use cgmath::{Vector, Vector2, Vector3, EuclideanVector, Matrix};
+use cgmath::{Vector, Vector2, Vector3, EuclideanVector};
 use shader::base::*;
+use std::ops::{Sub, Mul};
 
 impl Shader {
     // out:
     // 0 - Vector3 reflection
     pub fn vertex_cubemap(&mut self) {
-        let eye = self.matrix_arr[MATRIX_VIEW_WORLD].mul_v(&self.read_vec4(IN_VS_VEC_POS)).normalize();
+        let eye = self.matrix_arr[MATRIX_VIEW_WORLD].mul(&self.read_vec4(IN_VS_VEC_POS)).normalize();
         let norm = self.matrix_arr[MATRIX_VIEW_WORLD]
-            .mul_v(&self.read_vec4(IN_VS_VEC_NORM).normalize()).normalize();
-        let reflection = eye.sub_v(&norm.mul_s(norm.dot(&eye) * 2.0_f32));
+            .mul(&self.read_vec4(IN_VS_VEC_NORM).normalize()).normalize();
+        let reflection = eye.sub(&norm.mul(norm.dot(eye) * 2.0_f32));
 
         self.out_vec3_from4(&reflection)
     }
@@ -61,7 +62,7 @@ impl Shader {
                 .get_texture(index)
                 .get_surface(lod)
                 .tex_2d_bilinear(coord)
-                .lerp(&base_color, 0.3_f32),
+                .lerp(base_color, 0.3_f32),
             None => panic!("texture_cube is not set"),
         }
     }
